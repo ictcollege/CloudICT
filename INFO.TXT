@@ -25,7 +25,7 @@ Uputstvo za GIT:
     (izuzetak su modeli i baza, zato sto on predstavljaju osnovu za dalji rad).
     Branch je predstavlja poseban odeljak za kod vaseg tima (ako radite sa nekim) u kome
     mozete raditi bilo kakve izmene a da ne uticete na kod iz glavnog branch-a (master).
-    da bi se prebacili na branch koji je odgovoran ya kode na kome treba da radite izvrsavate
+    da bi se prebacili na branch koji je odgovoran za kode na kome treba da radite izvrsavate
     sledecu komandu:
     >cd <put do vaseg root direktorijuma>
     >git checkout <ime brancha na koji se kacite>
