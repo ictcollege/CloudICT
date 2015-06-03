@@ -1,0 +1,41 @@
+Postavljena verzija CodeIgniter-a je 3.0
+
+Folder application je preimenovan u ictcloud.
+Folder system je preimenovan u codeigniter.
+
+Dodati su folderi:
+
+- data (za fajlove) - svaki korisnik ima svoj folder i u njemu files a u njemu Documents itd.
+- database (skripta za bazu)
+- public (za css, js, itd. koje ce da koriste view-ovi)
+- template (za frontend template koji ce kasnije da se cepa na view-ove)
+
+(Svi upiti za dalji postupak nalaze se u database/ictcloud.sql fajlu)
+Potrebno je da kreirate na localhost-u bazu podataka ictcloud.
+U bazi kreirajte korisnika ict sa lozinkom cloud.
+Dodelite korisniku ict sva prava nad bazom ictcloud.
+Ovo je potrebno da se pristupni parametri u ictcloud/config/database.php ne bi menjali.
+
+Pomocu skripte u folderu database cete kreirati tabele i uneti podatke u bazu (kada skripta bude uradjena).
+
+
+Uputstvo za GIT:
+
+    Da bi GIT ispravno radio potrebno je da svaku novu mogucnost stavimo u poseban branch
+    (izuzetak su modeli i baza, zato sto on predstavljaju osnovu za dalji rad).
+    Branch je predstavlja poseban odeljak za kod vaseg tima (ako radite sa nekim) u kome
+    mozete raditi bilo kakve izmene a da ne uticete na kod iz glavnog branch-a (master).
+    da bi se prebacili na branch koji je odgovoran ya kode na kome treba da radite izvrsavate
+    sledecu komandu:
+    >cd <put do vaseg root direktorijuma>
+    >git checkout <ime brancha na koji se kacite>
+
+
+    pre pocetka rada treba da povucete izmene sa komandom:
+    >git pull --rebase
+    ili
+    >git pull
+
+    za vise informacija o GIT-u pogledajte:
+    http://pcottle.github.io/learnGitBranching/ (interaktivni tutorijal za git branching)
+    https://www.atlassian.com/git/ (za sam pocetak)
