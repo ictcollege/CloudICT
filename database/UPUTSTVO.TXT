@@ -1,0 +1,11 @@
+UPUTSTVO:
+U linux shell-u ili windows command prompt-u izvrsite sledecu komandu:
+    mysql -p -u root < ictcloud.sql
+
+NAPOMENA:
+Bitno je da sql skripta bude kopirana u folder na kome ste trenutno pozicionirani
+ili promenite putanju do skripte ili se pozicionirate na folder u kome je skripta.
+
+PAZNJA:
+Skripta ce izbrisati bazu ictcloud ukoliko vec postoji.
+
