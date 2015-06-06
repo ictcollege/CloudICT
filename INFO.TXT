@@ -5,7 +5,7 @@ Folder system je preimenovan u codeigniter.
 
 Dodati su folderi:
 
-- data (za fajlove) - svaki korisnik ima svoj folder i u njemu files a u njemu Documents itd.
+- data (za fajlove) - svaki korisnik ima svoj folder (u njemu files a u njemu Documents itd.)
 - database (sema i skripta za bazu)
 - public (za css, js, itd. koje ce da koriste view-ovi)
 - template (za frontend template koji ce kasnije da se cepa na view-ove)
