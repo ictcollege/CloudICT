@@ -1,23 +1,14 @@
-Postavljena verzija CodeIgniter-a je 3.0
+Postavljena verzija CodeIgniter-a je 3.0.0
 
-Folder application je preimenovan u ictcloud.
+Folder application je preimenovan u cloudict.
 Folder system je preimenovan u codeigniter.
 
 Dodati su folderi:
 
 - data (za fajlove) - svaki korisnik ima svoj folder i u njemu files a u njemu Documents itd.
-- database (skripta za bazu)
+- database (sema i skripta za bazu)
 - public (za css, js, itd. koje ce da koriste view-ovi)
 - template (za frontend template koji ce kasnije da se cepa na view-ove)
-
-(Svi upiti za dalji postupak nalaze se u database/ictcloud.sql fajlu)
-Potrebno je da kreirate na localhost-u bazu podataka ictcloud.
-U bazi kreirajte korisnika ict sa lozinkom cloud.
-Dodelite korisniku ict sva prava nad bazom ictcloud.
-Ovo je potrebno da se pristupni parametri u ictcloud/config/database.php ne bi menjali.
-
-Pomocu skripte u folderu database cete kreirati tabele i uneti podatke u bazu (kada skripta bude uradjena).
-
 
 Uputstvo za GIT:
 
