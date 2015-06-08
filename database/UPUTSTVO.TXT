@@ -1,11 +1,17 @@
 UPUTSTVO:
-U linux shell-u ili windows command prompt-u izvrsite sledecu komandu:
+Ukoliko koristite XAMPP, na kontrol panelu startujte MySQL.
+Kliknite na dugme Shell ili XAMPP-Shell (zavisi od verzije, nalazi se sa desne strane gore).
+U Shell-u izvrsite datu komandu.
+
+Ukoliko koristite mysql-server, u Linux Terminal-u ili Windows Command Prompt-u izvrsite datu komandu.
+
+KOMANDA:
     mysql -p -u root < ictcloud.sql
 
 NAPOMENA:
-Bitno je da sql skripta bude kopirana u folder na kome ste trenutno pozicionirani
-ili promenite putanju do skripte ili se pozicionirate na folder u kome je skripta.
+Bitno je da skripta ictcloud.sql bude kopirana u folder na kome ste trenutno pozicionirani.
+U slucaju Shell-a na XAMPP-u ispisace vam se trenutna pozicija prilikom pokretanja Shell-a.
+Umesto da kopirate skriptu mozete i zadati relativnu ili apsolutnu putanju do nje.
 
 PAZNJA:
 Skripta ce izbrisati bazu ictcloud ukoliko vec postoji.
-
