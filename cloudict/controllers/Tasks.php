@@ -23,7 +23,7 @@ class Tasks extends CI_Controller {
 
         //TODO:Implement proper redirect
         if($_SESSION['LoggedIn'] == false){
-            redirect('/welcome');
+            redirect('/tasks');
         }
 
         $this->userID = $this->session->userID;
@@ -51,7 +51,15 @@ class Tasks extends CI_Controller {
  * Target for create method, stores created task in database
  */
     public function store(){
+        $taskName = $this->input->post('taskName');
+        $taskDescription = $this->input->post('taskDescription');
+        $timeToExecute = $this->input->post('timeToExecute');
+        $executeType = $this->input->post('executeType');
+        $assignedUserID = $this->input->post('assignedUserIDs');
 
+        $this->TaskModel->storeTask($taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserID);
+
+        redirect('/tasks');
     }
 
     /**
