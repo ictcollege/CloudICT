@@ -22,9 +22,9 @@ class Tasks extends CI_Controller {
         $this->load->helper('url');
 
         //TODO:Implement proper redirect
-        if($_SESSION['LoggedIn'] == false){
-            redirect('/tasks');
-        }
+//        if($_SESSION['LoggedIn'] == false){
+//            redirect('/tasks');
+//        }
 
         $this->userID = $this->session->userID;
         $this->load->model('TasksModel');
@@ -56,9 +56,7 @@ class Tasks extends CI_Controller {
         $timeToExecute = $this->input->post('timeToExecute');
         $executeType = $this->input->post('executeType');
         $assignedUserID = $this->input->post('assignedUserIDs');
-
         $this->TaskModel->storeTask($taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserID);
-
         redirect('/tasks');
     }
 
@@ -67,7 +65,9 @@ class Tasks extends CI_Controller {
      * TODO: Find a way to limit the access to task to people who are on the task
      */
     public function show(){
-        
+        $taskID = $_POST['taskID'];
+        $task['task'] = $this->TaskModel->getTask($taskID);
+        $this->load->view("TaskInfo", $task);
     }
 
     /**
@@ -88,6 +88,7 @@ class Tasks extends CI_Controller {
      * Method for deleting selected tasks
      */
     public function destroy(){
-
+        $taskID = $_POST['taskID'];
+        $this->TaskModel->removeTask($taskID);
     }
 }
