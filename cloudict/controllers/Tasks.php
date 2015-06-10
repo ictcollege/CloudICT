@@ -27,7 +27,7 @@ class Tasks extends CI_Controller {
 //        }
 
         $this->userID = $this->session->userID;
-        $this->load->model('TasksModel');
+        $this->load->model('TaskModel');
     }
 
 
@@ -35,7 +35,7 @@ class Tasks extends CI_Controller {
      * Shows all Tasks for current user
      */
     public function index(){
-        $tasks['assigned'] = $this->TasksModel->getAssignedTaks($this->userID);
+        $tasks['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
         $tasks['given'] = $this->TaskModel->getgivenTasks($this->userID);
         $this->load->view("TaskViewData", $tasks);
     }
@@ -55,8 +55,8 @@ class Tasks extends CI_Controller {
         $taskDescription = $this->input->post('taskDescription');
         $timeToExecute = $this->input->post('timeToExecute');
         $executeType = $this->input->post('executeType');
-        $assignedUserID = $this->input->post('assignedUserIDs');
-        $this->TaskModel->storeTask($taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserID);
+        $assignedUserIDs = $this->input->post('assignedUserIDs');
+        $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserIDs);
         redirect('/tasks');
     }
 
@@ -65,7 +65,7 @@ class Tasks extends CI_Controller {
      * TODO: Find a way to limit the access to task to people who are on the task
      */
     public function show(){
-        $taskID = $_POST['taskID'];
+        $taskID = $this->input->post('taskID');
         $task['task'] = $this->TaskModel->getTask($taskID);
         $this->load->view("TaskInfo", $task);
     }
@@ -88,7 +88,7 @@ class Tasks extends CI_Controller {
      * Method for deleting selected tasks
      */
     public function destroy(){
-        $taskID = $_POST['taskID'];
+        $taskID = $this->input->post('taskID');
         $this->TaskModel->removeTask($taskID);
     }
 }
