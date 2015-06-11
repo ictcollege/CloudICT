@@ -23,10 +23,11 @@ class TaskModel extends CI_Model {
         $insertID = $this->db->insert('Task', $data)->insert_id();
         if($insertID != null){
             foreach($assignedUserIDs as $Id){
-                $taskUser = array(
-
+                $taskUserData = array(
+                    'IdTask' => $insertID,
+                    'IdUser' => $Id
                 );
-                $this->db->insert('TaskUser', $taskUser);
+                $this->db->insert('TaskUser', $taskUserData);
             }
         }
 
