@@ -3,12 +3,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class TaskModel extends CI_Model {
 
-    public function getAssignedTaks($id){
-        
+    /**
+     * @param $currentUserID
+     * @return mixed
+     */
+    public function getAssignedTaks($currentUserID){
+        return $this->db->from('TaskUser')->where("IdUser", $currentUserID);
     }
 
-    public function getgivenTasks($id){
-        
+    public function getGivenTasks($currentUserID){
+        return $this->db->from('Task')->where("IdUser", $currentUserID);
     }
 
     public function storeTask($userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserIDs){
@@ -29,8 +33,9 @@ class TaskModel extends CI_Model {
                     'IdUser' => $Id
                 ));
             }
-            $this->db->insert_batch('TaskUser', $taskUserData);
+            if($this->db->insert_batch('TaskUser', $taskUserData) != null)
+                return true;
         }
-
+        return false;
     }
 }
