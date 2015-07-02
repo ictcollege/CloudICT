@@ -1,0 +1,32 @@
+.route{
+	padding-top: 30px;
+	margin-bottom: 30px; 
+	height: 50px;
+	width: 100%;
+}
+
+.route .routebutton{
+  	position: relative;
+  	top: -5px;
+}
+.table-files i{
+	cursor: pointer;
+}
+
+.filename{
+	width:50px; 
+	white-space: nowrap; 
+}
+
+.fileiconhide{
+	display: none;
+}
+
+.content{
+	margin-top: 70px;
+}
+
+.row-padding-top
+{
+	padding-top: 65px;
+}
