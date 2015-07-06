@@ -72,8 +72,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 	<div id="body">
         <form action="<?php echo base_url('user/login')?>" method="post">
-            <input type="text" name="user">
-            <input type="password" name="password">
+            <input type="text" name="Username">
+            <input type="password" name="Password">
             <input type="submit" name="login" value="Login">
         </form>
 	</div>
