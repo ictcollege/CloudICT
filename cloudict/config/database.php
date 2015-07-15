@@ -64,9 +64,9 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => '192.168.2.102',
-	'username' => 'ict',
-	'password' => 'cloud',
+	'hostname' => 'localhost',
+	'username' => 'root',
+	'password' => '',
 	'database' => 'ictcloud',
 	'dbdriver' => 'mysqli',
 	'dbprefix' => '',

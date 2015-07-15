@@ -18,7 +18,10 @@ class Tasks extends CI_Controller {
      */
     public function __construct()
     {
-        parent::_construct();
+        parent::__construct();
+
+        $this->load->library('session');
+
         $this->load->helper('url');
 
         //TODO:Implement proper redirect
@@ -26,7 +29,7 @@ class Tasks extends CI_Controller {
 //            redirect('/tasks');
 //        }
 
-        $this->userID = $this->session->userID;
+        $this->userID = $this->session->userData("UserID");
         $this->load->model('TaskModel');
     }
 
@@ -36,28 +39,31 @@ class Tasks extends CI_Controller {
      */
     public function index(){
         $tasks['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
-        $tasks['given'] = $this->TaskModel->getgivenTasks($this->userID);
-        $this->load->view("TaskViewData", $tasks);
+        $tasks['given'] = $this->TaskModel->getGivenTasks($this->userID);
+        $this->load->view("Task/Show", $tasks);
     }
 
     /**
      * shows view for creating new task
      */
     public function create(){
-        $this->load->view("createTask");
+        $this->load->view("Task/Create");
     }
 
     /**
  * Target for create method, stores created task in database
  */
     public function store(){
+
         $taskName = $this->input->post('taskName');
         $taskDescription = $this->input->post('taskDescription');
         $timeToExecute = $this->input->post('timeToExecute');
         $executeType = $this->input->post('executeType');
         $assignedUserIDs = $this->input->post('assignedUserIDs');
-        $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserIDs);
-        redirect('/tasks');
+
+        $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription,
+                                    $timeToExecute, $executeType, $assignedUserIDs);
+        redirect('Task/Index');
     }
 
     /**

@@ -9,12 +9,27 @@ class TaskModel extends CI_Model {
      */
     public function getAssignedTaks($currentUserID){
         return $this->db->from('TaskUser')->where("IdUser", $currentUserID);
+
     }
 
+    /**
+     * @param $currentUserID
+     * @return mixed
+     */
     public function getGivenTasks($currentUserID){
-        return $this->db->from('Task')->where("IdUser", $currentUserID);
+        //return $this->db->from('Task')->where("IdUser", $currentUserID);
     }
 
+
+    /**
+     * @param $userID
+     * @param $taskName
+     * @param $taskDescription
+     * @param $timeToExecute
+     * @param $executeType
+     * @param $assignedUserIDs
+     * @return bool
+     */
     public function storeTask($userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUserIDs){
         $data = array(
             'IdUser' => $userID,
