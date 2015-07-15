@@ -11,26 +11,25 @@ class Tasks extends CI_Controller {
     private $userID;
 
     /**
-     * None of these methods are final
-     */
-    /**
      * Tasks constructor.
      */
     public function __construct()
     {
         parent::__construct();
 
-        $this->load->library('session');
-
         $this->load->helper('url');
 
-        //TODO:Implement proper redirect
-//        if($_SESSION['LoggedIn'] == false){
-//            redirect('/tasks');
+        //TODO:Implement proper redirect on not logged in
+        //TODO: Update Users Controller to include idUser in session
+//        if($_SESSION['LoggedIn'] == true){
+//            $this->userID = $this->session->userData("UserID");
 //        }
+//        else redirect('/User');
 
-        $this->userID = $this->session->userData("UserID");
+
+        $this->userID = 2;
         $this->load->model('TaskModel');
+        $this->load->model('UserModel');
     }
 
 
@@ -40,6 +39,7 @@ class Tasks extends CI_Controller {
     public function index(){
         $tasks['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
         $tasks['given'] = $this->TaskModel->getGivenTasks($this->userID);
+        $tasks['url_helper'] = base_url();
         $this->load->view("Task/Show", $tasks);
     }
 
@@ -54,7 +54,6 @@ class Tasks extends CI_Controller {
  * Target for create method, stores created task in database
  */
     public function store(){
-
         $taskName = $this->input->post('taskName');
         $taskDescription = $this->input->post('taskDescription');
         $timeToExecute = $this->input->post('timeToExecute');
@@ -70,8 +69,8 @@ class Tasks extends CI_Controller {
      * Shows current task, i.e no. of people who finished the selected task
      * TODO: Find a way to limit the access to task to people who are on the task
      */
-    public function show(){
-        $taskID = $this->input->post('taskID');
+    public function show($taskID){
+        //$taskID = $this->input->post('taskID');
         $task['task'] = $this->TaskModel->getTask($taskID);
         $this->load->view("TaskInfo", $task);
     }
@@ -93,8 +92,8 @@ class Tasks extends CI_Controller {
     /**
      * Method for deleting selected tasks
      */
-    public function destroy(){
-        $taskID = $this->input->post('taskID');
+    public function destroy($taskID){
+        //$taskID = $this->input->post('taskID');
         $this->TaskModel->removeTask($taskID);
     }
 }
