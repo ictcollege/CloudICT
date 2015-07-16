@@ -63,6 +63,7 @@ class UserModel extends CI_Model
         $data = array();
 
         if (!empty($result)) {
+
             foreach ($result as $row) {
                 $data[$row['Group']] = array();
                 foreach ($result as $row2) {
@@ -74,6 +75,7 @@ class UserModel extends CI_Model
                     }
                 }
             }
+
         }
 
 
