@@ -1,44 +1,3 @@
-<!--
-
-          
-        <div class="row placeholders">
-            <div class="form-group-sm">
-                <button type="button" id="inputButton" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i>Add files</button>
-                <input type="file" name="files[]" id="inputFile" style="display: none;" multiple>
-                <button type="submit" id="upload-button" class="btn btn-primary"><i class="glyphicon glyphicon-upload"></i>Upload files</button>
-            </div>
-            <div class="form-group-sm">
-
-            </div>
-        </div>
-          <div class="table-responsive">
-            <table class="table table-striped" id="filetable">
-              <thead>
-                <tr>
-                  <th></th>
-                  <th>File name</th>
-                  <th></th>
-                  <th>Size</th>
-                  <th>Modified</th>
-                </tr>
-              </thead>
-              <tbody>
-              
-                <tr>
-                    
-                </tr>
-                <tr>
-                    
-                </tr>
-                
-              </tbody>
-            </table>
-          </div>
-           -->
-       
-
-
-
 <div id="page-wrapper">
             <div class="row">
                 <div class="col-lg-12">
@@ -116,54 +75,7 @@
     
     <?php
      $this->load->view('scripts.php');
-    ?>
-    <script type="text/javascript">
-        //set user current_dir
-        function setCurrentDir(){
-            
-        }
-        //get user current_dir
-        function getCurrentDir(){
-            
-        }
-        //FILEUPLOAD JS
-//(function (e){
-//            $("#inputButton").on("click",function (){
-//                $("#inputFile").click();
-//            });
-//            
-//            allFilesUrl = "<?php echo base_url();?>Files/?all_files";
-//            $.getJSON( allFilesUrl, function( data ) {
-//            var items = [];
-//            $.each( data, function( key, val ) {
-//              items.push("<tr>");
-//              items.push("<td style='width:50px' align='left'><i class='fa  fa-star-o fa-fw fileiconhide'></td>");
-//              items.push("<td style='width:50px'></td>");
-//              items.push("<td style='width:50px' class='filename'>"+val.FileName+"</td>");
-//              items.push("<td style='width:50px' align='left'><i class='fa  fa-pencil fa-fw fileiconhide'></i></td>");
-//              items.push("<td style='width:50px'><i class='fa  fa-cloud-download fa-fw fileiconhide'></i></td>");
-//              items.push(' <td style="width:50px"><i class="fa  fa-share-alt fa-fw fileiconhide"></i></td>');
-//              items.push(' <td style="width:50px"><i class="fa  fa-trash-o fa-fw fileiconhide"></i></td>');
-//              items.push('<td style="width:50px">'+Math.round(val.FileSize/1024)+'KB</td>');
-//              items.push('<td style="width:50px">'+val.FileLastModified+'</td>' );
-//              items.push("</tr>");
-//            });
-//
-//            $(items.join("")).appendTo("#file-table");
-//            
-//          });
-//           
-//        })();
-
-        
-
-        $(document).ready(function (e){
-            
-//            $("#inputButton").click(function (){
-//                $("#inputFile").click();
-//            });
-        });
-        
+    ?>  
     </script>
 </body>
 

@@ -1,9 +1,6 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 /**
- * Sta sve fali od funkcija
- *  bilo bi dobro da imamo neku funkciju za prebrojavanje FileSize u folderu , 
- * neka vrati koji god broj , ja cu dodatno ovo obraditi na klijentskoj strani kolko je to u MB ili GB        
  * fali neka funkcija za kvotu , da znam dal je prekoracio limit na upload-u
  * 
  * 
@@ -186,12 +183,23 @@ class FileModel extends CI_Model {
 			FROM `FileType`
 			
 			WHERE `FileTypeMime` = ?
+                        
+                        LIMIT 1
 		";
 
 		$result = $this->db->query($query, [$FileTypeMime])->result_array();
 		
 		if(!empty($result)) return $result[0]['IdFileType'];
-		
+		else{
+                    $query= "INSERT INTO `filetype` (
+					`FileTypeMime`
+				)
+				
+			VALUES 	(?)";
+                    $result = $this->db->query($query, [$FileTypeMime]);
+                    $IdFileType = $this->db->insert_id();
+                    return $IdFileType;
+                }
 		return 0;
 	}
 	
@@ -220,6 +228,42 @@ class FileModel extends CI_Model {
 		return !empty($result)?1:0; 
 		// Okida se triger koji brise sve podfoldere i fajlove koji pripadaju tom folderu!
 	}
+        
+        public function getFile($IdUser,$FileName){
+            $query = "
+			SELECT	`IdFile`, 
+					`FileTypeMime`,
+					`FileExtension`,
+					`FileName`,
+					`FileSize`,
+					`FileLastModified`,
+					`FileCreated`
+				
+			FROM 	`file`
+
+			JOIN	`FileType`
+			USING	(`IdFileType`)
+
+			WHERE	`IdUser` = ? AND `FileName` = ? ";
+                //mozda neka funkcija za sortiranje npr(LastModified), folderi u svakom slucaju moraju prvi
+                $query.= "LIMIT 1";
+		$result = $this->db->query($query, [$IdUser, $FileName])->result_array();
+                
+		return $result;
+        }
+        public function getFolder($IdUser,$IdFolder){
+            $query = "
+			SELECT	`IdFile`, 
+                                `FileName`,
+				`IdFolder`
+			FROM 	`file`
+
+			WHERE	`IdUser` = ? AND `IdFile` = ? ";
+                $query.= "LIMIT 1";
+		$result = $this->db->query($query, [$IdUser, $IdFolder])->row();
+                
+		return $result;
+        }
         
 
         

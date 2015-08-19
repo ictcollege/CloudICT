@@ -26,7 +26,11 @@
     
     <!-- Jericho's css -->
     <link href="css/jericho.css" rel="stylesheet" type="text/css">
-
+    
+    <!--JQuery FileUpload-->
+    <link rel="stylesheet" href="css/blueimp-gallery.min.css">
+    <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload.css">
+    <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload-ui.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>

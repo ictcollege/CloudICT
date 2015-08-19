@@ -236,7 +236,9 @@ protected $error_messages = array(
     }
     
     protected function get_file_type($param) {
-        return 2;
+        $this->load->model("FileModel");
+        $id = $this->FileModel->getFileType($param);
+        return $id;
     }
     
     protected function get_IdFolder($param) {
@@ -262,7 +264,6 @@ protected $error_messages = array(
         }
         mkdir($this->options['user_dir'].$name,  $this->options['mkdir_mode']);
         $this->load->model("FileModel");
-        //insertUserFile($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName, $FileSize)
         //hardcoded IdFileType 1
         $this->FileModel->insertUserFile($this->get_user(), 1, NULL, NULL, $name, 0);
     }
