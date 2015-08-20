@@ -9,7 +9,7 @@
  *
  * @author Darko
  */
-class Fileupload extends CI_Controller{
+class Fileupload extends Frontend_Controller{
     public function __construct() {
         parent::__construct();
     }
@@ -30,9 +30,7 @@ class Fileupload extends CI_Controller{
         else{
             $data['current_dir'] = 0;
         }
-        $this->load->view('header', $data);
-        $this->load->view('menu', $data);
-        $this->load->view('fileupload',$data);
+        $this->load_view('fileupload',$data,'menu');
     }
     
     protected function breadcrumbs($filename=''){
@@ -62,7 +60,6 @@ class Fileupload extends CI_Controller{
         return isset($_SERVER[$id]) ? $_SERVER[$id] : '';
     }
     protected function get_user_id(){
-        //return $this->session->userdata('userid');
-        return 1;
+        return $this->session->userdata('userid');
     }
 }

@@ -11,7 +11,10 @@
  *
  * @author Jericho
  */
-class Admin extends CI_Controller {
+class Admin extends Backend_Controller {
+    public function __construct() {
+        parent::__construct();
+    }
     //put your code here
     public function index(){
         //helpers

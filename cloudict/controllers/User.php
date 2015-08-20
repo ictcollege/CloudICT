@@ -11,11 +11,13 @@
  *
  * @author Jericho
  */
-class User extends CI_Controller {
+class User extends MY_Controller { //MY_Controller jer on nema zastitu za logovane user-e
+    public function __construct() {
+        parent::__construct();
+    }
     //put your code here
     public function index(){
         //helpers
-        $this->load->helper('url');
         $this->load->helper('form');
         
         //variables
@@ -49,8 +51,7 @@ class User extends CI_Controller {
             $data['password_attr'] = $password_attr;
         
         //views
-        $this->load->view('header', $data);
-        $this->load->view('login');
+        $this->load_view('login', $data);
     }
     
     public function login()
@@ -66,7 +67,7 @@ class User extends CI_Controller {
         {
             $idrole = $user["User"]["IdRole"];
             $username = $user["User"]["User"];
-            $userId = $user["User"]["IdUser"]; //dodao Darko treba mi za fajlove
+            $userId = $user["User"]["Id"]; //dodao Darko treba mi za fajlove
             $groups = $this->UserModel->getAllUsersInGroups($user["User"]["Id"]);
             
             $session= array(
@@ -80,5 +81,13 @@ class User extends CI_Controller {
         }
         
         echo json_encode($session);
+    }
+    
+    public function logout() {
+        session_destroy();
+        header("location:".base_url()."User");
+        exit;
+        //redirect(base_url()); //CI_Version
+
     }
 }

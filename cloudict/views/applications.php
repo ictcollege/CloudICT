@@ -1,4 +1,3 @@
-<body>
 
     <div id="wrapper">
     <div class="container">
@@ -9,7 +8,7 @@
                     <div class="panel-body">
                         <div class="row">
                         	<div class="col-lg-4 text-center">	
-                        		<h2><i class="fa fa-folder-open fa-fw"></i></h2>
+                                    <h2><a href="<?php echo base_url();?>Fileupload"><i class="fa fa-folder-open fa-fw"></i></a></h2>
                         	</div>
                         	<div class="col-lg-4 text-center">
 	                       		<h2><i class="fa fa-flash fa-fw"></i></h2>
@@ -36,11 +35,3 @@
     </div>
     </div>
     
-    <?php
-     $data['base_url'] = $base_url;
-     $this->load->view('scripts.php', $data);
-    ?>
-    
-</body>
-
-</html>

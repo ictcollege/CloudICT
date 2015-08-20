@@ -84,7 +84,7 @@ class UserModel extends CI_Model {
 	* Structure of returned data:
 	*      array (
 	*          [User] => array (
-	*              [Id] => [UserId],
+	*                          [Id] => [UserId],
 	*			   [User] => [UserName],
 	*			   [Password] => [UserPassword],
 	*			   [FullName] => [UserFullname],
@@ -103,6 +103,7 @@ class UserModel extends CI_Model {
 	{
 		$query = "
 			SELECT	`IdUser` AS `Id`,
+                                `IdRole`,
 				`UserName` AS `User`,
 				`UserPassword` AS `Password`,
 				`UserFullname` AS `FullName`,

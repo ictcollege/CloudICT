@@ -9,26 +9,26 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <!--BASE URL FOR LINKS AND SCRIPTS-->
-    <base href="<?php echo base_url();?>public/">
+    <base href="<?php echo base_url();?>">
     <title></title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="public/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
-    <link href="css/metisMenu.min.css" rel="stylesheet">
+    <link href="public/css/metisMenu.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="css/sb-admin-2.css" rel="stylesheet">
+    <link href="public/css/sb-admin-2.css" rel="stylesheet">
 
     <!-- Custom Fonts -->
-    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="public/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     
     <!-- Jericho's css -->
-    <link href="css/jericho.css" rel="stylesheet" type="text/css">
+    <link href="public/css/jericho.css" rel="stylesheet" type="text/css">
     
     <!--JQuery FileUpload-->
-    <link rel="stylesheet" href="css/blueimp-gallery.min.css">
+    <link rel="stylesheet" href="public/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload.css">
     <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload-ui.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -37,4 +37,9 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+    <?php
+        $this->load->view('scripts');
+    ?>
 </head>
+<body>
+<div class="container-fluid">

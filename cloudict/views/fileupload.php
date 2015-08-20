@@ -87,13 +87,8 @@
                     
             </div>
         </div>
-    <div class="clearfix"></div>
-    <div class="row">
-        <div class="col-lg-12">
-            <p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo (ENVIRONMENT === 'development') ? 'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?></p>
-        </div>
-    </div>
 </div><!-- /#page-wrapper -->
+<div class="clearfix"></div>
     <!-- The blueimp Gallery widget -->
 <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
     <div class="slides"></div>
@@ -105,9 +100,6 @@
     <ol class="indicator"></ol>
 </div>
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>    
-    <?php
-     $this->load->view('scripts.php');
-    ?>  
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
@@ -328,6 +320,3 @@
 });
 
 </script>
-</body>
-
-</html>

@@ -31,6 +31,7 @@ class FileModel extends CI_Model {
 					`FileTypeMime`,
 					`FileExtension`,
 					`FileName`,
+                                        `FilePath`,
 					`FileSize`,
 					`FileLastModified`,
 					`FileCreated`
@@ -63,7 +64,7 @@ class FileModel extends CI_Model {
 	* @param int $FileSize
 	* @return int
 	*/
-	public function insertUserFile($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName, $FileSize)
+	public function insertUserFile($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize)
 	{
 		$FileCreated = time();
 		$FileModified = time();
@@ -74,6 +75,7 @@ class FileModel extends CI_Model {
 					`IdFolder`,
 					`FileExtension`,
 					`FileName`,
+                                        `FilePath`,
 					`FileSize`,
 					`FileCreated`,
 					`FileLastModified`
@@ -82,7 +84,7 @@ class FileModel extends CI_Model {
 			VALUES 	(?,?,?,?,?,?,?,?)
 		";
 
-		$result = $this->db->query($query, [$IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName, $FileSize, $FileCreated, $FileModified]);
+		$result = $this->db->query($query, [$IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified]);
 		$IdFile = $this->db->insert_id();
 		
 		return $IdFile;
@@ -104,7 +106,7 @@ class FileModel extends CI_Model {
 	public function changeFileFolder($IdFile, $IdFolder)
 	{
 		$updateQuery = "
-			UPDATE `File` SET `IdFolder` = ?
+			UPDATE `File` SET `IdFolder` = ? 
 			
 			WHERE IdFile = ?
 		";
@@ -125,16 +127,16 @@ class FileModel extends CI_Model {
 	* @param int $IdFileName
 	* @return int
 	*/
-	public function changeFileName($IdFile, $FileName)
+	public function changeFileName($IdFile, $FileName,$FilePath)
 	{
             //da li ovde treba FileLastModified ?
 		$updateQuery = "
-			UPDATE `File` SET `FileName` = ?
+			UPDATE `File` SET `FileName` = ?,`FilePath` = ?
 			
 			WHERE IdFile = ?
 		";
                 
-		$result = $this->db->query($updateQuery, [$FileName, $IdFile ]);
+		$result = $this->db->query($updateQuery, [$FileName,$FilePath, $IdFile ]);
                 
 		return !empty($result)?1:0; 
 	}
@@ -229,12 +231,13 @@ class FileModel extends CI_Model {
 		// Okida se triger koji brise sve podfoldere i fajlove koji pripadaju tom folderu!
 	}
         
-        public function getFile($IdUser,$FileName){
+        public function getFile($IdUser,$FileName,$FilePath){
             $query = "
 			SELECT	`IdFile`, 
 					`FileTypeMime`,
 					`FileExtension`,
 					`FileName`,
+                                        `FilePath`,
 					`FileSize`,
 					`FileLastModified`,
 					`FileCreated`
@@ -244,10 +247,10 @@ class FileModel extends CI_Model {
 			JOIN	`FileType`
 			USING	(`IdFileType`)
 
-			WHERE	`IdUser` = ? AND `FileName` = ? ";
-                //mozda neka funkcija za sortiranje npr(LastModified), folderi u svakom slucaju moraju prvi
+			WHERE	`IdUser` = ? AND `FileName` = ? AND `FilePath` = ?";
+            
                 $query.= "LIMIT 1";
-		$result = $this->db->query($query, [$IdUser, $FileName])->result_array();
+		$result = $this->db->query($query, [$IdUser, $FileName,$FilePath])->result_array();
                 
 		return $result;
         }

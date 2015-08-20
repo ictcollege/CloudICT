@@ -30,15 +30,15 @@ $(document).ready(function(){
         
         if(!error) {
             $.ajax({
-                url: 'index.php/user/login',
+                url: 'user/login',
                 type: 'post',
                 dataType: 'json',
                 data:{Username:username.val(),Password:password.val()},
                 success: function(response) {
                     if(response["role"] == 3) {
-                        window.location = "index.php/admin";
+                        window.location = "Admin";
                     } else {
-                        window.location = "index.php/user"
+                        window.location = "User"
                     }
                     
                 } 

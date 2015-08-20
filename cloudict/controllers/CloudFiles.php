@@ -10,7 +10,7 @@
  * @author Darko
  */
 
-class CloudFiles extends MY_Controller{
+class CloudFiles extends File_Controller{
     protected $current_dir;
     protected $parrent_dir;
     public function __construct() {
