@@ -17,12 +17,43 @@ class Admin extends Backend_Controller {
     }
     //put your code here
     public function index(){
+           
         //helpers
         $this->load->helper('url');
         $this->load->helper('form');
         
         //variables
         $base_url = base_url();
+        
+        //model
+        $this->load->model('ApplicationModel');
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['applications'] = "";
+        $data['applications'] .= ' <div class="row">';  
+        $i= 0;
+        foreach($applications['Application'] as $a)
+        {
+            if($i%3==0)
+            {
+               $data['applications'] .= ' <div class="row">';  
+            }
+            $data['applications'] .= '<div class="col-sm-4 text-center">';
+            $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'">';
+            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+            $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '</div></a>';
+            $data['applications'] .= ' </div>';
+            $i++;
+            if($i%3==0)
+            {
+                $data['applications'] .= '</div>'; 
+            }
+            
+        }
+        
+        
             
         //data to view
         $data['base_url']= $base_url;

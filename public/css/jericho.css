@@ -44,10 +44,6 @@ body{
 	opacity: 0.7;
 }
 
-a:hover, a {
-    text-decoration: none;
-}
-
 .app1{
 	background-color: #18bc9c;
 }
@@ -88,7 +84,8 @@ a:hover, a {
   	color: white;
   	margin: 0px auto;
   	margin-top: -90px;
-	padding-bottom: 54px;
+	
+  	padding-bottom: 54px;
 }
 
 .fa-star{
@@ -176,4 +173,8 @@ textarea {
 	border-radius: 50%;
 	border:1px solid #000;
 
+}
+
+a {
+    text-decoration: none;
 }

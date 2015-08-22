@@ -6,7 +6,7 @@ $(document).ready(function() {
 	//
 	$(".app-name").hide(0);
 	$(".app").hover(function() {
-		$(this).find(".app-name").stop(true,true).fadeIn(500);
+		$(this).find(".app-name").stop(true,true).fadeIn(500); 
 	}, function() {
 		$(this).find(".app-name").stop(true,true).fadeOut(500);
 	});
