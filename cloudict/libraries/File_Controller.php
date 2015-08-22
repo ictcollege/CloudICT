@@ -1,5 +1,5 @@
 <?php
-
+defined('BASEPATH') OR exit('No direct script access allowed');
 /*
  *  @author Darko Lesendric <dlesendric at https://github.com/ @Darko_Lesendric at https://twitter.com/>
  */
@@ -67,10 +67,10 @@ class File_Controller extends Frontend_Controller
         parent::__construct();
         $this->options = array(
             'script_url' => base_url().'CloudFiles',
-            'upload_dir' => dirname($this->get_server_var('SCRIPT_FILENAME')).'/data/',
+            'upload_dir' => parent::get_user_path(),
             //'upload_dir' => 'data/'.$this->get_user_path(),
-            'upload_url' => $this->get_full_url().'/data/',
-            'user_dirs' => true,
+            'upload_url' => $this->get_full_url().'/'.parent::USERS_UPLOAD_DIR.'/',
+            'user_dirs' => false, //false because we already changed user upload dir abowe
             'mkdir_mode' => 0755,
             'param_name' => 'files',
             // Set the following option to 'POST', if your server does not support
@@ -192,10 +192,6 @@ class File_Controller extends Frontend_Controller
                 $this->head();
                 break;
             case 'GET':
-                if(isset($_GET['folder_name'])){
-                    $this->newFolder();
-                    break;
-                }
                 $this->get();
                 break;
             case 'PATCH':
@@ -224,20 +220,6 @@ class File_Controller extends Frontend_Controller
             substr($_SERVER['SCRIPT_NAME'],0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
     }
 
-    protected function get_user_id() {
-        if(!isset($_SESSION)){
-            session_start();
-        }
-        //return session_id();
-        return $this->session->userdata('userid');
-    }
-
-    protected function get_user_path() {
-        if ($this->options['user_dirs']) {
-            return $this->get_user_id().'/';
-        }
-        return '';
-    }
 
     protected function get_upload_path($file_name = null, $version = null) {
         $file_name = $file_name ? $file_name : '';
@@ -1147,9 +1129,6 @@ class File_Controller extends Frontend_Controller
         header($str);
     }
 
-    protected function get_server_var($id) {
-        return isset($_SERVER[$id]) ? $_SERVER[$id] : '';
-    }
 
     protected function generate_response($content, $print_response = true) {
         if ($print_response) {

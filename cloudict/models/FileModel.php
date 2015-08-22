@@ -184,7 +184,7 @@ class FileModel extends CI_Model {
 			
 			FROM `FileType`
 			
-			WHERE `FileTypeMime` = ?
+			WHERE `FileTypeMime` = ? 
                         
                         LIMIT 1
 		";
@@ -249,21 +249,22 @@ class FileModel extends CI_Model {
 
 			WHERE	`IdUser` = ? AND `FileName` = ? AND `FilePath` = ?";
             
-                $query.= "LIMIT 1";
+                $query.= " LIMIT 1";
 		$result = $this->db->query($query, [$IdUser, $FileName,$FilePath])->result_array();
                 
 		return $result;
         }
-        public function getFolder($IdUser,$IdFolder){
+        public function getFolder($IdUser,$IdFolder,$FilePath){
             $query = "
 			SELECT	`IdFile`, 
                                 `FileName`,
+                                `FilePath`,
 				`IdFolder`
 			FROM 	`file`
 
-			WHERE	`IdUser` = ? AND `IdFile` = ? ";
-                $query.= "LIMIT 1";
-		$result = $this->db->query($query, [$IdUser, $IdFolder])->row();
+			WHERE	`IdUser` = ? AND `IdFile` = ? AND `FilePath` = ?";
+                $query.= " LIMIT 1";
+		$result = $this->db->query($query, [$IdUser, $IdFolder,$FilePath])->row();
                 
 		return $result;
         }

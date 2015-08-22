@@ -1,5 +1,5 @@
 <?php
-
+defined('BASEPATH') OR exit('No direct script access allowed');
 /*
  *  @author Darko Lesendric <dlesendric at https://github.com/ @Darko_Lesendric at https://twitter.com/>
  */
@@ -13,7 +13,10 @@
 class CloudFiles extends File_Controller{
     protected $current_dir;
     protected $parrent_dir;
+    protected $current_path;
     public function __construct() {
+
+
         parent::__construct();
         $this->load->model('FileModel');
     }
@@ -25,20 +28,13 @@ class CloudFiles extends File_Controller{
         
     }
     protected function initialize() {
-        $current_dir = (isset($_GET['current_dir']))? intval($_GET['current_dir']) : NULL;
-        $this->current_dir = '';
-        $this->parrent_dir = '';
-        if($current_dir!=0){
-            $this->load->model("FileModel");
-            $result = $this->FileModel->getFolder($this->get_user_id(),$current_dir);
-            $this->current_dir = $result->FileName;
-            if(is_null($result->IdFolder)||$result->IdFolder===0){
-                $this->parrent_dir = $result->IdFolder; 
-            }
+        if(isset($_GET['action'])){
+            
         }
         parent::initialize();
     }
     protected function handle_form_data($file, $index) {
+        
         $file->IdFolder = $this->current_dir;
         $file->FileExtension = pathinfo($file->name, PATHINFO_EXTENSION);
     }
@@ -71,6 +67,9 @@ class CloudFiles extends File_Controller{
 //            }
         if(isset($_GET['current_dir'])){
             $file->deleteUrl.='&current_dir='.$_GET['current_dir'];   
+        }
+        if(isset($_GET['current_path'])){
+            var_dump($_GET);
         }
         
             
@@ -136,9 +135,9 @@ class CloudFiles extends File_Controller{
      * Novi folder
      * new folder
      */
-    public function createDir(){
+    protected function createDir(){
         //current user dir
-        $filepath = $this->options['upload_dir'].$this->get_user_path();
+        $filepath = $this->get_user_path();
         $folder_name = '';
         if(isset($_GET['folder_name'])){
             $folder_name = trim($_GET['folder_name']);
@@ -177,21 +176,54 @@ class CloudFiles extends File_Controller{
     
     protected function get_user_path() {
         $user_real_path = parent::get_user_path();
-        if($this->current_dir!=''){
-            $path = realpath(realpath($this->options['upload_dir'].$user_real_path));
-            $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-            foreach ($objects as $name=>$obj){
-                $info = new SplFileInfo($name);
-                if($info->getFilename()===$this->current_dir){
-                    $winpath =str_replace(realpath($this->options['upload_dir']), '', $name);
-                    return str_replace('\\', '/', $winpath).'/';
-                }
-            }
-        }
+//        if($this->current_dir!=''){
+//            $path = realpath(realpath($this->options['upload_dir'].$user_real_path));
+//            $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
+//            foreach ($objects as $name=>$obj){
+//                $info = new SplFileInfo($name);
+//                if($info->getFilename()===$this->current_dir){
+//                    $winpath =str_replace(realpath($this->options['upload_dir']), '', $name);
+//                    return str_replace('\\', '/', $winpath).'/';
+//                }
+//            }
+//        }
         return $user_real_path;
         
     }
     
+        /**
+     * generates random string
+     * len is length of string
+     * @param int $len
+     * @return string
+     */
+    protected function generate_random_version($len=8){
+        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return substr(str_shuffle(str_repeat($pool, ceil($len / strlen($pool)))), 0, $len);
+    }
+    
+        /**
+     * convert file size of file
+     * @param int $bytes
+     * @return string
+     */
+    protected function formatSizeUnits($bytes) {
+        if ($bytes >= 1073741824) {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        } elseif ($bytes > 1) {
+            $bytes = $bytes . ' bytes';
+        } elseif ($bytes == 1) {
+            $bytes = $bytes . ' byte';
+        } else {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
+    }
     
 
     
