@@ -1,3 +1,7 @@
+body{
+	font-family: 'Patua One', cursive;
+	font-weight: 100;
+}
 .route{
 	padding-top: 30px;
 	margin-bottom: 30px; 
@@ -9,7 +13,7 @@
   	position: relative;
   	top: -5px;
 }
-.table-files i{
+.tablefiles tr td .fa{
 	cursor: pointer;
 }
 
@@ -22,11 +26,154 @@
 	display: none;
 }
 
+.td-50{
+	width: 50px;
+}
+
 .content{
 	margin-top: 70px;
 }
 
-.row-padding-top
-{
+.row-padding-top{
 	padding-top: 65px;
+}
+
+.app{
+	margin: 10px; 
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+a:hover, a {
+    text-decoration: none;
+}
+
+.app1{
+	background-color: #18bc9c;
+}
+
+.app2{
+	background-color: rgba(31, 164, 182, 1);
+}
+
+.app3{
+	background-color: rgba(186, 76, 99, 1);
+}
+
+.app4{
+	background-color: rgba(29, 131, 193, 1);
+}
+
+.app5{
+	background-color: rgba(204, 178, 163, 1);
+}
+
+.app6{
+	background-color: rgba(239, 200, 74, 1);
+}
+
+.app h2{
+	padding: 50px 10px 50px 10px;
+}
+
+.app-panel{
+	  margin-top: 17%;
+}
+
+.main-panel{
+	font-weight: 100;
+}
+
+.app-name{
+  	color: white;
+  	margin: 0px auto;
+  	margin-top: -90px;
+	padding-bottom: 54px;
+}
+
+.fa-star{
+	color: rgb(244, 216, 128);
+}
+
+.white {
+	color: white;
+	border: 1px solid #000;
+}
+
+.rotate360 {
+	-webkit-transform: rotate(360deg);  
+	-moz-transform: rotate(360deg); 
+  	-ms-transform: rotate(360deg);  
+	-o-transform: rotate(360deg);  
+ 	transform: rotate(360deg);  
+}
+
+.transition_3 {
+  	-webkit-transition: all 0.3s ease-out;  
+ 	-moz-transition: all 0.3s ease-out;  
+   	-o-transition: all 0.3s ease-out;  
+  	transition: all 0.3s ease-out;  
+}
+
+textarea { 
+	resize:vertical; 
+	resize:horizontal;
+}
+
+.dropzone {
+    border: 2px dashed #0087F7 !important;
+    border-radius: 5px;
+    background: white !important;
+}
+
+.panel-heading { 
+    height: 50px;
+}
+
+.chat-wrapper {
+	padding-top: 50px !important;
+}
+
+.chat li {
+	border-bottom: none;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.user-image {
+	height: 35px;
+	margin-right: 15px;
+}
+
+.panel-people {
+	height: 400px;
+	overflow-y: scroll;
+}
+
+
+@media(max-width: 992px){
+	.people-panel {
+		display: none;
+	}	
+}
+
+.min-chat {
+	position: absolute;
+
+	height: 450px;
+	width: 400px;
+	border:1px solid #000;
+    top: 152px;
+    z-index: 100;
+    left: -400px;
+}
+
+.arrow {
+	position: absolute;
+
+	height: 50px;
+	width: 50px;
+	border-radius: 50%;
+	border:1px solid #000;
+
 }

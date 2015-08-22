@@ -67,11 +67,11 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         {
             $idrole = $user["User"]["IdRole"];
             $username = $user["User"]["User"];
-            $userId = $user["User"]["Id"]; //dodao Darko treba mi za fajlove
+            $userId = $user["User"]["Id"]; 
             $groups = $this->UserModel->getAllUsersInGroups($user["User"]["Id"]);
             
             $session= array(
-                'userid' =>$userId,//dodao Darko treba mi za fajlove
+                'userid' =>$userId,
                 'username' => $username,
                 'role' => $idrole,
                 'group' => $groups
