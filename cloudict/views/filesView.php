@@ -82,8 +82,8 @@
                             <tbody class="files"></tbody>
                         </table>
                         
-                        <input type="hidden" id="current_dir" value="<?php echo $current_dir;?>"/>
-                        <input type="hidden" id="current_path" value="<?php echo $current_path;?>"/>
+                        <input type="hidden" id="current_dir" name="current_dir" value="<?php echo $current_dir;?>"/>
+                        <input type="hidden" id="current_path" name="current_path" value="<?php echo $current_path;?>"/>
                 </form>
                     
             </div>
@@ -194,7 +194,7 @@
     </tr>
 {% } %}
 </script>
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="<?php echo base_url();?>public/js/vendor/jquery.ui.widget.js"></script>
 <!-- The Templates plugin is included to render the upload/download listings -->
@@ -237,9 +237,9 @@
     $('#fileupload').fileupload({
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
-        url: '<?php echo base_url();?>CloudFiles/?current_dir=<?php echo $current_dir;?>',
+        url: '<?php echo base_url();?>CloudFiles/',
         maxChunkSize: 4000000, // 4 MB,
-        formData: {current_dir: $("#current_dir").val(),current_path:$("#current_path").val()}
+        formData: {IdFolder: $("#current_dir").val(),Mask:$("#current_path").val()}
     });
 
     // Enable iframe cross-domain access via redirect option:
@@ -303,9 +303,11 @@
             if(folder_name.length>0){
                 $("#errorMsg").text('');
                 $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/?folder_name="+folder_name+"&current_dir="+IdFolder+"&current_path="+current_path,
-			success: function() {
-                          
+			url: "<?php echo base_url();?>CloudFiles/newFolder/"+folder_name,
+                        type: 'POST',
+                        data:{IdFolder : IdFolder},
+			success: function(data) {
+                            window.location.reload();
 			}
 			
 		});
@@ -315,7 +317,7 @@
             }
         });
         $(document).ajaxComplete(function (){
-            
+
         });
     });
 

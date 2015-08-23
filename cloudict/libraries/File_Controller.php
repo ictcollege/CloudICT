@@ -62,15 +62,14 @@ class File_Controller extends Frontend_Controller
     );
 
     protected $image_objects = array();
-
     function __construct($options = null, $initialize = true, $error_messages = null) {
+        $this->class_name = get_class($this);
         parent::__construct();
         $this->options = array(
-            'script_url' => base_url().'CloudFiles',
-            'upload_dir' => parent::get_user_path(),
-            //'upload_dir' => 'data/'.$this->get_user_path(),
-            'upload_url' => $this->get_full_url().'/'.parent::USERS_UPLOAD_DIR.'/',
-            'user_dirs' => false, //false because we already changed user upload dir abowe
+            'script_url' => $this->class_name,
+            'upload_dir' => parent::get_upload_dir().'/',
+            'upload_url' => parent::get_mask($this->class_name, $this->uri->uri_string()),
+            'user_dirs' => false, //false because we already changed user upload dir in parent class
             'mkdir_mode' => 0755,
             'param_name' => 'files',
             // Set the following option to 'POST', if your server does not support
@@ -207,18 +206,7 @@ class File_Controller extends Frontend_Controller
         }
     }
 
-    protected function get_full_url() {
-        $https = !empty($_SERVER['HTTPS']) && strcasecmp($_SERVER['HTTPS'], 'on') === 0 ||
-            !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) &&
-                strcasecmp($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') === 0;
-        return
-            ($https ? 'https://' : 'http://').
-            (!empty($_SERVER['REMOTE_USER']) ? $_SERVER['REMOTE_USER'].'@' : '').
-            (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : ($_SERVER['SERVER_NAME'].
-            ($https && $_SERVER['SERVER_PORT'] === 443 ||
-            $_SERVER['SERVER_PORT'] === 80 ? '' : ':'.$_SERVER['SERVER_PORT']))).
-            substr($_SERVER['SCRIPT_NAME'],0, strrpos($_SERVER['SCRIPT_NAME'], '/'));
-    }
+
 
 
     protected function get_upload_path($file_name = null, $version = null) {
@@ -228,12 +216,11 @@ class File_Controller extends Frontend_Controller
         } else {
             $version_dir = @$this->options['image_versions'][$version]['upload_dir'];
             if ($version_dir) {
-                return $version_dir.$this->get_user_path().$file_name;
+                return $version_dir.$file_name;
             }
             $version_path = $version.'/';
         }
-        return $this->options['upload_dir'].$this->get_user_path()
-            .$version_path.$file_name;
+        return $this->options['upload_dir'].$version_path.$file_name;
     }
 
     protected function get_query_separator($url) {
@@ -256,12 +243,11 @@ class File_Controller extends Frontend_Controller
         } else {
             $version_url = @$this->options['image_versions'][$version]['upload_url'];
             if ($version_url) {
-                return $version_url.$this->get_user_path().rawurlencode($file_name);
+                return $version_url.$this->get_upload_dir().rawurlencode($file_name);
             }
             $version_path = rawurlencode($version).'/';
         }
-        return $this->options['upload_url'].$this->get_user_path()
-            .$version_path.rawurlencode($file_name);
+        return $this->options['upload_url'].$version_path.rawurlencode($file_name);
     }
 
     protected function set_additional_file_properties($file) {
@@ -1344,7 +1330,7 @@ class File_Controller extends Frontend_Controller
         );
     }
 
-    public function delete($print_response = true,$currentdir='') {
+    public function delete($print_response = true) {
         //$file_names = $this->get_file_names_params();
         $file_name = $_GET['file'];
         if (empty($file_name)) {
@@ -1364,7 +1350,7 @@ class File_Controller extends Frontend_Controller
 //                    }
 //                }
 //            }
-            $file_path = $this->options['upload_dir'].$this->get_user_path().$file_name;
+            $file_path = $this->options['upload_dir'].$file_name;
             $success = is_file($file_path) && $file_name[0] !== '.' && unlink($file_path);
             if(!$success){
                 $success = is_dir($file_path) && $file_name[0] !== '.' && $this->forceDeleteDir($file_path);
@@ -1379,7 +1365,7 @@ class File_Controller extends Frontend_Controller
                         if(is_dir($file)){
                             rmdir($file);
                             //force delete thumbnail
-                            var_dump($file);
+                            
                         }
                     }
                 }

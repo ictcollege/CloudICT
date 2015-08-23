@@ -11,31 +11,35 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 
 class CloudFiles extends File_Controller{
-    protected $current_dir;
-    protected $parrent_dir;
-    protected $current_path;
+    private $IdFolder=0;
+    private $Mask;
     public function __construct() {
-
-
+        $this->class_name = get_class($this);
         parent::__construct();
         $this->load->model('FileModel');
     }
 
     
     public function index(){
-
-        
         
     }
     protected function initialize() {
-        if(isset($_GET['action'])){
-            
+        if(isset($_POST['action'])){
+            switch ($_POST['action']){
+                case 'newFolder': $this->newFolder();
+            }
+        }
+        if(isset($_POST['IdFolder'])){
+            $this->IdFolder = intval($_POST['IdFolder']);
+        }
+        if(isset($_POST['Mask'])){
+            $this->Mask = $_POST['Mask'];
         }
         parent::initialize();
     }
     protected function handle_form_data($file, $index) {
-        
-        $file->IdFolder = $this->current_dir;
+        $file->IdFolder = $this->IdFolder;
+        $file->Mask = $this->Mask;
         $file->FileExtension = pathinfo($file->name, PATHINFO_EXTENSION);
     }
     protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) {
@@ -44,9 +48,6 @@ class CloudFiles extends File_Controller{
         $this->load->model('FileModel');
         $file->filetype=  $this->FileModel->getFileType($file->type);
         $file->FileLastModified = time();
-        if(!$file->chunk){
-            $file->IdFile=$this->FileModel->insertUserFile($this->get_user_id(),$file->filetype,$file->IdFolder,$file->FileExtension,$file->name,$file->size);
-        }
         
         return $file;
     }
@@ -65,12 +66,9 @@ class CloudFiles extends File_Controller{
 //                var_dump($key);
 //                var_dump($file->$key);
 //            }
-        if(isset($_GET['current_dir'])){
-            $file->deleteUrl.='&current_dir='.$_GET['current_dir'];   
-        }
-        if(isset($_GET['current_path'])){
-            var_dump($_GET);
-        }
+        
+            
+
         
             
             
@@ -86,7 +84,7 @@ class CloudFiles extends File_Controller{
     protected function get_file_object($file_name) {
         $file = parent::get_file_object($file_name);
         $this->load->model("FileModel");
-        $result = $this->FileModel->getFile($this->get_user_id(),$file_name);
+        $result = $this->FileModel->getFile($this->get_user_id(),$file_name,  $this->get_upload_path());
         if(count($result)>0){
             $file->IdFile=$result[0]["IdFile"];
             $file->IdFolder = $this->current_dir;
@@ -104,9 +102,6 @@ class CloudFiles extends File_Controller{
         if(isset($_GET['IdFile'])){
             $IdFile = intval($_GET['IdFile']);
         }
-        if($currentdir==''){
-            $currentdir =  $this->current_dir;
-        }
 
         $response = parent::delete(false);
         
@@ -120,14 +115,18 @@ class CloudFiles extends File_Controller{
         return $this->generate_response($response, $print_response);
     }
     
-    protected function newFolder() {
+    public function newFolder() {
         $newFolder = $this->createDir();
-        $current_dir= (isset($_GET['current_dir']))? $_GET['current_dir'] : null;
         if($newFolder!=FALSE){
-            $this->load->model("FileModel");
-            $this->FileModel->insertUserFile($this->get_user_id(),1,$current_dir,null,$newFolder,0); 
-            unset($_GET['folder_name']);
-            $this->initialize();
+            $split = explode('/', $newFolder);
+            $folderName = end($split);
+            $result = $this->FileModel->getFolder($this->get_user_id(), $this->IdFolder);
+            $parrent_dir = 0;
+            if($result){
+                $parrent_dir = $result->IdFile;
+            }
+            $this->FileModel->insertUserFile($this->get_user_id(),1,$parrent_dir,null,$folderName,$newFolder,0); 
+            
         }
     }
     
@@ -136,60 +135,26 @@ class CloudFiles extends File_Controller{
      * new folder
      */
     protected function createDir(){
-        //current user dir
-        $filepath = $this->get_user_path();
-        $folder_name = '';
-        if(isset($_GET['folder_name'])){
-            $folder_name = trim($_GET['folder_name']);
+        $filepath = $this->get_upload_path();
+        if(file_exists($filepath)){
+            $filepath= $this->upcount_name($filepath);
         }
-        if($folder_name!=''){
-            if(file_exists($filepath.$folder_name)){
-                $folder_name= $this->upcount_name($folder_name);
-            }
-            //var_dump($filepath.$folder_name);
-            if(mkdir($filepath.$folder_name,  $this->options['mkdir_mode'])){
-                return $folder_name;
-            }
-            
+        if(mkdir($filepath,  $this->options['mkdir_mode'])){
+            return $filepath;
         }
-        
-        return FALSE;
+        else{
+            return FALSE;
+        }
       
     }
 
-
-//    protected function get_upload_path($file_name = null, $version = null) {
-//        $separator = '';
-//        if(!is_null($version)){
-//            $separator = '/';
-//        }
-//        return parent::get_upload_path($file_name, $this->current_dir.$separator.$version);
-//    }
-    
-//    protected function get_download_url($file_name, $version = null, $direct = false) {
-//        $separator = '';
-//        if($this->current_dir!=''){
-//            $separator = '/';
-//        }
-//        return rawurldecode(parent::get_download_url($file_name, $this->current_dir.$separator.$version, $direct));
-//    }
-    
-    protected function get_user_path() {
-        $user_real_path = parent::get_user_path();
-//        if($this->current_dir!=''){
-//            $path = realpath(realpath($this->options['upload_dir'].$user_real_path));
-//            $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path), RecursiveIteratorIterator::SELF_FIRST);
-//            foreach ($objects as $name=>$obj){
-//                $info = new SplFileInfo($name);
-//                if($info->getFilename()===$this->current_dir){
-//                    $winpath =str_replace(realpath($this->options['upload_dir']), '', $name);
-//                    return str_replace('\\', '/', $winpath).'/';
-//                }
-//            }
-//        }
-        return $user_real_path;
-        
+ 
+    protected function get_upload_path($file_name = null, $version = null) {
+        $mask = $this->get_mask($this->class_name,  uri_string()).$version;
+        $this->IdFolder = dirname(parent::get_upload_path($file_name,$version));
+        return parent::get_upload_path($file_name, $mask);
     }
+    
     
         /**
      * generates random string
