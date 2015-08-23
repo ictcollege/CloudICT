@@ -81,7 +81,7 @@ class FileModel extends CI_Model {
 					`FileLastModified`
 				)
 				
-			VALUES 	(?,?,?,?,?,?,?,?)
+			VALUES 	(?,?,?,?,?,?,?,?,?)
 		";
 
 		$result = $this->db->query($query, [$IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified]);
@@ -254,17 +254,14 @@ class FileModel extends CI_Model {
                 
 		return $result;
         }
-        public function getFolder($IdUser,$IdFolder,$FilePath){
+        public function getFolder($IdUser,$FilePath=''){
             $query = "
-			SELECT	`IdFile`, 
-                                `FileName`,
-                                `FilePath`,
-				`IdFolder`
-			FROM 	`file`
+			SELECT	`IdFile`  
+			FROM 	`file` 
 
-			WHERE	`IdUser` = ? AND `IdFile` = ? AND `FilePath` = ?";
+			WHERE	`IdUser` = ? AND `FilePath` = ?";
                 $query.= " LIMIT 1";
-		$result = $this->db->query($query, [$IdUser, $IdFolder,$FilePath])->row();
+		$result = $this->db->query($query, [$IdUser,$FilePath])->row();
                 
 		return $result;
         }

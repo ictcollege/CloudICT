@@ -10,24 +10,28 @@
  * @author Darko
  */
 class Frontend_Controller extends MY_Controller{
-    const USERS_UPLOAD_DIR = 'data'; //main upload_dir
-
+    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudFiles/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
+    public $class_name;
     public function __construct() {
+        $this->class_name = get_class($this);
         parent::__construct();
         if(!$this->isLogged()){
             header('location:'.base_url());
             exit();
            //redirect('Users'); //CI_version
         }
+        if(!file_exists(self::USERS_UPLOAD_DIR)){
+            mkdir(self::USERS_UPLOAD_DIR);
+        }
     }
     
-    protected function get_user_path() {
-        $dirname = dirname($this->get_server_var('SCRIPT_FILENAME')).'/'.self::USERS_UPLOAD_DIR.'/'.$this->get_user_id().'/';
-        if(!file_exists($dirname)){
-            mkdir($dirname);
+    protected function get_upload_dir() {
+        $userpath = self::USERS_UPLOAD_DIR.$this->get_user_id();
+        if(!file_exists($userpath)){
+            mkdir($userpath);
         }
         
-        return $dirname;
+        return $userpath;
     }
     
     protected function get_server_var($id) {
@@ -37,7 +41,30 @@ class Frontend_Controller extends MY_Controller{
         return $this->session->userdata('userid');
     }
     
-    protected function get_upload_url(){
-        return base_url().'/'.self::USERS_UPLOAD_DIR.'/'.$this->get_user_id();
+    protected function get_download_url(){
+        return base_url().$this->get_user_id().$this->get_mask();
     }
+
+    
+    protected function get_mask($class_name='',$uri_string=''){
+        $class_name = strtolower($class_name);
+        $uri_string = strtolower($uri_string);
+        if(empty($class_name)){
+            $class_name= strtolower($this->class_name);
+        }
+        if(empty($uri_string)){
+            $uri_string = strtolower($this->uri->uri_string());
+        }
+        $split = explode('/', $uri_string);
+        $upload_path = '';
+        foreach($split as $segment){
+            if($segment != $class_name && $segment!=strtolower($this->uri->segment(2))){
+                $upload_path.='/'.$segment;
+            }
+        }
+        return $upload_path;
+    }
+    
+    
+    
 }

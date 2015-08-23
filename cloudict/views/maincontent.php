@@ -79,12 +79,7 @@
         <!-- /#page-wrapper -->
 
     </div>
-    
-    <?php
-     $data['base_url'] = $base_url;
-     $this->load->view('scripts.php', $data);
-    ?>
-    
+
 </body>
 
 </html>
