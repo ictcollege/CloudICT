@@ -127,4 +127,23 @@ class Admin extends Backend_Controller {
         $this->load->view('menu', $data);
         $this->load->view('newuser', $data);
     }
+    
+    public function group()
+    {
+        //helpers
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+         //data to view
+        $data['base_url']= $base_url;
+        $data['title'] = "ICT Cloud | Admin | Groups";
+        
+        //views
+        $this->load->view('header', $data);
+        $this->load->view('menu', $data);
+        $this->load->view('groups', $data);
+    }
 }
