@@ -10,7 +10,7 @@
  * @author Darko
  */
 class Frontend_Controller extends MY_Controller{
-    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudFiles/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
+    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudICT/data/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
     public $class_name;
     public function __construct() {
         $this->class_name = get_class($this);
@@ -26,7 +26,7 @@ class Frontend_Controller extends MY_Controller{
     }
     
     protected function get_upload_dir() {
-        $userpath = self::USERS_UPLOAD_DIR.$this->get_user_id();
+        $userpath = self::USERS_UPLOAD_DIR.$this->get_user_id().'/';
         if(!file_exists($userpath)){
             mkdir($userpath);
         }
@@ -41,9 +41,7 @@ class Frontend_Controller extends MY_Controller{
         return $this->session->userdata('userid');
     }
     
-    protected function get_download_url(){
-        return base_url().$this->get_user_id().$this->get_mask();
-    }
+
 
     
     protected function get_mask($class_name='',$uri_string=''){
@@ -59,7 +57,7 @@ class Frontend_Controller extends MY_Controller{
         $upload_path = '';
         foreach($split as $segment){
             if($segment != $class_name && $segment!=strtolower($this->uri->segment(2))){
-                $upload_path.='/'.$segment;
+                $upload_path.=$segment.'/';
             }
         }
         return $upload_path;

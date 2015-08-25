@@ -250,7 +250,7 @@ class FileModel extends CI_Model {
 			WHERE	`IdUser` = ? AND `FileName` = ? AND `FilePath` = ?";
             
                 $query.= " LIMIT 1";
-		$result = $this->db->query($query, [$IdUser, $FileName,$FilePath])->result_array();
+		$result = $this->db->query($query, [$IdUser, $FileName,$FilePath])->row();
                 
 		return $result;
         }
@@ -262,7 +262,6 @@ class FileModel extends CI_Model {
 			WHERE	`IdUser` = ? AND `FilePath` = ?";
                 $query.= " LIMIT 1";
 		$result = $this->db->query($query, [$IdUser,$FilePath])->row();
-                
 		return $result;
         }
         

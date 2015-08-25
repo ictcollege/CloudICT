@@ -19,18 +19,17 @@ class Files extends Frontend_Controller{
     
     function index(){
         $data = array();
-        $upload_dir = $this->get_upload_dir();
         $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
-        // 0 is root user mask
         $data['current_path'] = $mask;
         $data['current_dir'] = (empty($mask)) ? 0 : $this->get_current_dir($mask);
+        $data['breadcrumbs'] = $this->breadcrumbs($mask);
         $this->load_view('filesView',$data,'menu');
         
     }
     
     protected function get_current_dir($mask){
         $this->load->model("FileModel");
-        $filepath = $this->get_upload_dir().$mask;
+        $filepath = substr(strtolower($this->get_upload_dir().$mask),0,-1);
         $result = $this->FileModel->getFolder($this->get_user_id(),$filepath);
         if($result){
             return $result->IdFile;
@@ -38,6 +37,17 @@ class Files extends Frontend_Controller{
         else{
             return 0;
         }
+    }
+    
+    protected function breadcrumbs($mask){
+        $bread = explode('/', $mask);
+        $breadcrumbs = array();
+        foreach($bread as $crumbs){
+            if(!empty($crumbs)){
+                $breadcrumbs[] = $crumbs;
+            }
+        }
+        return $breadcrumbs;
     }
 
 }
