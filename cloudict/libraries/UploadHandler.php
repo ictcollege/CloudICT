@@ -42,11 +42,10 @@ class UploadHandler
 
     function __construct($options = null, $initialize = true, $error_messages = null) {
         $this->options = array(
-            'script_url' => base_url().'Fileupload/upload/',
-            'upload_dir' => dirname($this->get_server_var('SCRIPT_FILENAME')).'/data/',
-            //'upload_dir' => 'data/'.$this->get_user_path(),
-            'upload_url' => $this->get_full_url().'/data/',
-            'user_dirs' => true,
+            'script_url' => $this->get_full_url().'/',
+            'upload_dir' => dirname($this->get_server_var('SCRIPT_FILENAME')).'/files/',
+            'upload_url' => $this->get_full_url().'/files/',
+            'user_dirs' => false,
             'mkdir_mode' => 0755,
             'param_name' => 'files',
             // Set the following option to 'POST', if your server does not support
@@ -287,7 +286,7 @@ class UploadHandler
 
     protected function is_valid_file_object($file_name) {
         $file_path = $this->get_upload_path($file_name);
-        if (is_file($file_path) || is_dir($file_path) && $file_name[0] !== '.') {
+        if (is_file($file_path) && $file_name[0] !== '.') {
             return true;
         }
         return false;
@@ -1150,15 +1149,6 @@ class UploadHandler
     }
 
     protected function get_file_names_params() {
-        if(isset($_REQUEST[$this->options['param_name']])){
-            $params = $_REQUEST[$this->options['param_name']];
-        }
-        elseif(isset($_GET['file'])){
-            $params = $_GET['file'];
-        }
-        else{
-            $params= array();
-        }
         $params = isset($_REQUEST[$this->options['param_name']]) ?
             $_REQUEST[$this->options['param_name']] : array();
         foreach ($params as $key => $value) {
@@ -1327,45 +1317,26 @@ class UploadHandler
     }
 
     public function delete($print_response = true) {
-        //$file_names = $this->get_file_names_params();
-        $file_name = $_GET['file'];
-        if (empty($file_name)) {
+        $file_names = $this->get_file_names_params();
+        if (empty($file_names)) {
             $file_names = array($this->get_file_name_param());
         }
         $response = array();
-//        foreach($file_names as $file_name) {
-//            $file_path = $this->get_upload_path($file_name).$file_name;
-//            $success = is_file($file_path) && $file_name[0] !== '.' && unlink($file_path);
-//            if ($success) {
-//                foreach($this->options['image_versions'] as $version => $options) {
-//                    if (!empty($version)) {
-//                        $file = $this->get_upload_path($file_name, $version);
-//                        if (is_file($file)) {
-//                            unlink($file);
-//                        }
-//                    }
-//                }
-//            }
-            $file_path = $this->options['upload_dir'].$this->get_user_path().$file_name;
+        foreach($file_names as $file_name) {
+            $file_path = $this->get_upload_path($file_name);
             $success = is_file($file_path) && $file_name[0] !== '.' && unlink($file_path);
-            if(!$success){
-                $success = is_dir($file_path) && $file_name[0] !== '.' && rmdir($file_path);
-            }
-            if($success){
+            if ($success) {
                 foreach($this->options['image_versions'] as $version => $options) {
                     if (!empty($version)) {
                         $file = $this->get_upload_path($file_name, $version);
                         if (is_file($file)) {
                             unlink($file);
                         }
-                        if(is_dir($file)){
-                            rmdir($file);
-                        }
                     }
                 }
             }
             $response[$file_name] = $success;
-        
+        }
         return $this->generate_response($response, $print_response);
     }
 

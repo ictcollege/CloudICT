@@ -12,13 +12,20 @@
                           <li><a href="<?php echo base_url();?>Files/"><i class="fa fa-home fa-2x homeicon"></i><i class="fa fa-angle-right fa-2x separatoricon"></i> </a></li>
                           <?php
                           if(isset($breadcrumbs)){
+                              $end = count($breadcrumbs);
+                              $i =0;
+                              $delimiter = '/';
+                              
+                              $link = base_url().'Files/index';
                               foreach($breadcrumbs as $bread){
-                                  $active = '';
-                                  if($current_dir_name==$bread){
-                                      $active = 'class="active"';
-                                  }
-                                  echo "<li {$active}>".$bread."</li>";
+                                  $li = "<li><a href='";
+                                  $link.=$delimiter.$bread;
+                                  $li.=$link;
+                                  $li.="'>".$bread."</a></li>";
+                                  echo $li;
                               }
+                              
+                              
                           }
                           
                           ?>
@@ -88,6 +95,25 @@
                     
             </div>
         </div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Share</h4>
+      </div>
+      <div class="modal-body">
+        <?php print_r($this->session->all_userdata());?>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
     <!-- The blueimp Gallery widget -->
@@ -100,12 +126,15 @@
     <a class="play-pause"></a>
     <ol class="indicator"></ol>
 </div>
+
 <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>    
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
     <tr class="template-upload fade">
         <td>
+            <input name="Mask[]" type="hidden" value="<?php echo $current_path;?>"/>
+            <input type="hidden" name="IdFolder[]" value="<?php echo $current_dir;?>"/>
             <span class="preview"></span>
         </td>
         <td>
@@ -157,7 +186,7 @@
         <td>
             <p class="name">
                 {% if(file.FileTypeMime=="DIR"){ %}
-                    <a href="<?php echo base_url();?>Fileupload/?current_dir={%=file.IdFile%}">{%=file.name%}</a>
+                    <a href="<?php echo base_url();?>files/index/{%=file.Mask+file.name%}">{%=file.name%}</a>
                 {% } else if (file.url) { %}
                     <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" {%=file.thumbnailUrl?'data-gallery':''%}>{%=file.name%}</a>
                 {% } else { %}
@@ -169,14 +198,25 @@
             {% } %}
         </td>
         <td>
-          <a href="#" title="edit/rename"><i class="fa  fa-pencil fa-fw"></i></a>
+          <div class="btn-group">
+          <a href="#" data-toggle="dropdown" title="edit/rename"><i class="fa  fa-pencil fa-fw"></i></a>
+          <ul class="dropdown-menu">
+            <li><a href="#" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" class="rename">Rename</a></li>
+            <li><a href="#" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" class="move">Move</a></li>
+            {% if(file.FileTypeMime!="DIR"){ %}
+            <li><a href="#" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" class="edit">Edit</a></li>
+            {% } %}
+          </ul>
           {% if (file.deleteUrl) { %}
                 <a href="#" class="delete" data-IdFile="{%=file.IdFile%}" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}>
                     <i class="glyphicon glyphicon-trash"></i>
                 </a>
             {% } %}
-          <a href="#" title="download"><i class="fa  fa-cloud-download fa-fw"></i></a>
-          <a href="#" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
+
+          <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" title="download"><i class="fa  fa-cloud-download fa-fw"></i></a>
+          
+          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
+          </div>
         </td>
         <td>
           {% if (file.FileTypeMime=="DIR") { %}
@@ -187,7 +227,7 @@
         </td>
         <td>
             <p class="FileLastModified">{%=timeConverter(file.FileLastModified)||''%}</p>
-            
+
         </td>
         
 
@@ -237,11 +277,16 @@
     $('#fileupload').fileupload({
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
-        url: '<?php echo base_url();?>CloudFiles/',
+        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
         maxChunkSize: 4000000, // 4 MB,
         formData: {IdFolder: $("#current_dir").val(),Mask:$("#current_path").val()}
     });
-
+    $('#fileupload').fileupload({
+        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
+        maxChunkSize: 4000000 // 4 MB
+    }).on('fileuploadsubmit', function (e, data) {
+        data.formData = data.context.find(':input').serializeArray();
+    });
     // Enable iframe cross-domain access via redirect option:
     $('#fileupload').fileupload(
         'option',
@@ -298,16 +343,15 @@
         $("#newFolder").click(function (e){
             e.preventDefault();
             var IdFolder = $("#current_dir").val();
-            var current_path = $("#current_path").val();
+            var Mask = $("#current_path").val();
             var folder_name = prompt("Folder name:");
             if(folder_name.length>0){
                 $("#errorMsg").text('');
                 $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/newFolder/"+folder_name,
-                        type: 'POST',
-                        data:{IdFolder : IdFolder},
+			url: "<?php echo base_url();?>CloudFiles/",
+                        data:{action:"newFolder",Mask:Mask,folderName:folder_name,IdFolder : IdFolder},
 			success: function(data) {
-                            window.location.reload();
+                           window.location.reload();
 			}
 			
 		});
@@ -316,11 +360,49 @@
               $("#errorMsg").text("Please give folder some name!");  
             }
         });
-        $(document).ajaxComplete(function (){
+        
 
+        $(document).ajaxComplete(function (){
+            //pencil click
+            $(".edit").click(function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                var IdFolder = $("#current_dir").val();
+                var Mask = $("#current_path").val();
+            });
+            $(".rename").click(function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                var newName = prompt("New name");
+                var IdFolder = $("#current_dir").val();
+                var Mask = $("#current_path").val();
+                var tdHref=$(this).parents('tr').find('p.name').find('a');
+                if(newName!=null&&newName.length>0){
+                $("#errorMsg").text('');
+                $.ajax({
+			url: "<?php echo base_url();?>CloudFiles/",
+                        data:{action:"renameFile",Mask:Mask,folderName:newName,IdFolder : IdFolder},
+			success: function(data) {
+                           //nije odradjeno serverski
+                           $(tdHref).text(newName);
+			}
+
+                    });
+                }
+                else{
+                  $("#errorMsg").text("Please give folder some name!");  
+                }
+            });
+            
+            $(".move").click(function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+            });
         });
     });
 
 });
+
+
 
 </script>

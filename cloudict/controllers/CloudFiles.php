@@ -11,130 +11,62 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 
 class CloudFiles extends File_Controller{
-    private $IdFolder=0;
+    private $current_dir;
+    private $current_path;
     private $Mask;
+    private $Files;
     public function __construct() {
         $this->class_name = get_class($this);
         parent::__construct();
-        $this->load->model('FileModel');
+        
     }
 
     
     public function index(){
         
     }
+    
     protected function initialize() {
-        if(isset($_POST['action'])){
-            switch ($_POST['action']){
-                case 'newFolder': $this->newFolder();
+        $this->Mask = $this->get_mask($this->class_name,  uri_string());
+        if(isset($_GET['action'])){
+            switch ($_GET['action']){
+                case "newFolder":
+                    $clean = trim($_GET['folderName']);
+                    $folderName = rawurlencode(preg_replace('/\s+/', '_', $clean));
+                    $this->newFolder($folderName,$_GET['Mask'],intval($_GET['IdFolder']));
+                    break;
             }
         }
-        if(isset($_POST['IdFolder'])){
-            $this->IdFolder = intval($_POST['IdFolder']);
-        }
-        if(isset($_POST['Mask'])){
-            $this->Mask = $_POST['Mask'];
-        }
+
+
         parent::initialize();
     }
-    protected function handle_form_data($file, $index) {
-        $file->IdFolder = $this->IdFolder;
-        $file->Mask = $this->Mask;
-        $file->FileExtension = pathinfo($file->name, PATHINFO_EXTENSION);
-    }
-    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error, $index = null, $content_range = null) {
-        $file=parent::handle_file_upload($uploaded_file, $name, $size, $type, $error, $index, $content_range);
-        //public function insertUserFile($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName, $FileSize)
-        $this->load->model('FileModel');
-        $file->filetype=  $this->FileModel->getFileType($file->type);
-        $file->FileLastModified = time();
-        
-        return $file;
-    }
-    /**
-     * 
-     * @param type $file
-     */
-    protected function set_additional_file_properties($file) {
-        parent::set_additional_file_properties($file);
-        if($_SERVER['REQUEST_METHOD']==='GET'){
-//            //public function getAllFilesInFolder($IdUser, $IdFolder=NULL)
-//            $this->load->model("FileModel");
-//            $result = $this->FileModel->getAllFilesInFolder($this->get_user_id());
-//            $i = 0;
-//            foreach($file as $key=>$val){
-//                var_dump($key);
-//                var_dump($file->$key);
-//            }
-        
-            
-
-        
-            
-            
-        }
-    }
-    /**
-     * overvrajtovana metoda zbog bug-a sa svim id-jevima 
-     * nije idealno resenje, moguce usporavanje baze
-     * trebalo bi po nekom pravilu sve file object-e da povezem sa nizom u tom folderu, ali to je nemoguce
-     * @param type $file_name
-     * @return type
-     */
-    protected function get_file_object($file_name) {
-        $file = parent::get_file_object($file_name);
-        $this->load->model("FileModel");
-        $result = $this->FileModel->getFile($this->get_user_id(),$file_name,  $this->get_upload_path());
-        if(count($result)>0){
-            $file->IdFile=$result[0]["IdFile"];
-            $file->IdFolder = $this->current_dir;
-            $file->FileExtension = $result[0]["FileExtension"];
-            $file->FileCreated = $result[0]["FileCreated"];
-            $file->FileLastModified = $result[0]["FileLastModified"]; 
-            $file->FileTypeMime = $result[0]["FileTypeMime"];
-            $file->deleteUrl.='&IdFile='.$file->IdFile;
-        }
-
-        return $file;
-    }
     
-    public function delete($print_response = true,$currentdir='') {
-        if(isset($_GET['IdFile'])){
-            $IdFile = intval($_GET['IdFile']);
-        }
-
-        $response = parent::delete(false);
-        
-        
-        foreach ($response as $name => $deleted) {
-            if ($deleted&&isset($IdFile)) {
-                $this->load->model('FileModel');
-                $this->FileModel->deleteFile($IdFile);
-            }
-        } 
-        return $this->generate_response($response, $print_response);
-    }
     
-    public function newFolder() {
-        $newFolder = $this->createDir();
-        if($newFolder!=FALSE){
-            $split = explode('/', $newFolder);
-            $folderName = end($split);
-            $result = $this->FileModel->getFolder($this->get_user_id(), $this->IdFolder);
-            $parrent_dir = 0;
-            if($result){
-                $parrent_dir = $result->IdFile;
-            }
-            $this->FileModel->insertUserFile($this->get_user_id(),1,$parrent_dir,null,$folderName,$newFolder,0); 
-            
+    protected function newFolder($FolderName,$FilePath='',$IdFolder=0) {
+        if($IdFolder == 0){
+            $filepath = $this->get_upload_path($FolderName);
         }
+        else{
+            
+            $filepath = $this->get_upload_path($FilePath.$FolderName);
+        }
+        if(file_exists($filepath)){
+            $filepath = $this->upcount_name($filepath);
+        }
+        $filepath = strtolower($filepath);
+        if(mkdir($filepath)){
+            $this->load->model("FileModel");
+            $this->FileModel->insertUserFile($this->get_user_id(), 1, $IdFolder, null, $FolderName,$filepath, 0);
+        }
+        
     }
     
     /**
      * Novi folder
      * new folder
      */
-    protected function createDir(){
+    protected function createDir($fileName){
         $filepath = $this->get_upload_path();
         if(file_exists($filepath)){
             $filepath= $this->upcount_name($filepath);
@@ -148,12 +80,6 @@ class CloudFiles extends File_Controller{
       
     }
 
- 
-    protected function get_upload_path($file_name = null, $version = null) {
-        $mask = $this->get_mask($this->class_name,  uri_string()).$version;
-        $this->IdFolder = dirname(parent::get_upload_path($file_name,$version));
-        return parent::get_upload_path($file_name, $mask);
-    }
     
     
         /**
@@ -190,10 +116,201 @@ class CloudFiles extends File_Controller{
         return $bytes;
     }
     
+    
+    protected function handle_form_data($file, $index) {
+        $file->IdFolder = @intval($_REQUEST['IdFolder'][$index]);
+        $file->Mask = @$_REQUEST['Mask'][$index];
+    }
 
+    protected function handle_file_upload($uploaded_file, $name, $size, $type, $error,
+            $index = null, $content_range = null) {
+        $file = parent::handle_file_upload(
+            $uploaded_file, $name, $size, $type, $error, $index, $content_range
+        );
+        if (empty($file->error)) {
+            
+            $this->load->model("FileModel");
+            $file->filetype=  $this->FileModel->getFileType($file->type);
+            $file->FilePath = strtolower($this->get_upload_path($file->name));
+            $file->FileExtension = pathinfo($file->FilePath,PATHINFO_EXTENSION);
+            $file->FileLastModified = time();
+            if($file->chunk==FALSE){
+
+                $file->IdFile = $this->FileModel->insertUserFile($this->get_user_id(),$file->filetype,  $file->IdFolder,$file->FileExtension,$file->name, $file->FilePath,$file->size);
+            }
+        }
+        return $file;
+    }
+
+    protected function set_additional_file_properties($file) {
+        parent::set_additional_file_properties($file);
+        if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $file->Mask = $this->get_mask($this->class_name,  uri_string());
+            $this->load->model("FileModel");
+            $result = $this->FileModel->getFile($this->get_user_id(),$file->name,  $file->FilePath);
+            if($result){
+                $file->IdFile = $result->IdFile;
+                $file->FileTypeMime = $result->FileTypeMime;
+                $file->FileExtension = $result->FileExtension;
+                $file->FileLastModified = $result->FileLastModified;
+                $file->deleteUrl.="&IdFile=".$result->IdFile."&Mask=".$file->Mask;
+            }
+        }
+    }
+    protected function get_file_object($file_name) {
+        if ($this->is_valid_file_object($file_name)) {
+            $file = new \stdClass();
+            $file->name = $file_name;
+            $file->size = $this->get_file_size(
+                $this->get_upload_path($file_name)
+            );
+            $file->url = $this->get_download_url($file->name);
+            $file->FilePath = $this->get_upload_path($file->name);
+            foreach($this->options['image_versions'] as $version => $options) {
+                if (!empty($version)) {
+                    if (is_file($this->get_upload_path($file_name, $version))) {
+                        $file->{$version.'Url'} = $this->get_download_url(
+                            $file->name,
+                            $version
+                        );
+                    }
+                }
+            }
+            $this->set_additional_file_properties($file);
+            return $file;
+        }
+        return null;
+    }
+    protected function get_file_objects($iteration_method = 'get_file_object') {
+        $upload_dir = $this->get_upload_path();
+        if (!is_dir($upload_dir)) {
+            return array();
+        }
+        return array_values(array_filter(array_map(
+            array($this, $iteration_method),
+            scandir($upload_dir)
+        )));
+    }
     
+
+
+    protected function getFilePath($file_name){
+        $user_path = $this->options['upload_dir'];
+        if($this->options['user_dirs']){
+            $user_path.=$this->get_user_id();
+        }
+        $user_path.=$this->get_mask($this->class_name,  uri_string());
+        if(file_exists($user_path.'/'.$file_name)){
+            return $user_path;
+        }
+        else{
+            return null;
+        }
+    }
     
+    protected function get_upload_path($file_name = null, $version = null) {
+        $file_name = $file_name ? $file_name : '';
+        if (empty($version)) {
+            $version_path = '';
+        } else {
+            $version_dir = @$this->options['image_versions'][$version]['upload_dir'];
+            if ($version_dir) {
+                return $version_dir.$this->get_user_path().$file_name;
+            }
+            $version_path = $version.'/';
+        }
+
+         return $this->options['upload_dir'].$this->get_user_path().$this->Mask.$version_path.$file_name;
+    }
     
+    public function delete($print_response = true,$currentdir='') {
+        if(isset($_GET['IdFile'])){
+            $IdFile = intval($_GET['IdFile']);
+        }
+        if(isset($_GET['Mask'])){
+            $mask = $_GET['Mask'];
+        }
+        $file_name = $_GET['file'];
+        if (empty($file_name)) {
+            $file_names = array($this->get_file_name_param());
+        }
+        $response = array();
+
+        $file_path = $this->get_upload_path($mask.$file_name);
+        $success = is_file($file_path) && $file_name[0] !== '.' && unlink($file_path);
+        if(!$success){
+            $success = is_dir($file_path) && $file_name[0] !== '.' && $this->forceDeleteDir($file_path);
+        }
+        if($success){
+            foreach($this->options['image_versions'] as $version => $options) {
+                if (!empty($version)) {
+                    $file = $this->get_upload_path($mask.$file_name, $version);
+                    if (is_file($file)) {
+                        unlink($file);
+                    }
+                    if(is_dir($file)){
+                        rmdir($file);
+                        //force delete thumbnail
+
+                    }
+                }
+            }
+            $this->load->model("FileModel");
+            $this->FileModel->deleteFile($IdFile);
+        }
+        
+        $response[$file_name] = $success;
+         
+        return $this->generate_response($response, $print_response);
+    }
     
+    protected function get_download_url($file_name, $version = null, $direct = false) {
+        return parent::get_download_url($file_name, $this->Mask.$version, $direct);
+    }
+    
+    protected function download() {
+        switch ($this->options['download_via_php']) {
+            case 1:
+                $redirect_header = null;
+                break;
+            case 2:
+                $redirect_header = 'X-Sendfile';
+                break;
+            case 3:
+                $redirect_header = 'X-Accel-Redirect';
+                break;
+            default:
+                return $this->header('HTTP/1.1 403 Forbidden');
+        }
+        $file_name = $this->get_file_name_param();
+        if (!$this->is_valid_file_object($file_name)) {
+            return $this->header('HTTP/1.1 404 Not Found');
+        }
+        if ($redirect_header) {
+            return $this->header(
+                $redirect_header.': '.$this->get_download_url(
+                    $file_name,
+                    $this->get_version_param(),
+                    true
+                )
+            );
+        }
+        $file_path = $this->get_upload_path($file_name, $this->get_version_param());
+        // Prevent browsers from MIME-sniffing the content-type:
+        $this->header('X-Content-Type-Options: nosniff');
+        if (!preg_match($this->options['inline_file_types'], $file_name)) {
+            $this->header('Content-Type: application/octet-stream');
+            $this->header('Content-Disposition: attachment; filename="'.$file_name.'"');
+        } else {
+            $this->header('Content-Type: '.$this->get_file_type($file_path));
+            $this->header('Content-Disposition: inline; filename="'.$file_name.'"');
+        }
+        $this->header('Content-Length: '.$this->get_file_size($file_path));
+        $this->header('Last-Modified: '.gmdate('D, d M Y H:i:s T', filemtime($file_path)));
+        $this->readfile($file_path);
+    }
+    
+
+
     
 }
