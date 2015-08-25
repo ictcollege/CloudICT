@@ -51,7 +51,9 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
             $data['password_attr'] = $password_attr;
         
         //views
-        $this->load_view('login', $data);
+        $this->load->view('header', $data);
+        $this->load->view('login', $data);
+        $this->load->view('footer', $data);
     }
     
     public function login()

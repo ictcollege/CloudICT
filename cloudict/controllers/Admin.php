@@ -50,11 +50,8 @@ class Admin extends Backend_Controller {
             {
                 $data['applications'] .= '</div>'; 
             }
-            
         }
         
-        
-            
         //data to view
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Applications";
@@ -128,7 +125,7 @@ class Admin extends Backend_Controller {
         $this->load->view('newuser', $data);
     }
     
-    public function group()
+    public function groups()
     {
         //helpers
         $this->load->helper('url');
@@ -137,13 +134,147 @@ class Admin extends Backend_Controller {
         //variables
         $base_url = base_url();
         
+        //model
+        $this->load->model('MenuModel');
+        $this->load->model('UserGroupModel');
+        
+        $menu = $this->MenuModel->getMenuOfApplication(3);
+        
+        $data['menu'] = "";
+        
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+        
+        $groups = $this->UserGroupModel->getGroups();
+        $usergroups = $this->UserGroupModel->getGroupAndUsersInIt();
+        
+        $data['usergroups'] = "";
+        $i=0;
+        foreach($groups['Group'] as $g)
+        {  
+            if($i%3==0)
+            {
+               $data['usergroups'] .= ' <div class="row">';  
+            }
+            $data['usergroups'] .= '<div class="col-lg-4">';
+            $data['usergroups'] .= '<div class="panel panel-primary">';
+            $data['usergroups'] .= '<div class="panel-heading">';
+            $data['usergroups'] .= $g['GroupName'];
+            $data['usergroups'] .= '</div>';
+            $data['usergroups'] .= '<div class="panel-body">';
+            $data['usergroups'] .= '<div class="group-admin">';
+            
+            foreach($usergroups['UserGroup'] as $ug)
+            {
+                if($ug['IdGroup'] == $g['IdGroup'])
+                {
+                   if($ug['Admin']==1)
+                   {
+                       $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-default btn-xs">'.$ug['UserName'].'</button>';
+                   }
+                }
+            }
+            
+            $data['usergroups'] .= '</div>';
+            $data['usergroups'] .= '<hr/>';
+            $data['usergroups'] .= '<ul class="list-inline">';
+            
+            foreach($usergroups['UserGroup'] as $ug)
+            {
+                if($ug['IdGroup'] == $g['IdGroup'])
+                {
+                   if($ug['Admin']==0)
+                   {
+                       $data['usergroups'] .= '<li>'.$ug['UserName'].'</li>';
+                   }
+                }
+            }
+            
+            $data['usergroups'] .= '</ul">';
+            $data['usergroups'] .= '</div>';
+            $data['usergroups'] .= '<div class="panel-footer">';
+            $data['usergroups'] .= '<button type="button" class="btn btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup">Edit</button>';
+            $data['usergroups'] .= '<button type="button" class="btn btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'.$g['IdGroup'].'">Delete</button>';
+            $data['usergroups'] .= '</div>';
+            $data['usergroups'] .= '</div>';
+            $data['usergroups'] .= '</div>';
+            
+            $i++;
+            if($i%3==0)
+            {
+                $data['usergroups'] .= '</div>'; 
+            }
+        }
+        
+        $data['deltemodal'] = "";
+        
+        foreach($groups['Group'] as $g)
+        { 
+            $data['deltemodal'] .= '<div class="modal fade" id="mDeleteGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
+            $data['deltemodal'] .= '<div class="modal-content">';
+            $data['deltemodal'] .= '<div class="modal-header">';
+            $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+            $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '<div class="modal-body text-center">';
+            $data['deltemodal'] .= 'Delete group '.$g['GroupName'].'?';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '<div class="modal-footer text-center">';
+            $data['deltemodal'] .= '<button type="button" class="btn btn-primary btnDeleteGroupYes">Yes</button>';
+            $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+        }
+        
+        
+        //data to view
+        $data['base_url']= $base_url;
+        $data['title'] = "ICT Cloud | Admin | Groups";
+        
+        //views
+        $this->load_view('groups', $data);
+    }
+    
+    public function insertGroup()
+    {
+        
+    }
+    
+    public function users()
+    {
+        //helpers
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+        //model
+        $this->load->model('MenuModel');
+        
+        $menu = $this->MenuModel->getMenuOfApplication(3);
+        
+        $data['menu'] = "";
+        
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+        
          //data to view
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Groups";
         
         //views
-        $this->load->view('header', $data);
-        $this->load->view('menu', $data);
-        $this->load->view('groups', $data);
+        $this->load_view('groups', $data);
     }
 }

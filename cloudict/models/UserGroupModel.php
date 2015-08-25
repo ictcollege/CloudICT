@@ -2,7 +2,60 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class UserGroupModel extends CI_Model {
-    public function getAllGroupsAndUsersInThem()
+    public function insertGroup($groupName)
+    {
+        $query = "
+                INSERT INTO `Group`(`GroupName`)
+                
+                VALUES ?
+            ";
+            
+        $this->db->query($query, [$groupName]);
+    }
+    
+    public function deleteGroup($idGroup)
+    {
+        $query = "
+                DELETE FROM `Group` 
+                
+                WHERE `IdGroup` = ?
+            ";
+        
+        $this->db->query($query, [$idGroup]);
+        
+        $query2 = "
+                DELETE FROM `UserGroup`
+                
+                 WHERE `IdGroup` = ?
+            ";
+        
+        $this->db->query($query2, [$idGroup]);
+    }
+    public function getGroups()
+    {
+        $query = " 
+                SELECT  `GroupName`,
+                        `IdGroup`
+
+                FROM    `Group`
+            ";
+        
+            $result = $this->db->query($query)->result_array();
+            
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['Group'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+    }
+    public function getGroupAndUsersInIt()
     {
             $query = " 
                     SELECT	`GroupName`,
@@ -28,9 +81,10 @@ class UserGroupModel extends CI_Model {
             
             if(!empty($result))
             {
+                $i=0;
                 foreach($result as $row)
                 {
-                    $data['UserGroup'] = $row;
+                    $data['UserGroup'][$i++] = $row;
                 }
             }
             

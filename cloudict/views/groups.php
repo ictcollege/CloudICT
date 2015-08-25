@@ -11,39 +11,9 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <div class="col-lg-4">
-                            <div class="panel panel-primary">
-                                <div class="panel-heading">
-                                    Group #1
-                                </div>
-                            <div class="panel-body">
-                                <div class="group-admin">
-                                    <button type="button" class="btn btn-outline btn-default btn-xs">Admin</button>
-                                </div>
-                                <hr/>
-                                <ul class="list-inline">
-                                    <li>User 1,</li>
-                                    <li>User 2,</li>
-                                    <li>User 3,</li>
-                                    <li>User 4,</li>
-                                    <li>User 5,</li>
-                                    <li>User 1,</li>
-                                    <li>User 2,</li>
-                                    <li>User 3,</li>
-                                    <li>User 4,</li>
-                                    <li>User 5,</li>
-                                    <li>User 1,</li>
-                                    <li>User 2,</li>
-                                    <li>User 3,</li>
-                                    <li>User 4,</li>
-                                    <li>User 5,</li>
-                                </ul>
-                            </div>
-                            <div class="panel-footer">
-                                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#mEditGroup">Edit</button> 
-                            </div>
-                        </div>
-                    </div>
+                        <?php
+                            echo $usergroups;
+                        ?>
                     </div>
                 </div>
             </div>
@@ -95,4 +65,8 @@
             </div>
         </div>
     </div>
+    <!-- /#modal -->
+        <?php
+            echo $deltemodal;
+        ?>
     <!-- /#modal -->

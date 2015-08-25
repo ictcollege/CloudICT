@@ -59,12 +59,9 @@ class MY_Controller extends CI_Controller{
      * @param type $data
      * @param type $menu
      */
-    public function load_view($view,$data=array(),$menu=''){
+    public function load_view($view,$data=array()){
         $this->load->view('header',$data);
-        //menu name, load some specific menu like admin_menu, file_menu etc...
-        if($menu!=''){
-            $this->load->view($menu,$data);
-        }
+        $this->load->view('menu',$data);
         $this->load->view($view, $data);
         $this->load->view('footer');
     }

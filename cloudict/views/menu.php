@@ -10,7 +10,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="">ICT Cloud</a>
+                <a class="navbar-brand" href="admin/"><img src="public/img/ict.png" class="logo"/> <span class="cloud">Cloud</span></a>
             </div>
             <!-- /.navbar-header -->
 
@@ -107,23 +107,10 @@
                             </div>
                             <!-- /input-group -->
                         </li>
-                        <li>
-                            <a href="allfiles.html"><i class="fa fa-files-o fa-fw"></i> All Files</a>
-                        </li>
-                        
-                        <li>
-                            <a href="favourites.html"><i class="fa fa-star-o fa-fw"></i> Favourites</a>
-                        </li>
-                        <li>
-                            <a href="sharedwithyou.html"><i class="fa fa-share-alt fa-fw"></i> Shared With You</a>
-                        </li>
-                        <li>
-                            <a href="sharedwithothers.html"><i class="fa fa-share fa-fw"></i> Shared With Others</a>
-                        </li>
-                        <li>
-                            <a href="sharedbylink.html"><i class="fa fa-link fa-fw"></i> Shared By Link</a>
-                        </li>
-                     </ul>
+                        <?php
+                            echo $menu;
+                        ?>
+                    </ul>
                 </div>
                 <!-- /.sidebar-collapse -->
             </div>

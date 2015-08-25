@@ -178,3 +178,13 @@ textarea {
 a {
     text-decoration: none;
 }
+
+.logo {
+    height: 50px;
+    position: absolute;
+    top: 0px;
+}
+
+.cloud {
+    margin-left: 50px;
+}

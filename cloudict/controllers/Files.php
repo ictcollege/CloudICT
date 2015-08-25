@@ -24,8 +24,24 @@ class Files extends Frontend_Controller{
         // 0 is root user mask
         $data['current_path'] = $mask;
         $data['current_dir'] = (empty($mask)) ? 0 : $this->get_current_dir($mask);
-        $this->load_view('filesView',$data,'menu');
         
+        /*
+         * Lodovanje menija /Jericho 
+         */
+        $this->load->model('MenuModel');
+        
+        $menu = $this->MenuModel->getMenuOfApplication(2);
+        
+        $data['menu'] = "";
+        
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+        
+        $this->load_view('filesView', $data);
     }
     
     protected function get_current_dir($mask){
