@@ -101,6 +101,29 @@ class UserGroupModel extends CI_Model {
         
         $this->db->query($query, [$idGroup, $idUser]);
     }
+    
+    public function addAdmin($idUser, $idGroup) {
+        $query = "
+                UPDATE      `UserGroup`
+                SET         `UserGroupStatusAdmin` = 1
+                WHERE       `IdGroup` = ? 
+                AND         `IdUser` = ?
+                ";
+        
+        $this->db->query($query, [$idGroup, $idUser]);
+    }
+    
+    public function removeUserFromGroup($idUser, $idGroup) {
+        $query = "
+                DELETE      
+                FROM        `UserGroup` 
+                WHERE       `IdGroup` = ? 
+                AND         `IdUser` = ?
+                ";
+        
+        $this->db->query($query, [$idGroup, $idUser]);
+    }
+    
 }
 
 

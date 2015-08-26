@@ -200,7 +200,28 @@ a {
     margin-left: 50px;
 }
 
-.btn-admin {
+.btn-admin, .btn-user {
     margin-left: 5px;
     margin-top: 5px;
 }
+
+.btn-no-hover {
+    cursor: initial;
+}
+
+.icon-remove-user {
+    color: #357ebd;
+}
+
+.icon-add-admin{
+    color: #357ebd;
+}
+
+.admins {
+    min-height: 50px;
+}
+
+.users {
+    min-height: 50px;
+}
+
