@@ -210,5 +210,53 @@ $(document).ready(function() {
 
 	//test 
 	//$("#test").DataTable();
+        
+        //Ajax za delete grupe
+        $(".btnDeleteGroupYes").click(function() {
+            var id = $(this).parent().find(".hdId").val();
+            $.ajax({
+                url: '',
+                type: '',
+                dataType: '',
+                data: '',
+                success: function(response) {
+                    
+                }
+            });
+        });
+        
+        //group modal, remove admin
+        
+        $(".icon-remove-admin").hide();
+        
+        $(".icon-remove-admin").hover(function() {
+            $(this).css({"color":"red", "opacity":"0.6"});
+        }, function() {
+            $(this).css({"color":"white", "opacity":"0.6"});
+        });
+        
+        $(".btn-admin").hover(function() {
+            $(this).find(".icon-remove-admin").stop(true,true).show(500);
+        }, function() {
+            $(this).find(".icon-remove-admin").stop(true,true).hide(500);
+        });
+        
+        $(".icon-remove-admin").click(function() {
+            var _this = $(this),
+                iduser = $(this).attr("id"),
+                idgroup = $(this).find(".hdIdGroup").attr("id");
+            
+            $.ajax({
+                url: 'admin/removeAdmin',
+                type: 'post',
+                dataType: 'json',
+                data:{IdUser:iduser,IdGroup:idgroup},
+                success: function(response) {
+                    _this.parent().hide(500);
+                } 
+            });
+            
+            
+        });
 
 });

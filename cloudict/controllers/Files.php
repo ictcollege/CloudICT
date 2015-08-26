@@ -23,7 +23,6 @@ class Files extends Frontend_Controller{
         $data['current_path'] = $mask;
         $data['current_dir'] = (empty($mask)) ? 0 : $this->get_current_dir($mask);
         $data['breadcrumbs'] = $this->breadcrumbs($mask);
-        $this->load_view('filesView',$data,'menu');
         
         /*
          * Lodovanje menija /Jericho 
