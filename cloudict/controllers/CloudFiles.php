@@ -35,7 +35,14 @@ class CloudFiles extends File_Controller{
                     $folderName = rawurlencode(preg_replace('/\s+/', '_', $clean));
                     $this->newFolder($folderName,$_GET['Mask'],intval($_GET['IdFolder']));
                     break;
+                case "renameFile":
+                    $clean = trim($_GET['newName']);
+                    $newName = rawurlencode(preg_replace('/\s+/', '_', $clean));
+                    $IdFile = intval($_GET['IdFile']);
+                    $this->renameFile($IdFile, $newName);
+                    break;
             }
+            
         }
 
 
@@ -58,26 +65,23 @@ class CloudFiles extends File_Controller{
         if(mkdir($filepath)){
             $this->load->model("FileModel");
             $this->FileModel->insertUserFile($this->get_user_id(), 1, $IdFolder, null, $FolderName,$filepath, 0);
+            die(TRUE);
         }
         
     }
     
-    /**
-     * Novi folder
-     * new folder
-     */
-    protected function createDir($fileName){
-        $filepath = $this->get_upload_path();
-        if(file_exists($filepath)){
-            $filepath= $this->upcount_name($filepath);
+    protected function renameFile($IdFile,$newName) {
+        $this->load->model("FileModel");
+        $result = $this->FileModel->getFileById($IdFile);
+        if($result){
+            if(file_exists($result->FilePath)){
+                $newFilePath = dirname($result->FilePath)."/".$newName;
+                if(rename($result->FilePath, $newFilePath)){
+                    $this->FileModel->changeFileName($IdFile,$newName,$newFilePath);
+                    die(TRUE);
+                }
+            }
         }
-        if(mkdir($filepath,  $this->options['mkdir_mode'])){
-            return $filepath;
-        }
-        else{
-            return FALSE;
-        }
-      
     }
 
     
@@ -269,6 +273,7 @@ class CloudFiles extends File_Controller{
     }
     
     protected function download() {
+        die("AKJDSKA");
         switch ($this->options['download_via_php']) {
             case 1:
                 $redirect_header = null;

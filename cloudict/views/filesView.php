@@ -1,3 +1,4 @@
+
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
@@ -279,6 +280,7 @@
         //xhrFields: {withCredentials: true},
         url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
         maxChunkSize: 4000000, // 4 MB,
+        dropzone : true,
         formData: {IdFolder: $("#current_dir").val(),Mask:$("#current_path").val()}
     });
     $('#fileupload').fileupload({
@@ -374,17 +376,19 @@
                 e.preventDefault();
                 var IdFile = $(this).data("idfile");
                 var newName = prompt("New name");
-                var IdFolder = $("#current_dir").val();
-                var Mask = $("#current_path").val();
                 var tdHref=$(this).parents('tr').find('p.name').find('a');
                 if(newName!=null&&newName.length>0){
                 $("#errorMsg").text('');
                 $.ajax({
 			url: "<?php echo base_url();?>CloudFiles/",
-                        data:{action:"renameFile",Mask:Mask,folderName:newName,IdFolder : IdFolder},
+                        data:{action:"renameFile",IdFile:IdFile,newName:newName},
 			success: function(data) {
-                           //nije odradjeno serverski
-                           $(tdHref).text(newName);
+                           if(data){
+                               window.location.reload();
+                           }
+                           else{
+                               alert("Error!");
+                           }
 			}
 
                     });

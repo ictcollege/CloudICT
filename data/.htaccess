@@ -1,0 +1,8 @@
+<Files ~ "\.(jpg|jpeg|png|gif)$">
+order deny,allow
+allow from all
+</Files>
+Order Deny,Allow
+Deny from all
+Allow from localhost
+Allow from 127.0.0.1
