@@ -267,6 +267,7 @@ class FileModel extends CI_Model {
         
         public function getFileById($IdFile){
             $query = "SELECT * FROM `file` "
+                    . "JOIN `FileType` USING (`IdFileType`) "
                     . "WHERE `IdFile` = ? "
                     . "LIMIT 1";
             $result = $this->db->query($query, [$IdFile])->row();

@@ -14,7 +14,6 @@ class CloudFiles extends File_Controller{
     private $current_dir;
     private $current_path;
     private $Mask;
-    private $Files;
     public function __construct() {
         $this->class_name = get_class($this);
         parent::__construct();
@@ -158,6 +157,22 @@ class CloudFiles extends File_Controller{
                 $file->FileExtension = $result->FileExtension;
                 $file->FileLastModified = $result->FileLastModified;
                 $file->deleteUrl.="&IdFile=".$result->IdFile."&Mask=".$file->Mask;
+                switch ($file->FileExtension){
+                    case "jpg":
+                    case "jpeg":
+                    case "png":
+                    case "gif":
+
+                        $file->url= $this->get_download_url($file->name);
+                        break;
+                    default :
+                        $file->url= base_url()."share/download/".$file->IdFile;
+                        break;
+                }
+            }
+            else{
+                //can't find file in db so it need to be downloaded directly
+                $file->url = base_url()."share/download/".  rawurlencode(base64_encode($file->FilePath));
             }
         }
     }
@@ -168,8 +183,7 @@ class CloudFiles extends File_Controller{
             $file->size = $this->get_file_size(
                 $this->get_upload_path($file_name)
             );
-            $file->url = $this->get_download_url($file->name);
-            $file->FilePath = $this->get_upload_path($file->name);
+            $file->FilePath = strtolower($this->get_upload_path($file->name));
             foreach($this->options['image_versions'] as $version => $options) {
                 if (!empty($version)) {
                     if (is_file($this->get_upload_path($file_name, $version))) {
@@ -231,6 +245,7 @@ class CloudFiles extends File_Controller{
         if(isset($_GET['IdFile'])){
             $IdFile = intval($_GET['IdFile']);
         }
+        $mask = '';
         if(isset($_GET['Mask'])){
             $mask = $_GET['Mask'];
         }
@@ -272,48 +287,18 @@ class CloudFiles extends File_Controller{
         return parent::get_download_url($file_name, $this->Mask.$version, $direct);
     }
     
-    protected function download() {
-        die("AKJDSKA");
-        switch ($this->options['download_via_php']) {
-            case 1:
-                $redirect_header = null;
-                break;
-            case 2:
-                $redirect_header = 'X-Sendfile';
-                break;
-            case 3:
-                $redirect_header = 'X-Accel-Redirect';
-                break;
-            default:
-                return $this->header('HTTP/1.1 403 Forbidden');
-        }
-        $file_name = $this->get_file_name_param();
-        if (!$this->is_valid_file_object($file_name)) {
-            return $this->header('HTTP/1.1 404 Not Found');
-        }
-        if ($redirect_header) {
-            return $this->header(
-                $redirect_header.': '.$this->get_download_url(
-                    $file_name,
-                    $this->get_version_param(),
-                    true
-                )
-            );
-        }
-        $file_path = $this->get_upload_path($file_name, $this->get_version_param());
-        // Prevent browsers from MIME-sniffing the content-type:
-        $this->header('X-Content-Type-Options: nosniff');
-        if (!preg_match($this->options['inline_file_types'], $file_name)) {
-            $this->header('Content-Type: application/octet-stream');
-            $this->header('Content-Disposition: attachment; filename="'.$file_name.'"');
-        } else {
-            $this->header('Content-Type: '.$this->get_file_type($file_path));
-            $this->header('Content-Disposition: inline; filename="'.$file_name.'"');
-        }
-        $this->header('Content-Length: '.$this->get_file_size($file_path));
-        $this->header('Last-Modified: '.gmdate('D, d M Y H:i:s T', filemtime($file_path)));
-        $this->readfile($file_path);
-    }
+    
+    
+    
+    
+    
+    
+  
+    
+
+    
+    
+
     
 
 

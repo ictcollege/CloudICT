@@ -214,7 +214,7 @@
                 </a>
             {% } %}
 
-          <a href="{%=file.url%}" title="{%=file.name%}" download="{%=file.name%}" title="download"><i class="fa  fa-cloud-download fa-fw"></i></a>
+          <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}" title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
           
           <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
           </div>

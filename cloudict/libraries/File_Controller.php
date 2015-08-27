@@ -200,7 +200,10 @@ class File_Controller extends Frontend_Controller
         return $this->session->userdata('userid');
     }
 
-    protected function get_user_path() {
+    protected function get_user_path($requested_user=null) {
+        if(!empty($requested_user)){
+            return $requested_user.'/';
+        }
         if ($this->options['user_dirs']) {
             return $this->get_user_id().'/';
         }
