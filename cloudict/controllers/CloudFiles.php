@@ -138,8 +138,20 @@ class CloudFiles extends File_Controller{
             $file->FileExtension = pathinfo($file->FilePath,PATHINFO_EXTENSION);
             $file->FileLastModified = time();
             if($file->chunk==FALSE){
-
+                $file->size = $this->get_file_size($file->FilePath);
                 $file->IdFile = $this->FileModel->insertUserFile($this->get_user_id(),$file->filetype,  $file->IdFolder,$file->FileExtension,$file->name, $file->FilePath,$file->size);
+                switch ($file->FileExtension){
+                    case "jpg":
+                    case "jpeg":
+                    case "png":
+                    case "gif":
+
+                        $file->url= $this->get_download_url($file->name);
+                        break;
+                    default :
+                        $file->url= base_url()."share/download/".$file->IdFile;
+                        break;
+                }
             }
         }
         return $file;
@@ -182,7 +194,7 @@ class CloudFiles extends File_Controller{
             $file->name = $file_name;
             $file->size = $this->get_file_size(
                 $this->get_upload_path($file_name)
-            );
+            );            
             $file->FilePath = strtolower($this->get_upload_path($file->name));
             foreach($this->options['image_versions'] as $version => $options) {
                 if (!empty($version)) {
@@ -286,6 +298,7 @@ class CloudFiles extends File_Controller{
     protected function get_download_url($file_name, $version = null, $direct = false) {
         return parent::get_download_url($file_name, $this->Mask.$version, $direct);
     }
+    
     
     
     

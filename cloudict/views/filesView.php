@@ -77,7 +77,7 @@
                     </div>
                     
                         <!-- The table listing the files available for upload/download -->
-                        <table role="presentation" class="table table-striped">
+                        <table id="dropzone" role="presentation" class="table table-striped">
                             <thead>
                                 <th>Preview</th>
                                 <th></th>
@@ -271,6 +271,33 @@
 <script src="<?php echo base_url();?>public/js/cors/jquery.xdr-transport.js"></script>
 <![endif]-->
 <script type="text/javascript" charset="utf-8">
+    $(document).bind('dragover', function (e) {
+        var dropZone = $('#dropzone'),
+            timeout = window.dropZoneTimeout;
+        if (!timeout) {
+            dropZone.addClass('in');
+        } else {
+            clearTimeout(timeout);
+        }
+        var found = false,
+            node = e.target;
+        do {
+            if (node === dropZone[0]) {
+                found = true;
+                break;
+            }
+            node = node.parentNode;
+        } while (node != null);
+        if (found) {
+            dropZone.addClass('hover');
+        } else {
+            dropZone.removeClass('hover');
+        }
+        window.dropZoneTimeout = setTimeout(function () {
+            window.dropZoneTimeout = null;
+            dropZone.removeClass('in hover');
+        }, 100);
+    });
     $(function () {
     'use strict';
 
@@ -280,7 +307,7 @@
         //xhrFields: {withCredentials: true},
         url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
         maxChunkSize: 4000000, // 4 MB,
-        dropzone : true,
+        dropZone : $("#dropzone"),
         formData: {IdFolder: $("#current_dir").val(),Mask:$("#current_path").val()}
     });
     $('#fileupload').fileupload({
