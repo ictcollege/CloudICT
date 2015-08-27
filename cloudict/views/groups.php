@@ -55,6 +55,9 @@
                         <input class="form-control">
                     </div>
                     <div class="form-group">
+                        <label>Admins</label>
+                    </div>
+                    <div class="form-group">
                         <label>Members</label>
                     </div>
                 </div>
@@ -65,6 +68,9 @@
             </div>
         </div>
     </div>
+    <?php
+            echo $editmodal;
+        ?>
     <!-- /#modal -->
         <?php
             echo $deltemodal;

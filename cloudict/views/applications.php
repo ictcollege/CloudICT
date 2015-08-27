@@ -5,7 +5,7 @@
 	        <div class="col-md-8 col-md-offset-2">
                 <div class="app-panel panel">
                     
-                    <div class="panel-body">
+                    <div class="panel-body application-panel">
                         <?php
                             echo $applications;
                         ?>

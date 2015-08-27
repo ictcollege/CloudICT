@@ -168,20 +168,32 @@ class Admin extends Backend_Controller {
             $data['usergroups'] .= '<div class="panel-body">';
             $data['usergroups'] .= '<div class="group-admin">';
             
+            $loop = false;
+            
             foreach($usergroups['UserGroup'] as $ug)
             {
                 if($ug['IdGroup'] == $g['IdGroup'])
                 {
+                   $hasadmin = false;
                    if($ug['Admin']==1)
                    {
-                       $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-default btn-xs">'.$ug['UserName'].'</button>';
+                       $data['usergroups'] .= '<button type="button" class="btn btn-primary btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
+                       $hasadmin = true;
+                   }
+                   
+                   if(!$loop)
+                   {
+                        if(!$hasadmin)
+                        {
+                            $data['usergroups'] .= '<span>No admins</span>';
+                        }
+                        $loop = true;
                    }
                 }
             }
             
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '<hr/>';
-            $data['usergroups'] .= '<ul class="list-inline">';
             
             foreach($usergroups['UserGroup'] as $ug)
             {
@@ -189,16 +201,17 @@ class Admin extends Backend_Controller {
                 {
                    if($ug['Admin']==0)
                    {
-                       $data['usergroups'] .= '<li>'.$ug['UserName'].'</li>';
+                       $data['usergroups'] .= '<button type="button" class="btn btn-info btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
                    }
                 }
+                
+                
             }
             
-            $data['usergroups'] .= '</ul">';
             $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '<div class="panel-footer">';
-            $data['usergroups'] .= '<button type="button" class="btn btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup">Edit</button>';
-            $data['usergroups'] .= '<button type="button" class="btn btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'.$g['IdGroup'].'">Delete</button>';
+            $data['usergroups'] .= '<div class="panel-footer group-panel-footer">';
+            $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'.$g['IdGroup'].'">Edit</button>';
+            $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'.$g['IdGroup'].'">Delete</button>';
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '</div>';
@@ -211,6 +224,7 @@ class Admin extends Backend_Controller {
         }
         
         $data['deltemodal'] = "";
+        $data['editmodal'] = "";
         
         foreach($groups['Group'] as $g)
         { 
@@ -227,12 +241,67 @@ class Admin extends Backend_Controller {
             $data['deltemodal'] .= '<div class="modal-footer text-center">';
             $data['deltemodal'] .= '<button type="button" class="btn btn-primary btnDeleteGroupYes">Yes</button>';
             $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+            $data['deltemodal'] .= '<input type="hidden" id="'.$g['IdGroup'].'" class="hdId"/>';
             $data['deltemodal'] .= '</div>';
             $data['deltemodal'] .= '</div>';
             $data['deltemodal'] .= '</div>';
             $data['deltemodal'] .= '</div>';
+            
+            $data['editmodal'] .= '<div class="modal fade" id="mEditGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+            $data['editmodal'] .= '<div class="modal-content">';
+            $data['editmodal'] .= '<div class="modal-header">';
+            $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+            $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit Group</h4>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="modal-body">';
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Group Name</label>';
+            $data['editmodal'] .= '<input class="form-control" placeholder="'.$g['GroupName'].'" />';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Admins</label>';
+            
+            $data['editmodal'] .= '<div class="admins">';
+            foreach($usergroups['UserGroup'] as $ug)
+            {
+                if($ug['IdGroup'] == $g['IdGroup'])
+                {
+                   if($ug['Admin']==1)
+                   {
+                       $data['editmodal'] .= '<button type="button" class="btn btn-primary btn-admin">'.$ug['UserName'].'   <i class="fa fa-minus icon-remove-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+                   }
+                }
+            }
+            $data['editmodal'] .= '</div>';
+            
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Members</label>';
+            
+            $data['editmodal'] .= '<div class="users">';
+            foreach($usergroups['UserGroup'] as $ug)
+            {
+                if($ug['IdGroup'] == $g['IdGroup'])
+                {
+                   if($ug['Admin']==0)
+                   {
+                       $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$ug['UserName'].'   <i class="fa fa-trash-o icon-remove-user" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+                   }
+                }
+            }
+            $data['editmodal'] .= '</div>';
+            
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="modal-footer">';
+            $data['editmodal'] .= '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+            $data['editmodal'] .= '<button type="button" class="btn btn-primary btnNewGroup">Save</button>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
         }
-        
         
         //data to view
         $data['base_url']= $base_url;
@@ -242,9 +311,53 @@ class Admin extends Backend_Controller {
         $this->load_view('groups', $data);
     }
     
+    public function removeAdmin()
+    {
+        $iduser = $this->input->post('IdUser');
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->removeAdmin($iduser, $idgroup);
+        
+        echo json_encode(true);
+    }
+    
+    public function addAdmin()
+    {
+        $iduser = $this->input->post('IdUser');
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->addAdmin($iduser, $idgroup);
+        
+        echo json_encode(true);
+    }
+    
+    public function removeUserFromGroup()
+    {
+        $iduser = $this->input->post('IdUser');
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->removeUserFromGroup($iduser, $idgroup);
+        
+        echo json_encode(true);
+    }
+    
     public function insertGroup()
     {
         
+    }
+    
+    public function deleteGroup()
+    {
+        $this->input->post($idGroup);
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->deleteGroup($idGroup);
     }
     
     public function users()
