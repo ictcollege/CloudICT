@@ -238,7 +238,7 @@ class Admin extends Backend_Controller {
             $data['deltemodal'] .= '</div>';
             $data['deltemodal'] .= '</div>';
             
-            $data['editmodal'] .= '<div class="modal fade" id="mEditGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['editmodal'] .= '<div class="modal fade '.$g['IdGroup'].'" id="mEditGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
             $data['editmodal'] .= '<div class="modal-dialog" role="document">';
             $data['editmodal'] .= '<div class="modal-content">';
             $data['editmodal'] .= '<div class="modal-header">';
@@ -376,9 +376,16 @@ class Admin extends Backend_Controller {
         
         $response = "";
         
-        foreach($searchusers["SearchUsers"] as $su)
+        if(isset($searchusers["SearchUsers"]))
         {
-            $response .= $su["UserName"];
+            foreach($searchusers["SearchUsers"] as $su)
+            {
+                $response .= '<button type="button" class="btn btn-default btn-user">'.$su['UserName'].'<input type="hidden" id="'.$idgroup.'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-newuser" id="'.$su['IdUser'].'"><input type="hidden" id="'.$idgroup.'" class="hdIdGroup"/></i></button>';
+            }
+        }
+        else
+        {
+            $response .= '<button type="button" class="btn btn-default btn-user">No such user</button>';
         }
         
         echo json_encode($response);

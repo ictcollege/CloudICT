@@ -342,7 +342,8 @@ $(document).ready(function() {
                 dataType: 'json',
                 data:{Username:username,IdGroup:idgroup},
                 success: function(response) {
-                    alert(response);
+                    $(".modal."+idgroup).find(".newusers").text("");
+                     $(".modal."+idgroup).find(".newusers").append(response);
                 } 
             });
         });

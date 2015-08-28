@@ -180,12 +180,12 @@ class UserGroupModel extends CI_Model {
                                                         
                                                         FROM    `UserGroup`
                                                         
-                                                        WHERE `IdGroup` = ?
+                                                        WHERE `IdGroup` = '.$idGroup.'
                                                 ) 
-                        AND `UserName` LIKE "%?%"
+                        AND `UserName` LIKE "%'.$username.'%"
                 ';
         
-        $result = $this->db->query($query, [$idGroup, $username])->result_array();
+        $result = $this->db->query($query)->result_array();
             
         $data = array();
 
@@ -201,7 +201,7 @@ class UserGroupModel extends CI_Model {
         return $data;
     }   
     
-     public function getUsersThatAreInTheGroup($idGroup)
+    public function getUsersThatAreInTheGroup($idGroup)
     {
         $query = " 
                     SELECT	`UserName`,
