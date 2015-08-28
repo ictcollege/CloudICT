@@ -137,6 +137,7 @@ class Admin extends Backend_Controller {
         //model
         $this->load->model('MenuModel');
         $this->load->model('UserGroupModel');
+        $this->load->model('UserModel');
         
         $menu = $this->MenuModel->getMenuOfApplication(3);
         
@@ -154,6 +155,7 @@ class Admin extends Backend_Controller {
         
         $data['usergroups'] = "";
         $i=0;
+        
         foreach($groups['Group'] as $g)
         {  
             if($i%3==0)
@@ -161,33 +163,20 @@ class Admin extends Backend_Controller {
                $data['usergroups'] .= ' <div class="row">';  
             }
             $data['usergroups'] .= '<div class="col-lg-4">';
-            $data['usergroups'] .= '<div class="panel panel-primary">';
+            $data['usergroups'] .= '<div id="'.$g['IdGroup'].'" class="panel panel-primary">';
             $data['usergroups'] .= '<div class="panel-heading">';
             $data['usergroups'] .= $g['GroupName'];
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '<div class="panel-body">';
             $data['usergroups'] .= '<div class="group-admin">';
             
-            $loop = false;
-            
             foreach($usergroups['UserGroup'] as $ug)
             {
                 if($ug['IdGroup'] == $g['IdGroup'])
                 {
-                   $hasadmin = false;
                    if($ug['Admin']==1)
                    {
-                       $data['usergroups'] .= '<button type="button" class="btn btn-primary btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
-                       $hasadmin = true;
-                   }
-                   
-                   if(!$loop)
-                   {
-                        if(!$hasadmin)
-                        {
-                            $data['usergroups'] .= '<span>No admins</span>';
-                        }
-                        $loop = true;
+                       $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-primary btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
                    }
                 }
             }
@@ -195,19 +184,21 @@ class Admin extends Backend_Controller {
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '<hr/>';
             
+            $data['usergroups'] .= '<div class="group-user">';
             foreach($usergroups['UserGroup'] as $ug)
             {
                 if($ug['IdGroup'] == $g['IdGroup'])
                 {
                    if($ug['Admin']==0)
                    {
-                       $data['usergroups'] .= '<button type="button" class="btn btn-info btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
+                       $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-info btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
                    }
                 }
                 
                 
             }
             
+            $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '</div>';
             $data['usergroups'] .= '<div class="panel-footer group-panel-footer">';
             $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'.$g['IdGroup'].'">Edit</button>';
@@ -291,7 +282,20 @@ class Admin extends Backend_Controller {
                 }
             }
             $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>New Memers</label>';
+            $data['editmodal'] .= '<div class="newusers">';
             
+            $usersnotingroup = $this->UserGroupModel->getUsersThatAreNotInTheGroup($g['IdGroup']);
+            
+            foreach($usersnotingroup['UsersNotInGroup'] as $unig)
+            {
+                $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$unig['UserName'].'<input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-newuser" id="'.$unig['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+            }
+            
+            
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
             $data['editmodal'] .= '</div>';
             $data['editmodal'] .= '</div>';
             $data['editmodal'] .= '<div class="modal-footer">';
@@ -343,6 +347,18 @@ class Admin extends Backend_Controller {
         $this->load->model("UserGroupModel");
         
         $this->UserGroupModel->removeUserFromGroup($iduser, $idgroup);
+        
+        echo json_encode(true);
+    }
+    
+    public function addNewUserToGroup()
+    {
+        $iduser = $this->input->post('IdUser');
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->addNewUserToGroup($iduser, $idgroup);
         
         echo json_encode(true);
     }

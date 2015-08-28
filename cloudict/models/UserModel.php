@@ -304,6 +304,29 @@ class UserModel extends CI_Model {
 		$result = $this->db->query($updateQuery, [$UserDiskUsed,$IdUser]);
 		return !empty($result)?1:0; 
 	}
+        
+        public function getAllUsers()
+        {
+            $query = "
+                    SELECT * 
+                    FROM `User`
+                    ";
+            
+            $result = $this->db->query($query)->result_array();
+            
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['Users'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+        }
 }
 
 /* End of file UserModel.php */

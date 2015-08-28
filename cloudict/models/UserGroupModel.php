@@ -69,7 +69,7 @@ class UserGroupModel extends CI_Model {
 			JOIN	`UserGroup`
 			USING	(`IdUser`)
 
-			JOIN	`Group` AS `g`
+			JOIN	`Group`
 			USING	(`IdGroup`)
             
                         ORDER BY `IdGroup`
@@ -85,6 +85,39 @@ class UserGroupModel extends CI_Model {
                 foreach($result as $row)
                 {
                     $data['UserGroup'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+    }
+    
+    public function getUsersThatAreNotInTheGroup($idGroup)
+    {
+        $query = " 
+                    SELECT	`UserName`,
+                                `IdUser`
+			
+                        FROM 	`User`
+
+			WHERE `IdUser` NOT IN   (
+                                                        SELECT  `IdUser`
+                                                        
+                                                        FROM    `UserGroup`
+                                                        
+                                                        WHERE `IdGroup` = ?
+                                                )
+            ";
+            
+            $result = $this->db->query($query, [$idGroup])->result_array();
+            
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['UsersNotInGroup'][$i++] = $row;
                 }
             }
             
@@ -122,6 +155,17 @@ class UserGroupModel extends CI_Model {
                 ";
         
         $this->db->query($query, [$idGroup, $idUser]);
+    }
+    
+    public function addNewUserToGroup($idUser, $idGroup)
+    {
+        $query = "
+                INSERT INTO `UserGroup`(`IdUser`, `IdGroup`, `UserGroupStatusAdmin`)
+                
+                VALUES (?, ?, 0);
+                ";
+        
+        $this->db->query($query, [$idUser, $idGroup]);
     }
     
 }

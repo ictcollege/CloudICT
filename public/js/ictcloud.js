@@ -211,24 +211,7 @@ $(document).ready(function() {
 	//test 
 	//$("#test").DataTable();
         
-        //Ajax za delete grupe
-        $(".btnDeleteGroupYes").click(function() {
-            var id = $(this).parent().find(".hdId").val();
-            $.ajax({
-                url: '',
-                type: '',
-                dataType: '',
-                data: '',
-                success: function(response) {
-                    
-                }
-            });
-        });
-        
         //group modal, remove admin
-        
-        
-        
         $(document).on("mouseenter", ".icon-remove-admin", function(){
             $(this).css({"color":"red", "opacity":"0.6"});
         });
@@ -251,6 +234,8 @@ $(document).ready(function() {
                 success: function(response) {
                     _this.parent().hide(500);
                     $(".users").append('<button type="button" class="btn btn-default btn-user">'+username+'<i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>');
+                    $(".panel#"+idgroup).find(".group-admin").find("button#"+iduser).remove();
+                    $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
                 } 
             });
         });
@@ -293,6 +278,8 @@ $(document).ready(function() {
                 success: function(response) {
                     _this.parent().hide(500);
                     $(".admins").append('<button type="button" class="btn btn-primary btn-admin">'+username+'<i class="fa fa-minus icon-remove-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                    $(".panel#"+idgroup).find(".group-user").find("button#"+iduser).remove();
+                    $(".panel#"+idgroup).find(".group-admin").append('<button type="button" id="'+iduser+'" class="btn btn-primary btn-xs btn-no-hover btn-admin">'+username+'</button>');
                 } 
             });
         });
@@ -302,8 +289,7 @@ $(document).ready(function() {
                 iduser = $(this).attr("id"),
                 idgroup = $(this).find(".hdIdGroup").attr("id"),
                 username = $(this).parent().text();
-                
-              alert(iduser + idgroup +username);
+             
             $.ajax({
                 url: 'admin/removeUserFromGroup',
                 type: 'post',
@@ -311,10 +297,39 @@ $(document).ready(function() {
                 data:{IdUser:iduser,IdGroup:idgroup},
                 success: function(response) {
                     _this.parent().hide(500);
+                    $(".newusers").append('<button type="button" class="btn btn-default btn-admin">'+username+'<i class="fa fa-plus icon-add-newuser" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                    $(".panel#"+idgroup).find(".group-user").find("button#"+iduser).remove();
                 } 
             });
         });
         
+        // group modal, add new user
+        $(document).on("mouseenter", ".icon-add-newuser", function(){
+           $(this).css({"color":"red", "opacity":"0.6"});
+        });
         
+        $(document).on("mouseleave", ".icon-add-newuser", function(){
+             $(this).css({"color":"#357ebd", "opacity":"0.6"});
+        });
+        
+        $(document).on("click", ".icon-add-newuser", function() {
+            var _this = $(this),
+                iduser = $(this).attr("id"),
+                idgroup = $(this).find(".hdIdGroup").attr("id"),
+                username = $(this).parent().text();
+            
+                
+            $.ajax({
+                url: 'admin/addNewUserToGroup',
+                type: 'post',
+                dataType: 'json',
+                data:{IdUser:iduser,IdGroup:idgroup},
+                success: function(response) {
+                    _this.parent().hide(500);
+                    $(".users").append('<button type="button" class="btn btn-default btn-user">'+username+'   <i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                     $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
+                } 
+            });
+        });
 
 });
