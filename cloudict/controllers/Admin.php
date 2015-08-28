@@ -284,6 +284,8 @@ class Admin extends Backend_Controller {
             $data['editmodal'] .= '</div>';
             $data['editmodal'] .= '<div class="form-group">';
             $data['editmodal'] .= '<label>New Memers</label>';
+            $data['editmodal'] .= '<input class="form-control tbSearchNewUser" placeholder="search..." id="'.$g["IdGroup"].'" />';
+            $data['editmodal'] .= '</div">';
             $data['editmodal'] .= '<div class="newusers">';
             
             $usersnotingroup = $this->UserGroupModel->getUsersThatAreNotInTheGroup($g['IdGroup']);
@@ -361,6 +363,25 @@ class Admin extends Backend_Controller {
         $this->UserGroupModel->addNewUserToGroup($iduser, $idgroup);
         
         echo json_encode(true);
+    }
+    
+    public function searchNewUser()
+    {
+        $username = $this->input->post('Username');
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $searchusers = $this->UserGroupModel->searchNewUser($username, $idgroup);
+        
+        $response = "";
+        
+        foreach($searchusers["SearchUsers"] as $su)
+        {
+            $response .= $su["UserName"];
+        }
+        
+        echo json_encode($response);
     }
     
     public function insertGroup()

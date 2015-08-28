@@ -168,6 +168,71 @@ class UserGroupModel extends CI_Model {
         $this->db->query($query, [$idUser, $idGroup]);
     }
     
+    public function searchNewUser($username, $idGroup)
+    {
+        $query = 'SELECT	`UserName`,
+                                `IdUser`
+			
+                        FROM 	`User`
+
+			WHERE `IdUser` NOT IN   (
+                                                        SELECT  `IdUser`
+                                                        
+                                                        FROM    `UserGroup`
+                                                        
+                                                        WHERE `IdGroup` = ?
+                                                ) 
+                        AND `UserName` LIKE "%?%"
+                ';
+        
+        $result = $this->db->query($query, [$idGroup, $username])->result_array();
+            
+        $data = array();
+
+        if(!empty($result))
+        {
+            $i=0;
+            foreach($result as $row)
+            {
+                $data['SearchUsers'][$i++] = $row;
+            }
+        }
+
+        return $data;
+    }   
+    
+     public function getUsersThatAreInTheGroup($idGroup)
+    {
+        $query = " 
+                    SELECT	`UserName`,
+                                `IdUser`
+			
+                        FROM 	`User`
+
+			WHERE `IdUser` NOT IN   (
+                                                        SELECT  `IdUser`
+                                                        
+                                                        FROM    `UserGroup`
+                                                        
+                                                        WHERE `IdGroup` = ?
+                                                )
+            ";
+            
+            $result = $this->db->query($query, [$idGroup])->result_array();
+            
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['UsersInGroup'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+    }
 }
 
 

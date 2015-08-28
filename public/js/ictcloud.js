@@ -327,7 +327,22 @@ $(document).ready(function() {
                 success: function(response) {
                     _this.parent().hide(500);
                     $(".users").append('<button type="button" class="btn btn-default btn-user">'+username+'   <i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
-                     $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
+                    $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
+                } 
+            });
+        });
+        
+        $(document).on("keyup", ".tbSearchNewUser", function() {
+            var username = $(".tbSearchNewUser").val(),
+                idgroup = $(this).attr("id");
+                
+            $.ajax({
+                url: 'admin/searchNewUser',
+                type: 'post',
+                dataType: 'json',
+                data:{Username:username,IdGroup:idgroup},
+                success: function(response) {
+                    alert(response);
                 } 
             });
         });
