@@ -99,22 +99,57 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Share</h4>
-      </div>
-      <div class="modal-body">
-        <?php print_r($this->session->all_userdata());?>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="modal fade in" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Share</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-group" id="accordion">
+                            <input type="hidden" id='inputIdFileShare' />
+                            <input type='hidden' id='inputFileTypeMimeShare' />
+                            <?php
+                            $i = 0;
+                            foreach($user_groups as $group){ ?>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <?php if($group->UserGroupStatusAdmin==1){?>
+                                            <input type="checkbox" class="chbGroupShare" data-no='<?= $i;?>' value="<?php echo $group->IdGroup ?>">
+                                            <?php }?>
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$i;?>" aria-expanded="false" class="collapsed"><?php echo $group->GroupName ;?></a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapse<?=$i;?>" class="panel-collapse collapse" aria-expanded="false" style="display: block; height: 0px;">
+                                        <div class="panel-body">
+                                            <ul class="list-inline">
+                                                <?php 
+                                                foreach ($group->Users as $members){
+                                                    if($this->session->userdata('userid')!=$members['IdUser']){
+                                                ?>
+                                                <li><input type="checkbox" class="chbUserGroup input_chb_<?= $i; ?>" value="<?php echo $members['IdUser'];?>"><?php echo $members["UserName"];?> </li>
+                                                <?php 
+                                                    }
+                                                }?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div> 
+                            <?php 
+                            $i++;
+                            }
+                            ?>
+
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary btnShareFile">Share</button>                    </div>
+                </div>
+            </div>
+        </div>
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
     <!-- The blueimp Gallery widget -->
@@ -214,9 +249,9 @@
                 </a>
             {% } %}
 
-          <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}" title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
+          <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}"  title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
           
-          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
+          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
           </div>
         </td>
         <td>
@@ -390,6 +425,56 @@
             }
         });
         
+        $(".chbGroupShare").change(function (e){
+            var IdGroup = $(this).val();
+            var chb = $(this);
+            var IdFile = $("#inputIdFileShare").val();
+            var no = $(this).data('no');
+            //if is checked than file need to be shared
+            if($(this).is(':checked')){
+                 var share = true;
+                 $.ajax({
+			url: "<?php echo base_url();?>Share/shareFile",
+                        type: "POST",
+                        data:{IdFile:IdFile,IdGroup:IdGroup,Share:share},
+                        beforeSend: function (xhr) {
+                            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
+                            $("input:checkbox.input_chb_"+no).each(function () {
+                                    this.checked = true;
+                            });
+                        },
+			success: function(data) {
+                           if($(".fa-spin").length>0){
+                               $(".fa-spin").remove();
+                           }
+			}
+
+                    });
+                
+            }
+            else{ //file must be unshared
+                var share = false;
+                 $.ajax({
+			url: "<?php echo base_url();?>Share/shareFile",
+                        type: "POST",
+                        data:{IdFile:IdFile,IdGroup:IdGroup,Share:share},
+                        beforeSend: function (xhr) {
+                            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
+                            $("input:checkbox.input_chb_"+no).each(function () {
+                                    this.checked = true;
+                            });
+                        },
+			success: function(data) {
+                           if($(".fa-spin").length>0){
+                               $(".fa-spin").remove();
+                           }
+			}
+
+                    });
+            }
+            
+        });
+        
 
         $(document).ajaxComplete(function (){
             //pencil click
@@ -424,10 +509,19 @@
                   $("#errorMsg").text("Please give folder some name!");  
                 }
             });
-            
+            //click on move link
             $(".move").click(function (e){
                 e.preventDefault();
                 var IdFile = $(this).data("idfile");
+            });
+            //click on share anchor
+            $(".share").click(function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                var FileTypeMime = $(this).data("filetypemime");
+                $("#inputIdFileShare").val(IdFile);
+                $("#inputFileTypeMimeShare").val(FileTypeMime);
+                $("#ShareModal").modal({'show':true});
             });
         });
     });

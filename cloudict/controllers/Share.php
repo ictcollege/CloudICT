@@ -20,6 +20,22 @@ class Share extends Frontend_Controller{
         
     }
     
+    public function shareFile(){
+        $IdFile = intval($_POST['IdFile']);
+        $Share = $_POST['Share'];
+        //if is with group
+        if(isset($_POST['IdGroup'])){
+            $IdGroup = intval($_POST['IdGroup']);
+            $this->load->model("ShareModel");
+            echo $this->ShareModel->shareWithGroup($IdGroup,$IdFile,$Share);
+        }
+        if(isset($_POST['IdUser'])){
+            $IdUser = intval($_POST['IdUser']);
+            $this->load->model("ShareModel");
+            echo $this->ShareModel->shareWithUser($IdUser,$IdFile,$Share);
+        }
+    }
+    
     public function download($IdFile){
         $this->load->model("FileModel");
         $result = $this->FileModel->getFileById($IdFile);

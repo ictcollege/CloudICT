@@ -38,6 +38,10 @@ class ShareModel extends CI_Model{
         
     }
     
+   public function shareWithGroup($IdGroup,$IdFile,$Share){
+       
+   }
+    
     
     
     
