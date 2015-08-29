@@ -209,7 +209,7 @@ class UserGroupModel extends CI_Model {
 			
                         FROM 	`User`
 
-			WHERE `IdUser` NOT IN   (
+			WHERE `IdUser` IN   (
                                                         SELECT  `IdUser`
                                                         
                                                         FROM    `UserGroup`
@@ -220,18 +220,7 @@ class UserGroupModel extends CI_Model {
             
             $result = $this->db->query($query, [$idGroup])->result_array();
             
-            $data = array();
-            
-            if(!empty($result))
-            {
-                $i=0;
-                foreach($result as $row)
-                {
-                    $data['UsersInGroup'][$i++] = $row;
-                }
-            }
-            
-            return $data;
+            return $result;
     }
 }
 

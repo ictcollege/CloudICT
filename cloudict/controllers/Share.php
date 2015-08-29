@@ -15,24 +15,31 @@ class Share extends Frontend_Controller{
     }
     
     public function index(){
-        $Users = new stdClass();
-        $Groups = new stdClass();
+        if(isset($_GET['action'])){
+            switch($_GET['action']){
+                case 'checkFileShare':
+                    $this->checkFileShare($_GET['IdFile']);
+                    break;
+                
+            }
+        }
         
     }
     
     public function shareFile(){
         $IdFile = intval($_POST['IdFile']);
-        $Share = $_POST['Share'];
+        $Share = boolval($_POST['Share']);
+        $SharePrivilege=intval($_POST['SharePrivilege']);
         //if is with group
         if(isset($_POST['IdGroup'])){
             $IdGroup = intval($_POST['IdGroup']);
             $this->load->model("ShareModel");
-            echo $this->ShareModel->shareWithGroup($IdGroup,$IdFile,$Share);
+            $this->ShareModel->shareWithGroup($IdGroup,$IdFile,$Share,$SharePrivilege);
         }
         if(isset($_POST['IdUser'])){
             $IdUser = intval($_POST['IdUser']);
             $this->load->model("ShareModel");
-            echo $this->ShareModel->shareWithUser($IdUser,$IdFile,$Share);
+            $this->ShareModel->shareWithUser($IdUser,$IdFile,$Share,$SharePrivilege);
         }
     }
     
@@ -150,5 +157,13 @@ class Share extends Frontend_Controller{
             return $file_size;
         }
         return readfile($file_path);
+    }
+    
+    protected function checkFileShare($IdFile){
+        $this->load->model("ShareModel");
+        $result = $this->ShareModel->getAllSharedUsersForFile(intval($IdFile));
+        if(!empty($result)){
+            $this->generate_response($result,TRUE);
+        }
     }
 }

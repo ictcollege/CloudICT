@@ -29,7 +29,6 @@ class Files extends Frontend_Controller{
         $user_group = $this->session->userdata('group');
         $this->load->model("UserModel");
         $data['user_groups'] = $user_group;
-        
         $this->load_view('filesView', $data);
     }
     public function favourites(){
