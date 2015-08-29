@@ -39,6 +39,7 @@ class Share extends Frontend_Controller{
             echo "1";
         }
     }
+
     
     public function download($IdFile){
         $this->load->model("FileModel");

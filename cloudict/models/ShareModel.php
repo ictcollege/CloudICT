@@ -85,8 +85,56 @@ class ShareModel extends CI_Model{
        return array_values($this->db->query($query,[$IdFile])->result_array());
    }
     
-    
-    
+   /**
+    * files shared with user 
+    * @param type $IdUser
+    * @return  array
+    */
+   public function sharedWithUser($IdUser){
+       $query = "SELECT 
+            share.IdUser,
+            share.IdFile,
+            share.ShareCreated,
+            share.ShareFullName,
+            share.SharePrivilege,
+            user.UserName as Owner,
+            file.IdUser as OwnerId,
+            file.FilePath,
+            file.IdFolder,
+            file.FileExtension,
+            file.FileSize,
+            file.FileLastModified 
+            FROM `share` 
+            INNER JOIN file ON share.IdFile = file.IdFile 
+            JOIN user ON file.IdUser = user.IdUser
+            WHERE share.IdUser=?";
+       $result = $this->db->query($query,[$IdUser])->result_array();
+       return $result;
+   }
+   /**
+    * Files shared by user
+    * @param type $IdUser
+    * @return array
+    */
+   public function sharedByUser($IdUser){
+       $query = "SELECT 
+            file.IdUser,
+            share.IdFile,
+            share.ShareCreated,
+            share.ShareFullName,
+            share.SharePrivilege,
+            file.FilePath,
+            file.IdFolder,
+            file.FileExtension,
+            file.FileSize,
+            file.FileLastModified
+            FROM file 
+            JOIN share ON file.IdFile = share.IdFile 
+            WHERE file.IdFile IN 
+            (SELECT IdFile FROM share WHERE share.IdFile=file.IdFile) AND file.IdUser = ?";
+       $result = $this->db->query($query,[$IdUser])->result_array();
+       return $result;
+   }
     
     
 }
