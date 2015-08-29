@@ -27,19 +27,16 @@ class Share extends Frontend_Controller{
     }
     
     public function shareFile(){
-        $IdFile = intval($_POST['IdFile']);
-        $Share = boolval($_POST['Share']);
-        $SharePrivilege=intval($_POST['SharePrivilege']);
-        //if is with group
-        if(isset($_POST['IdGroup'])){
-            $IdGroup = intval($_POST['IdGroup']);
+        if(isset($_POST['json'])){
+            $json = json_decode($_POST['json']);
             $this->load->model("ShareModel");
-            $this->ShareModel->shareWithGroup($IdGroup,$IdFile,$Share,$SharePrivilege);
-        }
-        if(isset($_POST['IdUser'])){
-            $IdUser = intval($_POST['IdUser']);
-            $this->load->model("ShareModel");
-            $this->ShareModel->shareWithUser($IdUser,$IdFile,$Share,$SharePrivilege);
+            foreach($json->users as $user){
+                $this->ShareModel->shareWithUser($user,$json->IdFile,TRUE,$json->SharePrivilege);
+            }
+            foreach($json->unshare as $user){
+                $this->ShareModel->shareWithUser($user,$json->IdFile,FALSE);
+            }
+            echo "1";
         }
     }
     

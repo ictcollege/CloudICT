@@ -142,7 +142,7 @@
                                                 foreach ($group->Users as $members){
                                                     if($this->session->userdata('userid')!=$members['IdUser']){
                                                 ?>
-                                                <li><input type="checkbox" class="chbUserGroup input_chb_<?= $i; ?>" value="<?php echo $members['IdUser'];?>" onclick="shareWithUser(this)"><?php echo $members["UserName"];?> </li>
+                                                <li><input type="checkbox" class="chbUserGroup" name="input_chb_<?= $i; ?>[]" value="<?php echo $members['IdUser'];?>" onclick=""><?php echo $members["UserName"];?> </li>
                                                 <?php 
                                                     }
                                                 }?>
@@ -159,7 +159,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary btnShareFile">Share</button>                    </div>
+                        <button type="button" class="btn btn-primary" id="btnShareFile">Share</button>                    </div>
                 </div>
             </div>
         </div>
@@ -264,7 +264,7 @@
 
           <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}"  title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
           
-          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
+          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" title="share" onclick="openModal(this)"><i class="fa  fa-share-alt fa-fw"></i></a>
           </div>
         </td>
         <td>
@@ -438,58 +438,43 @@
             }
         });
         
-        $(".chbGroupShare").change(function (e){
-            var IdGroup = $(this).val();
-            var chb = $(this);
-            var IdFile = $("#inputIdFileShare").val();
-            var no = $(this).data('no');
-            var SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
-            
-            //if is checked than file need to be shared
-            if($(this).is(':checked')){
-                 var share = 1;
-                 $.ajax({
-			url: "<?php echo base_url();?>Share/shareFile",
-                        type: "POST",
-                        data:{IdFile:IdFile,IdGroup:IdGroup,Share:share,SharePrivilege:SharePrivilege},
-                        beforeSend: function (xhr) {
-                            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
-                            $("input:checkbox.input_chb_"+no).each(function () {
-                                    this.checked = true;
-                            });
-                        },
-                        error: function (){alert("Error...")},
-			success: function(data) {
-                           if($(".fa-spin").length>0){
-                               $(".fa-spin").remove();
-                           }
-			}
-
-                    });
-                
-            }
-            else{ //file must be unshared
-                var share = 0;
-                 $.ajax({
-			url: "<?php echo base_url();?>Share/shareFile",
-                        type: "POST",
-                        data:{IdFile:IdFile,IdGroup:IdGroup,Share:share,SharePrivilege:SharePrivilege},
-                        beforeSend: function (xhr) {
-                            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
-                            $("input:checkbox.input_chb_"+no).each(function () {
-                                    this.checked = true;
-                            });
-                        },
-                        error: function (){alert("Error...")},
-			success: function(data) {
-                           if($(".fa-spin").length>0){
-                               $(".fa-spin").remove();
-                           }
-			}
+        $(".chbGroupShare").click(function() {
+            var no = $(this).data("no");
+            var checkBoxes = $("input[name=input_chb_"+no+"\\[\\]]");
+                checkBoxes.prop("checked", !checkBoxes.prop("checked"));
+        });                 
+        
+        $("#btnShareFile").click(function (e){
+            var Share = new Object();
+            Share.users = [];
+            Share.IdFile = $("#inputIdFileShare").val();
+            Share.SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+            Share.unshare=[];
+            $("input:checkbox.chbUserGroup").each(function () {
+               if(this.checked){
+                   Share.users.push($(this).val());
+               }
+               else{
+                   Share.unshare.push($(this).val());
+               }
+            });
+            var json = JSON.stringify(Share);
+            $.ajax({
+                url: "<?php echo base_url();?>Share/shareFile",
+                type: "POST",
+                dataType: "json",
+                data:{json:json},
+                beforeSend: function (xhr) {
+                    $("#btnShareFile").append('<i class="fa fa-spinner fa-spin"></i>');
+                },
+                success: function(data) {
+                   if($(".fa-spin").length>0){
+                       $(".fa-spin").remove();
+                   }
+                }
                         
 
-                    });
-            }
+            });
             
         });
         
@@ -532,31 +517,6 @@
                 e.preventDefault();
                 var IdFile = $(this).data("idfile");
             });
-            //click on share anchor
-            $(".share").click(function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-                var FileTypeMime = $(this).data("filetypemime");
-                $("#inputIdFileShare").val(IdFile);
-                $("#inputFileTypeMimeShare").val(FileTypeMime);
-                 $.ajax({
-			url: "<?php echo base_url();?>Share/",
-                        data:{action:"checkFileShare",IdFile:IdFile},
-			success: function(data) {
-                            $.each(data,function(index,val){
-                                
-                                $("input:checkbox.chbUserGroup").each(function () {
-                                   if($(this).val()==val.IdUser){
-                                       $(this).prop('checked',true);
-                                   }
-                                });
-                            });
-                            
-			}
-
-                });
-                $("#ShareModal").show();
-            });
         });
     });
 
@@ -591,7 +551,27 @@ function shareWithUser(control){
     });
 }
 
+function openModal(control){
+    var IdFile = $(control).data("idfile");
+    var FileTypeMime = $(control).data("filetypemime");
+    $("#inputIdFileShare").val(IdFile);
+    $("#inputFileTypeMimeShare").val(FileTypeMime);
+     $.ajax({
+            url: "<?php echo base_url(); ?>Share/",
+            data:{action:"checkFileShare",IdFile:IdFile},
+            success: function(data) {
+                $.each(data,function(index,val){
 
+                    $("input:checkbox.chbUserGroup").each(function () {
+                       if($(this).val()==val.IdUser){
+                           $(this).prop('checked',true);
+                       }
+                    });
+                });
 
+            }
+
+    });
+ }
 
 </script>

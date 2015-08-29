@@ -66,14 +66,14 @@ class ShareModel extends CI_Model{
        
    }
    public function shareWithUser($IdUser,$IdFile,$Share,$SharePrivilege=self::READ){
-       //if true than share with group
+       //if true than share file
        if($Share){
             $this->load->model("FileModel");
             $File = $this->FileModel->getFileById($IdFile);
             $this->newShare($File->IdFile, $IdUser, $File->FileName, $File->FilePath, $SharePrivilege);
            
        }
-       else{ //than unshare with group
+       else{ //than unshare file
            $this->removeShare($IdFile, $IdUser);
            
        }
