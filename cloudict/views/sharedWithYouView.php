@@ -1,4 +1,12 @@
-
+<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript">
+    $(document).ready(function (){
+        $("#myTable").DataTable({
+            "ajax":"<?php echo base_url();?>share/?action=sharedWithYou"
+        });
+    });
+</script>
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
@@ -15,7 +23,7 @@
                         </div>
                         <div class="clearfix"></div>
                         <div class="col-lg-12">
-                            <table class="table table-striped table-hover">
+                            <table class="table table-striped table-hover" id="myTable">
                                 <thead>
                                     <tr>
                                         <th>Owner</th>
@@ -28,20 +36,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php
-                                    foreach($shared_files as $file){
-                                        echo "<tr>";
-                                        echo "<td>".$file["Owner"]."</td>";
-                                        echo "<td>".$file["ShareCreated"]."</td>";
-                                        echo "<td>".$file["ShareFullName"]."</td>";
-                                        echo "<td>".$file['SharePrivilege']."</td>";
-                                        echo "<td>".$file['FileSize']."</td>";
-                                        echo "<td>".$file['FileLastModified']."</td>";
-                                        echo "<td>"."modifiy"."</td>";
-                                        echo "</tr>";
-                                    }
-                                    
-                                    ?>
+                                   
                                 </tbody>
                             </table>
                         </div>

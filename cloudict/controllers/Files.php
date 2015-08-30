@@ -34,15 +34,13 @@ class Files extends Frontend_Controller{
         var_dump("Mora se doda tabela u bazi!");
     }
     public function shared_with_you(){
-        $this->load->model("ShareModel");
-        $files=  $this->ShareModel->sharedWithUser($this->get_user_id());
+        
         $data = array();
         $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
         $data['mask'] = $mask;
         $data['menu'] = $this->getMenu(2);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
-        $data['shared_files'] = $files;
         $this->load_view('sharedWithYouView', $data);
         
     }

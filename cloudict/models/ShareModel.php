@@ -103,10 +103,13 @@ class ShareModel extends CI_Model{
             file.IdFolder,
             file.FileExtension,
             file.FileSize,
-            file.FileLastModified 
+            file.FileLastModified, 
+			file.IdFileType,
+			filetype.FileTypeMime 
             FROM `share` 
             INNER JOIN file ON share.IdFile = file.IdFile 
-            JOIN user ON file.IdUser = user.IdUser
+            JOIN user ON file.IdUser = user.IdUser 
+			JOIN filetype ON file.IdFileType = filetype.IdFileType 
             WHERE share.IdUser=?";
        $result = $this->db->query($query,[$IdUser])->result_array();
        return $result;
@@ -135,6 +138,20 @@ class ShareModel extends CI_Model{
        $result = $this->db->query($query,[$IdUser])->result_array();
        return $result;
    }
-    
+   /**
+    * This method is much faster than if we use some in_array() function to check if user can download
+    * file or not.
+    * @param type $IdUser
+    * @param type $IdFile
+    * @return boolean
+    */
+   public function canDownload($IdUser,$IdFile) {
+       $query = "SELECT IdUser,IdFile FROM share WHERE IdUser= ? AND IdFile = ? LIMIT 1";
+       $result = $this->db->query($query,[$IdUser,$IdFile]);
+       if(!empty($result->row())){
+           return TRUE;
+       }
+       return FALSE;
+   }
     
 }
