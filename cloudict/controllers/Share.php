@@ -24,7 +24,9 @@ class Share extends Frontend_Controller{
                 case 'sharedWithYou':
                     $this->sharedWithYou();
                     break;
-                
+                case 'sharedWithOthers':
+                    $this->sharedWithOthers();
+                    break;
             }
         }
         
@@ -75,8 +77,13 @@ class Share extends Frontend_Controller{
     }
     
     protected function createZip($filePath=''){
-    if($this->get_file_size($filePath)==0){
-        die("Folder is empty!");
+    if(count(scandir($filePath))<=2){
+        if(isset($_SERVER['HTTP_REFERER'])){
+                header('Location:'.$_SERVER['HTTP_REFERER'].'?msg_type=danger&msg=Folder is empty! Make sure u have something in folder before download...');
+            }
+            else{
+                redirect('files/');
+            }
     }    
         // Get real path for our folder
     $rootPath = realpath($filePath);
@@ -193,12 +200,13 @@ class Share extends Frontend_Controller{
             $file_size = $this->formatSizeUnits($file["FileSize"]);
             $file_modified = date("d-m-Y h:i:s",$file["FileLastModified"]);
             $modify = "<a href='".base_url()."Share/download/".$file["IdFile"]."' title='download' class='download'><i class='fa fa-download'></i></a>";
+            $modify.="&nbsp;<a href='#' class='unshare' data-idfile='".$file["IdFile"]."' title='Remove this file from my share'><i class='fa fa-minus-circle'></i></a>";
             if($file["SharePrivilege"]==3){
                 $modify.="<a href='".base_url()."Share/delete/".$file["IdFile"]."' title='delete file' class='delete'><i class='fa fa-trash'></i></a>";
             }
             if($file["FileTypeMime"]=="DIR"){
                 $file_size = "<i class='fa fa-folder-open' title='folder'></i>";
-                $file_name= "<a href='#' class='viewFile' data-idfile='".$file["IdFile"]."'>".$file["ShareFullName"]."</a>";
+                $file_name= "<a href='#' class='viewFolder' data-idfile='".$file["IdFile"]."'>".$file["ShareFullName"]."</a>";
             }
             $data[$i][]=$owner;
             $data[$i][]=$shared_on;
@@ -213,7 +221,41 @@ class Share extends Frontend_Controller{
         $this->generate_response($content,TRUE);
         
     }
-    
+    /**
+     * this method format result into datatable which display shared files with some user
+     * result can be preview in files/shared_with_others
+     */
+    protected function sharedWithOthers(){
+        $this->load->model("ShareModel");
+        $files=  $this->ShareModel->sharedByUser($this->get_user_id());
+        $i =0;
+        $data = array();
+        foreach($files as $file){
+            $sharedusername = $file["SharedUsername"];
+            $shared_on = date("d-m-Y h:i:s",$file["ShareCreated"]);
+            $file_name = $file["ShareFullName"];
+            $privilege = $this->switchPrivilege($file["SharePrivilege"]);
+            $file_size = $this->formatSizeUnits($file["FileSize"]);
+            $file_modified = date("d-m-Y h:i:s",$file["FileLastModified"]);
+            $modify="<a href='#' class='unshare' data-shareduser='".$file["SharedUser"]."' data-idfile='".$file["IdFile"]."' title='Unshare this file'><i class='fa fa-minus-circle'></i></a>";
+            
+            if($file["FileTypeMime"]=="DIR"){
+                $file_size = "<i class='fa fa-folder-open' title='folder'></i>";
+                $file_name= "<a href='#' class='viewFolder' data-idfile='".$file["IdFile"]."'>".$file["ShareFullName"]."</a>";
+            }
+            $data[$i][]=$sharedusername;
+            $data[$i][]=$shared_on;
+            $data[$i][]=$file_name;
+            $data[$i][]=$privilege;
+            $data[$i][]=$file_size;
+            $data[$i][]=$file_modified;
+            $data[$i][]=$modify;
+            $i++;
+        }
+        $content["data"] = $data;
+        $this->generate_response($content,TRUE);
+        
+    }
     protected function checkFileTypeAndDownload($result) {
         if($result->FileTypeMime == "DIR"){
             $this->createZip($result->FilePath);

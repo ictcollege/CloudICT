@@ -122,7 +122,9 @@ class ShareModel extends CI_Model{
    public function sharedByUser($IdUser){
        $query = "SELECT 
             file.IdUser,
-            share.IdFile,
+            share.IdFile, 
+            share.IdUser as SharedUser, 
+            user.UserName as SharedUsername, 
             share.ShareCreated,
             share.ShareFullName,
             share.SharePrivilege,
@@ -130,9 +132,12 @@ class ShareModel extends CI_Model{
             file.IdFolder,
             file.FileExtension,
             file.FileSize,
-            file.FileLastModified
+            file.FileLastModified, 
+            filetype.FileTypeMime 
             FROM file 
             JOIN share ON file.IdFile = share.IdFile 
+            JOIN user ON share.IdUser = user.IdUser 
+            JOIN filetype ON file.IdFileType = filetype.IdFileType 
             WHERE file.IdFile IN 
             (SELECT IdFile FROM share WHERE share.IdFile=file.IdFile) AND file.IdUser = ?";
        $result = $this->db->query($query,[$IdUser])->result_array();

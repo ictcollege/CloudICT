@@ -5,12 +5,51 @@
         $("#myTable").DataTable({
             "ajax":"<?php echo base_url();?>share/?action=sharedWithYou"
         });
+        
+        $(document).ajaxComplete(function (){
+            $('.viewFolder').click(function (e){
+                e.preventDefault();
+                var idfile = $(this).data('idfile');
+                alert(idfile);
+            });
+            $('.unshare').click(function (e){
+                e.preventDefault();
+                var control = $(this);
+                var tr = $(this).parent('td').parent('tr');
+                var Share = new Object();
+                Share.users = [];
+                Share.IdFile = $(this).data('idfile');
+                Share.unshare=[];
+
+                Share.unshare.push("<?php echo $this->session->userdata('userid');?>");
+                var json = JSON.stringify(Share);
+                $.ajax({
+                    url: "<?php echo base_url();?>Share/shareFile",
+                    type: "POST",
+                    dataType: "json",
+                    data:{json:json},
+                    beforeSend: function (xhr) {
+                        $(control).append('<i class="fa fa-spinner fa-spin"></i>');
+                    },
+                    success: function(data) {
+                       if($(".fa-spin").length>0){
+                           $(".fa-spin").remove();
+                       }
+                       tr.remove();
+                    }
+
+
+                });
+            });
+            
+        });
     });
 </script>
 <div id="page-wrapper">
+    
     <div class="row">
         <div class="col-lg-12">
-            
+            <?php if(isset($msg)){ echo $msg;}?>
                         <div class="col-lg-7">
                         <ol class="breadcrumb">
                             <li><a href="<?php echo base_url();?>Files/shared_with_you"><i class="fa fa-share-alt fa-2x homeicon">&nbsp;</i><i class="fa fa-angle-right fa-2x separatoricon"></i> </a></li>
