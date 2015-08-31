@@ -1,9 +1,7 @@
 $(document).ready(function() {
 	
 	//Animacija na aplikacionoj stranici 
-	//
-	// TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//
+	
 	$(".app-name").hide(0);
 	$(".app").hover(function() {
 		$(this).find(".app-name").stop(true,true).fadeIn(500); 
@@ -11,11 +9,6 @@ $(document).ready(function() {
 		$(this).find(".app-name").stop(true,true).fadeOut(500);
 	});
 
-	//favorited
-	//
-	// TO DO!!!!!!!!!!!!!!!!!!!!!!!!!!
-	//
-	
 	$(".fa-star").click(function() {
 		if($(this).hasClass("favorited")) {
 			$(this).removeClass("favorited");
@@ -104,46 +97,7 @@ $(document).ready(function() {
 			foldername.parent().addClass("has-success");
 			foldername.parent().removeClass("has-error");
 		}
-		
-		
-		/*if(filecontent.val() == "") {
-			filecontent.parent().addClass("has-error");
-		} else {
-			filecontent.parent().removeClass("has-error");
-		}*/
-	});
-
-	//Group select
-
-//	$(".chbGroupShare").click(function() {
-//		var id = $(this).attr("id").split("_")[1];
-//		
-//		if(this.checked) {
-//			$("input:checkbox.chbUserGroup"+id).each(function () {
-//				this.checked = true;
-//			});
-//		} else {
-//			$("input:checkbox.chbUserGroup"+id).each(function () {
-//				this.checked = false;
-//			});
-//		}
-//	})
-
-	/*$('.check').click(function() {
-		var mark = 0;
-		$('input:checkbox.check').each(function () {
-   			if(this.checked == true) {
-   				mark++;
-   			}
-		});
-
-		if(mark>1) {
-			$(".multiple-select").show();
-		} else {
-			$(".multiple-select").hide();
-		}
-	});*/
-
+        });	
 	//multiple select dugmici i ostalo
 
 	$(".multiple-select").hide();
@@ -188,10 +142,6 @@ $(document).ready(function() {
 		}
 	});
 
-	/*$('input:checkbox.class').each(function () {
-       var sThisVal = (this.checked ? $(this).val() : "");
-  	});*/
-
 	// Opcije u tabeli
 	if($(window).width()>768){
 		$(".tablefiles").find('tr').find('td').find('i').addClass('fileiconhide');
@@ -208,10 +158,7 @@ $(document).ready(function() {
 		$(".tablefiles").find('tr').find('td').find('i').removeClass('fileiconhide');
 	}
 
-	//test 
-	//$("#test").DataTable();
-        
-        //group modal, remove admin
+	//group modal, remove admin
         $(document).on("mouseenter", ".icon-remove-admin", function(){
             $(this).css({"color":"red", "opacity":"0.6"});
         });
@@ -233,15 +180,14 @@ $(document).ready(function() {
                 data:{IdUser:iduser,IdGroup:idgroup},
                 success: function(response) {
                     _this.parent().hide(500);
-                    $(".users").append('<button type="button" class="btn btn-default btn-user">'+username+'<i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>');
+                    $(".users."+idgroup).append('<button type="button" class="btn btn-default btn-user">'+username+'<i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>');
                     $(".panel#"+idgroup).find(".group-admin").find("button#"+iduser).remove();
                     $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
                 } 
             });
         });
+        
         //group modal, remove user, add admin
-        
-        
         $(document).on("mouseenter", ".icon-remove-user", function(){
            $(this).css({"color":"red", "opacity":"0.6"});
         });
@@ -277,7 +223,7 @@ $(document).ready(function() {
                 data:{IdUser:iduser,IdGroup:idgroup},
                 success: function(response) {
                     _this.parent().hide(500);
-                    $(".admins").append('<button type="button" class="btn btn-primary btn-admin">'+username+'<i class="fa fa-minus icon-remove-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                    $(".admins."+idgroup).append('<button type="button" class="btn btn-primary btn-admin">'+username+'<i class="fa fa-minus icon-remove-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
                     $(".panel#"+idgroup).find(".group-user").find("button#"+iduser).remove();
                     $(".panel#"+idgroup).find(".group-admin").append('<button type="button" id="'+iduser+'" class="btn btn-primary btn-xs btn-no-hover btn-admin">'+username+'</button>');
                 } 
@@ -297,7 +243,7 @@ $(document).ready(function() {
                 data:{IdUser:iduser,IdGroup:idgroup},
                 success: function(response) {
                     _this.parent().hide(500);
-                    $(".newusers").append('<button type="button" class="btn btn-default btn-admin">'+username+'<i class="fa fa-plus icon-add-newuser" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                    $(".newusers."+idgroup).append('<button type="button" class="btn btn-default btn-admin">'+username+'<i class="fa fa-plus icon-add-newuser" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
                     $(".panel#"+idgroup).find(".group-user").find("button#"+iduser).remove();
                 } 
             });
@@ -325,7 +271,7 @@ $(document).ready(function() {
                 data:{IdUser:iduser,IdGroup:idgroup},
                 success: function(response) {
                     _this.parent().hide(500);
-                    $(".users").append('<button type="button" class="btn btn-default btn-user">'+username+'   <i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
+                    $(".users."+idgroup).append('<button type="button" class="btn btn-default btn-user">'+username+'   <i class="fa fa-trash-o icon-remove-user" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'+iduser+'"><input type="hidden" id="'+idgroup+'" class="hdIdGroup"/></i></button>').show(500);
                     $(".panel#"+idgroup).find(".group-user").append('<button type="button" id="'+iduser+'" class="btn btn-info btn-xs btn-no-hover btn-admin">'+username+'</button>');
                 } 
             });
@@ -335,8 +281,7 @@ $(document).ready(function() {
             var idgroup = $(this).attr("id"),
                 username = $(this).val(),
                 idnewcreatedgroup;
-                
-                alert(username);
+            
             $.ajax({
                 url: 'admin/searchNewUser',
                 type: 'post',
@@ -350,7 +295,6 @@ $(document).ready(function() {
         });
         
         //dodavanje nove grupe 
-        
         $(".btnNewGroup").click(function () {
             var groupname = $(".tbNewGroupName"),
                 error = false,
@@ -432,8 +376,6 @@ $(document).ready(function() {
                             $(".main-panel").find(".row:last-child").append(newgroupcontent);
                         }
                         
-                       
-                        
                         newgroupeditmodal += '<div class="modal fade '+idnewcreatedgroup+'" id="mEditGroup'+idnewcreatedgroup+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
                         newgroupeditmodal += '<div class="modal-dialog" role="document">';
                         newgroupeditmodal += '<div class="modal-content">';
@@ -442,7 +384,7 @@ $(document).ready(function() {
                         newgroupeditmodal += '<span aria-hidden="true">×</span></button>';
                         newgroupeditmodal += '<h4 class="modal-title" id="myModalLabel">Edit Group</h4></div>';
                         newgroupeditmodal += '<div class="modal-body"><div class="form-group"><label>Group Name</label>';
-                        newgroupeditmodal += '<input class="form-control" placeholder="admins"></div>';
+                        newgroupeditmodal += '<input class="form-control tbGroupName" placeholder="'+groupname.val()+'" id="'+idnewcreatedgroup+'" ><button type="button" class="btn btn-success pull-right btnChangeGroupName">Change Name</button></div>';
                         newgroupeditmodal += '<div class="form-group"><label>Admins</label><div class="admins">';
                         newgroupeditmodal += '</div></div>';
                         newgroupeditmodal += '<div class="form-group"><label>Members</label><div class="users">';
@@ -453,11 +395,27 @@ $(document).ready(function() {
                         newgroupeditmodal += users;
                         
                         newgroupeditmodal += '</div></div></div></div><div class="modal-footer">';
-                        newgroupeditmodal += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
-                        newgroupeditmodal += '<button type="button" class="btn btn-primary btnNewGroup">Save</button></div></div></div></div>';
-                        
+                        newgroupeditmodal += '</div></div></div></div>';
                         
                         $(".editmodals").append(newgroupeditmodal);
+                        
+                        
+                        newgroupdeletemodal += '<div class="modal fade mDeleteGroup" id="mDeleteGroup'+idnewcreatedgroup+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                        newgroupdeletemodal += '<div class="modal-dialog" role="document">';
+                        newgroupdeletemodal += '<div class="modal-content">';
+                        newgroupdeletemodal += '<div class="modal-header">';
+                        newgroupdeletemodal += '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                        newgroupdeletemodal += '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
+                        newgroupdeletemodal += '</div>';
+                        newgroupdeletemodal += '<div class="modal-body text-center">';
+                        newgroupdeletemodal += 'Delete group '+groupname.val()+'?';
+                        newgroupdeletemodal += '</div>';
+                        newgroupdeletemodal += '<div class="modal-footer text-center">';
+                        newgroupdeletemodal += '<button type="button" class="btn btn-primary btnDeleteGroupYes">Yes</button>';
+                        newgroupdeletemodal += '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+                        newgroupdeletemodal += '<input type="hidden" id="'+idnewcreatedgroup+'" class="hdId"/>';
+                        
+                        $(".deletemodals").append(newgroupdeletemodal);
                         
                         setTimeout(function() {
                             $('#mNewGroup').modal('hide');
@@ -474,7 +432,6 @@ $(document).ready(function() {
         });
         
         //brisanje grupe
-        
         $(document).on("click", ".btnDeleteGroupYes", function(){
            var idgroup = $(this).parent().find(".hdId").attr("id");
            
@@ -491,6 +448,61 @@ $(document).ready(function() {
                     }, 200);
                 }
             });
-           
+        });
+        
+        //promena imena grupe
+        
+        $(document).on("click", ".btnChangeGroupName", function() {
+            var _this = $(this),
+                idgroup = $(this).attr("id"),
+                newgroupname = $(this).parent().find(".tbGroupName").val(),
+                groupexists = false,
+                error = false;
+                
+            if(newgroupname == ""){
+                error = true;
+                _this.parent().removeClass("has-success");
+                _this.parent().addClass("has-error");
+            } else {
+                error = false;
+                _this.parent().addClass("has-success");
+                _this.parent().removeClass("has-error");
+            }
+                
+            $.ajax({
+                url: 'admin/getGroups',
+                type: 'post',
+                success: function(response) {
+                    var groupNames = jQuery.parseJSON(response),
+                        i = 0;
+                    for(i=0; i<groupNames.length;i++){
+                        if(groupNames[i] == newgroupname){
+                            groupexists = true;
+                            break;
+                        }
+                    }
+                    
+                    if(!groupexists&&!error)
+                    {
+                        $.ajax({
+                            url: 'admin/changeGroupName',
+                            type: 'post',
+                            dataType: 'json',
+                            data:{NewName:newgroupname,IdGroup:idgroup},
+                            success: function(response){
+                               $(".panel#"+idgroup).find(".panel-heading").text(" ");
+                               $(".panel#"+idgroup).find(".panel-heading").append(newgroupname);
+                               
+                               _this.parent().addClass("has-success");
+                               _this.parent().removeClass("has-error");
+                             }
+                        });
+                    } else {
+                        _this.parent().find(".help-block").append("Group already exits with this name");
+                        _this.parent().removeClass("has-success");
+			_this.parent().addClass("has-error");
+                    }
+                }
+            });
         });
 });

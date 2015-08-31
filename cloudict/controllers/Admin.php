@@ -255,12 +255,13 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<div class="modal-body">';
                 $data['editmodal'] .= '<div class="form-group">';
                 $data['editmodal'] .= '<label>Group Name</label>';
-                $data['editmodal'] .= '<input class="form-control" placeholder="'.$g['GroupName'].'" />';
+                $data['editmodal'] .= '<input class="form-control tbGroupName" placeholder="'.$g['GroupName'].'" id="'.$g['IdGroup'].'"/>';
+                $data['editmodal'] .= '<button type="button" class="btn btn-success pull-right btnChangeGroupName" id="'.$g['IdGroup'].'">Change Name</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="form-group">';
                 $data['editmodal'] .= '<label>Admins</label>';
 
-                $data['editmodal'] .= '<div class="admins">';
+                $data['editmodal'] .= '<div class="admins '.$g['IdGroup'].'">';
                 
                 if(isset($usergroups['UserGroup']))
                 {
@@ -281,7 +282,7 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<div class="form-group">';
                 $data['editmodal'] .= '<label>Members</label>';
 
-                $data['editmodal'] .= '<div class="users">';
+                $data['editmodal'] .= '<div class="users '.$g['IdGroup'].'">';
                 if(isset($usergroups['UserGroup']))
                 {
                     foreach($usergroups['UserGroup'] as $ug)
@@ -301,7 +302,7 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<label>New Memers</label>';
                 $data['editmodal'] .= '<input class="form-control tbSearchNewUser" placeholder="search..." id="'.$g["IdGroup"].'" />';
                 $data['editmodal'] .= '</div">';
-                $data['editmodal'] .= '<div class="newusers">';
+                $data['editmodal'] .= '<div class="newusers '.$g['IdGroup'].'">';
 
                 $usersnotingroup = $this->UserGroupModel->getUsersThatAreNotInTheGroup($g['IdGroup']);
                 
@@ -313,14 +314,11 @@ class Admin extends Backend_Controller {
                     }
                 }
 
-
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer">';
-                $data['editmodal'] .= '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
-                $data['editmodal'] .= '<button type="button" class="btn btn-primary btnNewGroup">Save</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
@@ -433,7 +431,17 @@ class Admin extends Backend_Controller {
         }
         
         echo json_encode($response);
+    }
+    
+    public function changeGroupName(){
+        $groupnewname = $this->input->post('NewName');
+        $idgroup = $this->input->post('IdGroup');
         
+        $this->load->model("UserGroupModel");
+        
+        $this->UserGroupModel->changeGroupName($idgroup, $groupnewname);
+        
+        echo json_encode(true);
     }
     
     public function getUsers()

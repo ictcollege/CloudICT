@@ -38,6 +38,18 @@ class UserGroupModel extends CI_Model {
         
         $this->db->query($query2, [$idGroup]);
     }
+    
+    public function changeGroupName($idGroup, $newName)
+    {
+        $query = "
+                UPDATE      `Group`
+                SET         `GroupName` = ?
+                WHERE       `IdGroup` = ?
+                ";
+        
+        $this->db->query($query, [$newName, $idGroup]);
+    }
+    
     public function getGroups()
     {
         $query = " 
