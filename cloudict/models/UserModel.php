@@ -25,57 +25,73 @@ class UserModel extends CI_Model {
 	* @param int $IdUser
 	* @return array
 	*/
-	public function getAllUsersInGroups($IdUser)
-	{
-		$query = "
-			SELECT	`GroupName` AS `Group`,
-				`UserName` AS `User`,
-				`UserGroupStatusAdmin` AS `Admin`
-
-			FROM 	`User`
-
-			JOIN	`UserGroup`
-			USING	(`IdUser`)
-
-			JOIN	`Group` AS `g`
-			USING	(`IdGroup`)
-
-			WHERE	`g`.`IdGroup` IN (
-							SELECT	`IdGroup`
-							FROM	`UserGroup`
-							WHERE	`IdUser` = ?
-						 )
-		";
-
-		$result = $this->db->query($query, [$IdUser])->result_array();
-
-		$data = array();
-
-		if(!empty($result))
-			foreach ($result as $row) $data[$row['Group']][$row['User']] = $row['Admin'];
-
-		$query2 = "
-			SELECT	`GroupName` AS `Group`
-
-			FROM	`Group`
-
-			JOIN	`UserGroup`
-			USING	(`IdGroup`)
-
-			WHERE	`IdUser` = ?
-			AND	`UserGroupStatusAdmin` = 1
-		";
-
-		$result2 = $this->db->query($query2, [$IdUser])->result_array();
-
-		$data['GroupAdmin'] = array();
-
-		if(!empty($result2))
-			foreach ($result2 as $row) $data['GroupAdmin'][] = $row['Group'];
-
-		return $data;
-	}
+//	public function getAllUsersInGroups($IdUser)
+//	{
+//		$query = "
+//			SELECT	`GroupName` AS `Group`,
+//				`UserName` AS `User`,
+//				`UserGroupStatusAdmin` AS `Admin`
+//
+//			FROM 	`User`
+//
+//			JOIN	`UserGroup`
+//			USING	(`IdUser`)
+//
+//			JOIN	`Group` AS `g`
+//			USING	(`IdGroup`)
+//
+//			WHERE	`g`.`IdGroup` IN (
+//							SELECT	`IdGroup`
+//							FROM	`UserGroup`
+//							WHERE	`IdUser` = ?
+//						 )
+//		";
+//
+//		$result = $this->db->query($query, [$IdUser])->result_array();
+//
+//		$data = array();
+//
+//		if(!empty($result)){
+//			foreach ($result as $row){
+//                    $data[$row['Group']][$row['User']] = $row['Admin'];
+//                        }
+//                }
+//
+//		$query2 = "
+//			SELECT	`GroupName` AS `Group`
+//
+//			FROM	`Group`
+//
+//			JOIN	`UserGroup`
+//			USING	(`IdGroup`)
+//
+//			WHERE	`IdUser` = ?
+//			AND	`UserGroupStatusAdmin` = 1
+//		";
+//
+//		$result2 = $this->db->query($query2, [$IdUser])->result_array();
+//
+//		$data['GroupAdmin'] = array();
+//
+//		if(!empty($result2))
+//			foreach ($result2 as $row) $data['GroupAdmin'][] = $row['Group'];
+//
+//		return $data;
+//	}
 	
+        public function getAllUsersInGroups($IdUser){
+            $query = "SELECT * FROM `usergroup` JOIN `group` ON usergroup.IdGroup = group.IdGroup WHERE usergroup.IdUser = ?";
+
+		$result = $this->db->query($query, [$IdUser]);
+                $query = "SELECT usergroup.IdUser,usergroup.IdGroup,usergroup.UserGroupStatusAdmin,user.UserName FROM usergroup JOIN user ON usergroup.IdUser = user.IdUser  WHERE usergroup.IdGroup = ?";
+                foreach($result->result() as $obj){
+                    $obj->Users = $this->db->query($query, $obj->IdGroup)->result_array();
+                }
+                return $result->result();
+        }
+    
+    
+    
 	/**
 	* Get User
 	* 

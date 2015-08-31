@@ -115,19 +115,19 @@ $(document).ready(function() {
 
 	//Group select
 
-	$(".chbGroupShare").click(function() {
-		var id = $(this).attr("id").split("_")[1];
-		
-		if(this.checked) {
-			$("input:checkbox.chbUserGroup"+id).each(function () {
-				this.checked = true;
-			});
-		} else {
-			$("input:checkbox.chbUserGroup"+id).each(function () {
-				this.checked = false;
-			});
-		}
-	})
+//	$(".chbGroupShare").click(function() {
+//		var id = $(this).attr("id").split("_")[1];
+//		
+//		if(this.checked) {
+//			$("input:checkbox.chbUserGroup"+id).each(function () {
+//				this.checked = true;
+//			});
+//		} else {
+//			$("input:checkbox.chbUserGroup"+id).each(function () {
+//				this.checked = false;
+//			});
+//		}
+//	})
 
 	/*$('.check').click(function() {
 		var mark = 0;

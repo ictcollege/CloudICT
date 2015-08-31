@@ -99,22 +99,70 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Share</h4>
-      </div>
-      <div class="modal-body">
-        <?php print_r($this->session->all_userdata());?>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>
+<div class="modal fade in" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Share</h4>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn active">
+                                <input type="radio" value="1" name="SharePrivilege"  autocomplete="off" checked> Can read
+                            </label>
+                            <label class="btn">
+                                <input type="radio" value="2" name="SharePrivilege"  autocomplete="off"> Can edit
+                            </label>
+                            <label class="btn">
+                                <input type="radio" value="3" name="SharePrivilege"  autocomplete="off"> Can Delete
+                            </label>
+                          </div>
+                        <div class="panel-group" id="accordion">
+                            <input type="hidden" id='inputIdFileShare' />
+                            <input type='hidden' id='inputFileTypeMimeShare' />
+                            <?php
+                            $i = 0;
+                            foreach($user_groups as $group){ ?>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <?php if($group->UserGroupStatusAdmin==1){?>
+                                            <input type="checkbox" class="chbGroupShare" data-no='<?= $i;?>' value="<?php echo $group->IdGroup ?>">
+                                            <?php }?>
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$i;?>" aria-expanded="false" class="collapsed"><?php echo $group->GroupName ;?></a>
+                                            
+                                        </h4>
+                                    </div>
+                                    <div id="collapse<?=$i;?>" class="panel-collapse collapse" aria-expanded="false" style="display: block; height: 0px;">
+                                        <div class="panel-body">
+                                            <ul class="list-inline">
+                                                <?php 
+                                                foreach ($group->Users as $members){
+                                                    if($this->session->userdata('userid')!=$members['IdUser']){
+                                                ?>
+                                                <li><input type="checkbox" class="chbUserGroup" name="input_chb_<?= $i; ?>[]" value="<?php echo $members['IdUser'];?>" onclick=""><?php echo $members["UserName"];?> </li>
+                                                <?php 
+                                                    }
+                                                }?>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div> 
+                            <?php 
+                            $i++;
+                            }
+                            ?>
+
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="btnShareFile">Share</button>                    </div>
+                </div>
+            </div>
+        </div>
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
     <!-- The blueimp Gallery widget -->
@@ -214,9 +262,9 @@
                 </a>
             {% } %}
 
-          <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}" title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
+          <a href="{%=file.url%}" class="download" data-idfile="{%=file.IdFile%}"  title="Download {%=file.name%}"><i class="fa  fa-cloud-download fa-fw"></i></a>
           
-          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" title="share"><i class="fa  fa-share-alt fa-fw"></i></a>
+          <a href="#" class="share" data-toggle="modal" data-target="#ShareModal" data-idfile="{%=file.IdFile%}" data-filetypemime="{%=file.FileTypeMime%}" title="share" onclick="openModal(this)"><i class="fa  fa-share-alt fa-fw"></i></a>
           </div>
         </td>
         <td>
@@ -390,6 +438,46 @@
             }
         });
         
+        $(".chbGroupShare").click(function() {
+            var no = $(this).data("no");
+            var checkBoxes = $("input[name=input_chb_"+no+"\\[\\]]");
+                checkBoxes.prop("checked", !checkBoxes.prop("checked"));
+        });                 
+        
+        $("#btnShareFile").click(function (e){
+            var Share = new Object();
+            Share.users = [];
+            Share.IdFile = $("#inputIdFileShare").val();
+            Share.SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+            Share.unshare=[];
+            $("input:checkbox.chbUserGroup").each(function () {
+               if(this.checked){
+                   Share.users.push($(this).val());
+               }
+               else{
+                   Share.unshare.push($(this).val());
+               }
+            });
+            var json = JSON.stringify(Share);
+            $.ajax({
+                url: "<?php echo base_url();?>Share/shareFile",
+                type: "POST",
+                dataType: "json",
+                data:{json:json},
+                beforeSend: function (xhr) {
+                    $("#btnShareFile").append('<i class="fa fa-spinner fa-spin"></i>');
+                },
+                success: function(data) {
+                   if($(".fa-spin").length>0){
+                       $(".fa-spin").remove();
+                   }
+                }
+                        
+
+            });
+            
+        });
+        
 
         $(document).ajaxComplete(function (){
             //pencil click
@@ -424,7 +512,7 @@
                   $("#errorMsg").text("Please give folder some name!");  
                 }
             });
-            
+            //click on move link
             $(".move").click(function (e){
                 e.preventDefault();
                 var IdFile = $(this).data("idfile");
@@ -434,6 +522,56 @@
 
 });
 
+function shareWithUser(control){
+        var IdUser = $(control).val();
+        var chb = $(control);
+        var IdFile = $("#inputIdFileShare").val();
+        var SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+        if(chb.checked){
+            share = 1;
+        }
+        else{
+            share = 0;
+        }
+        $.ajax({
+        url: "<?php echo base_url();?>Share/shareFile",
+        type: "POST",
+        data:{IdFile:IdFile,IdUser:IdUser,Share:share,SharePrivilege:SharePrivilege},
+        beforeSend: function (xhr) {
+            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
+        },
+        error: function (){alert("Error...")},
+        success: function(data) {
+           if($(".fa-spin").length>0){
+               $(".fa-spin").remove();
+           }
+        }
 
+
+    });
+}
+
+function openModal(control){
+    var IdFile = $(control).data("idfile");
+    var FileTypeMime = $(control).data("filetypemime");
+    $("#inputIdFileShare").val(IdFile);
+    $("#inputFileTypeMimeShare").val(FileTypeMime);
+     $.ajax({
+            url: "<?php echo base_url(); ?>Share/",
+            data:{action:"checkFileShare",IdFile:IdFile},
+            success: function(data) {
+                $.each(data,function(index,val){
+
+                    $("input:checkbox.chbUserGroup").each(function () {
+                       if($(this).val()==val.IdUser){
+                           $(this).prop('checked',true);
+                       }
+                    });
+                });
+
+            }
+
+    });
+ }
 
 </script>

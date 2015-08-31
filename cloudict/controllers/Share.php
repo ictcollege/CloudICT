@@ -15,10 +15,35 @@ class Share extends Frontend_Controller{
     }
     
     public function index(){
-        $Users = new stdClass();
-        $Groups = new stdClass();
+        if(isset($_GET['action'])){
+            switch($_GET['action']){
+                case 'checkFileShare':
+                    $this->checkFileShare($_GET['IdFile']);
+                    break;
+                
+                case 'sharedWithYou':
+                    $this->sharedWithYou();
+                    break;
+                
+            }
+        }
         
     }
+    
+    public function shareFile(){
+        if(isset($_POST['json'])){
+            $json = json_decode($_POST['json']);
+            $this->load->model("ShareModel");
+            foreach($json->users as $user){
+                $this->ShareModel->shareWithUser($user,$json->IdFile,TRUE,$json->SharePrivilege);
+            }
+            foreach($json->unshare as $user){
+                $this->ShareModel->shareWithUser($user,$json->IdFile,FALSE);
+            }
+            echo "1";
+        }
+    }
+
     
     public function download($IdFile){
         $this->load->model("FileModel");
@@ -26,16 +51,17 @@ class Share extends Frontend_Controller{
         if(!empty($result)){
             if($result->IdUser==$this->get_user_id()){
                 //user is owner of file, can download
-                if($result->FileTypeMime == "DIR"){
-                    $this->createZip($result->FilePath);
-                }
-                else{
-                    $this->download_file($result);
-                }
-                
+                $this->checkFileTypeAndDownload($result); 
             }
             else{
-                
+                $this->load->model("ShareModel");
+                $permission = $this->ShareModel->canDownload($this->get_user_id(),$IdFile);
+                if($permission){
+                    $this->checkFileTypeAndDownload($result);
+                }
+                else{
+                    die("You can't download this file, file not shared with you!");
+                }
             }
         }
         
@@ -49,7 +75,9 @@ class Share extends Frontend_Controller{
     }
     
     protected function createZip($filePath=''){
-        
+    if($this->get_file_size($filePath)==0){
+        die("Folder is empty!");
+    }    
         // Get real path for our folder
     $rootPath = realpath($filePath);
 
@@ -59,13 +87,13 @@ class Share extends Frontend_Controller{
     $zip->open($docname, ZipArchive::CREATE | ZipArchive::OVERWRITE);
 
     // Create recursive directory iterator
-    /** @var SplFileInfo[] $files */
-    $files = new RecursiveIteratorIterator(
+    /** @var SplFileInfo[] $data */
+    $data = new RecursiveIteratorIterator(
         new RecursiveDirectoryIterator($rootPath),
         RecursiveIteratorIterator::LEAVES_ONLY
     );
 
-    foreach ($files as $name => $file)
+    foreach ($data as $name => $file)
     {
         // Skip directories (they would be added automatically)
         if (!$file->isDir())
@@ -92,7 +120,7 @@ class Share extends Frontend_Controller{
         // Prevent browsers from MIME-sniffing the content-type:
         header('X-Content-Type-Options: nosniff');
         if (!preg_match('/\.(gif|jpe?g|png)$/i', $result->FileName)) {
-            header('Content-Type: application/octet-stream');
+           header('Content-Type: application/octet-stream');
             header('Content-Disposition: attachment; filename="'.$result->FileName.'"');
         } else {
             header('Content-Type: '.$result->FileTypeMime);
@@ -100,7 +128,11 @@ class Share extends Frontend_Controller{
         }
         header('Content-Length: '.$this->get_file_size($result->FilePath));
         header('Last-Modified: '.gmdate('D, d M Y H:i:s T', filemtime($result->FilePath)));
-        $this->readfile($result->FilePath);
+        $this->readfile($result->FilePath); 
+
+
+        
+
     }
     //ovo treba ukloniti kad se popravi bug sa filesize
     protected function get_file_size($file_path, $clear_stat_cache = false) {
@@ -122,7 +154,7 @@ class Share extends Frontend_Controller{
     }
     protected function readfile($file_path) {
         $file_size = $this->get_file_size($file_path);
-        $chunk_size = $this->options['readfile_chunk_size'];
+        $chunk_size = 10 * 1024 * 1024; //10 MB
         if ($chunk_size && $file_size > $chunk_size) {
             $handle = fopen($file_path, 'rb');
             while (!feof($handle)) {
@@ -135,4 +167,91 @@ class Share extends Frontend_Controller{
         }
         return readfile($file_path);
     }
+    
+    protected function checkFileShare($IdFile){
+        $this->load->model("ShareModel");
+        $result = $this->ShareModel->getAllSharedUsersForFile(intval($IdFile));
+        if(!empty($result)){
+            $this->generate_response($result,TRUE);
+        }
+    }
+    
+    /**
+     * this method format result into datatable which display shared files with some user
+     * result can be preview in files/shared_with_you
+     */
+    protected function sharedWithYou(){
+        $this->load->model("ShareModel");
+        $files=  $this->ShareModel->sharedWithUser($this->get_user_id());
+        $i =0;
+        $data = array();
+        foreach($files as $file){
+            $owner = $file["Owner"];
+            $shared_on = date("d-m-Y h:i:s",$file["ShareCreated"]);
+            $file_name = $file["ShareFullName"];
+            $privilege = $this->switchPrivilege($file["SharePrivilege"]);
+            $file_size = $this->formatSizeUnits($file["FileSize"]);
+            $file_modified = date("d-m-Y h:i:s",$file["FileLastModified"]);
+            $modify = "<a href='".base_url()."Share/download/".$file["IdFile"]."' title='download' class='download'><i class='fa fa-download'></i></a>";
+            if($file["SharePrivilege"]==3){
+                $modify.="<a href='".base_url()."Share/delete/".$file["IdFile"]."' title='delete file' class='delete'><i class='fa fa-trash'></i></a>";
+            }
+            if($file["FileTypeMime"]=="DIR"){
+                $file_size = "<i class='fa fa-folder-open' title='folder'></i>";
+                $file_name= "<a href='#' class='viewFile' data-idfile='".$file["IdFile"]."'>".$file["ShareFullName"]."</a>";
+            }
+            $data[$i][]=$owner;
+            $data[$i][]=$shared_on;
+            $data[$i][]=$file_name;
+            $data[$i][]=$privilege;
+            $data[$i][]=$file_size;
+            $data[$i][]=$file_modified;
+            $data[$i][]=$modify;
+            $i++;
+        }
+        $content["data"] = $data;
+        $this->generate_response($content,TRUE);
+        
+    }
+    
+    protected function checkFileTypeAndDownload($result) {
+        if($result->FileTypeMime == "DIR"){
+            $this->createZip($result->FilePath);
+        }
+        $this->download_file($result);
+        
+    }
+    
+    protected function formatSizeUnits($bytes) {
+        if ($bytes >= 1073741824) {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        } elseif ($bytes >= 1048576) {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        } elseif ($bytes > 1) {
+            $bytes = $bytes . ' bytes';
+        } elseif ($bytes == 1) {
+            $bytes = $bytes . ' byte';
+        } else {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
+    }
+    
+    protected function switchPrivilege($param){
+        switch ($param){
+            case 1:
+            case "1":
+                return "READ";
+            case 2:
+            case "2":
+                return "WRITE";
+            case 3:
+            case "3":
+                return "DELETE";
+        }
+    }
+    
 }
