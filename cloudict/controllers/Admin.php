@@ -219,7 +219,7 @@ class Admin extends Backend_Controller {
         
         foreach($groups['Group'] as $g)
         { 
-            $data['deltemodal'] .= '<div class="modal fade" id="mDeleteGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['deltemodal'] .= '<div class="modal fade mDeleteGroup" id="mDeleteGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
             $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
             $data['deltemodal'] .= '<div class="modal-content">';
             $data['deltemodal'] .= '<div class="modal-header">';
@@ -391,17 +391,42 @@ class Admin extends Backend_Controller {
         echo json_encode($response);
     }
     
-    public function insertGroup()
+    public function createNewGroup()
     {
+        $groupname = $this->input->post('GroupName');
+        
+        $this->load->model("UserGroupModel");
+        
+        echo json_encode($this->UserGroupModel->createNewGroup($groupname));
+    }
+    
+    public function getGroups()
+    {
+        $this->load->model("UserGroupModel");
+        
+        $groups = $this->UserGroupModel->getGroups();
+        
+        $resposne = array();
+        
+        $i=0;
+        foreach($groups["Group"] as $g)
+        {
+            $response[$i++] = $g["GroupName"];
+        }
+        
+        echo json_encode($response);
         
     }
     
     public function deleteGroup()
     {
-        $this->input->post($idGroup);
+        $idgroup = $this->input->post('IdGroup');
+        
         $this->load->model("UserGroupModel");
         
-        $this->UserGroupModel->deleteGroup($idGroup);
+        $this->UserGroupModel->deleteGroup($idgroup);
+        
+        echo json_encode(true);
     }
     
     public function users()

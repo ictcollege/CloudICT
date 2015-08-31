@@ -318,7 +318,6 @@ $(document).ready(function() {
                 idgroup = $(this).find(".hdIdGroup").attr("id"),
                 username = $(this).parent().text();
             
-                
             $.ajax({
                 url: 'admin/addNewUserToGroup',
                 type: 'post',
@@ -347,5 +346,135 @@ $(document).ready(function() {
                 } 
             });
         });
+        
+        //dodavanje nove grupe 
+        
+        $(".btnNewGroup").click(function () {
+            var groupname = $(".tbNewGroupName"),
+                error = false,
+                groupExists = false;
+            
+            if(groupname.val() == "") {
+                error = true;
+                groupname.parent().addClass("has-error");
+                groupname.parent().removeClass("has-success");
+            } else {
+                error = false;
+                groupname.parent().removeClass("has-error");
+                groupname.parent().addClass("has-success");
+            }
+            
+            if(!error)
+            {
+                $.ajax({
+                    url: 'admin/getGroups',
+                    type: 'post',
+                    success: function(response) {
+                        var groupNames = jQuery.parseJSON(response),
+                            i = 0;
 
+                        for(i=0; i<groupNames.length;i++){
+                            if(groupNames[i] == groupname.val()){
+                                groupExists = true;
+                                break;
+                            }
+                        }
+                    }
+                });
+                if(!groupExists) {
+                $.ajax({
+                    url: 'admin/createNewGroup',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{GroupName:groupname.val()},
+                    success: function(response) {
+                       $('#mNewGroup').find('modal-body').append('<div class="text-center"><h3>Group '+groupname.val()+' added</h3></div>');
+                     
+                        var numberofcolums = $(".main-panel").find(".panel-body").find(".row .col-lg-4").length,
+                            newgroupcontent = "",
+                            newgroupeditmodal = "",
+                            newgroupdeletemodal = "";
+                    
+                        if(numberofcolums%3 == 0) {
+                            newgroupcontent += '<div class="row">';
+                        }
+                        newgroupcontent += '<div class="col-lg-4">';
+                        newgroupcontent += '<div id="'+response+'" class="panel panel-primary">';
+                        newgroupcontent += ' <div class="panel-heading">'+groupname.val()+'</div>';
+                        newgroupcontent += '<div class="panel-body">';
+                        newgroupcontent += '<div class="group-admin">';
+                        newgroupcontent += '</div><hr>';
+                        newgroupcontent += '<div class="group-user">';
+                        newgroupcontent += '</div>';
+                        newgroupcontent += '</div>';
+                        newgroupcontent += '<div class="panel-footer group-panel-footer">';
+                        newgroupcontent += ' <button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'+response+'">Edit</button>';
+                        newgroupcontent += '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'+response+'">Delete</button>';
+                        newgroupcontent += '</div></div>';
+                        
+                        if(numberofcolums%3 == 0) {
+                            newgroupcontent += '</div>';
+                        }
+                        
+                        if(numberofcolums%3 == 0){
+                            $(".panel-groups").append(newgroupcontent);
+                        } else {
+                            $(".main-panel").find(".row:last-child").append(newgroupcontent);
+                        }
+                        
+                       
+                        
+                        newgroupeditmodal += '<div class="modal fade '+response+'" id="mEditGroup'+response+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                        newgroupeditmodal += '<div class="modal-dialog" role="document">';
+                        newgroupeditmodal += '<div class="modal-content">';
+                        newgroupeditmodal += '<div class="modal-header">';
+                        newgroupeditmodal += '<button type="button" class="close" data-dismiss="modal" aria-label="Close">';
+                        newgroupeditmodal += '<span aria-hidden="true">×</span></button>';
+                        newgroupeditmodal += '<h4 class="modal-title" id="myModalLabel">Edit Group</h4></div>';
+                        newgroupeditmodal += '<div class="modal-body"><div class="form-group"><label>Group Name</label>';
+                        newgroupeditmodal += '<input class="form-control" placeholder="admins"></div>';
+                        newgroupeditmodal += '<div class="form-group"><label>Admins</label><div class="admins">';
+                        newgroupeditmodal += '</div></div>';
+                        newgroupeditmodal += '<div class="form-group"><label>Members</label><div class="users">';
+                        newgroupeditmodal += '</div>';
+                        newgroupeditmodal += '<div class="form-group"><label>New Memers</label><input class="form-control tbSearchNewUser" placeholder="search..." id="1"><div class="newusers">';
+                        newgroupeditmodal += '</div></div></div></div><div class="modal-footer">';
+                        newgroupeditmodal += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+                        newgroupeditmodal += '<button type="button" class="btn btn-primary btnNewGroup">Save</button></div></div></div></div>';
+                        
+                        
+                        $(".editmodals").append(newgroupeditmodal);
+                        
+                        setTimeout(function() {
+                            $('#mNewGroup').modal('hide');
+                        }, 200);
+                        
+                    } 
+                });
+                } else {
+                    $('#mNewGroup').find('modal-body').append('<div class="text-center"><h3>Group already exists!</h3></div>');
+                }
+            }
+        });
+        
+        //brisanje grupe
+        
+        $(document).on("click", ".btnDeleteGroupYes", function(){
+           var idgroup = $(this).parent().find(".hdId").attr("id");
+           
+           $.ajax({
+                url: 'admin/deleteGroup',
+                type: 'post',
+                dataType: 'json',
+                data:{IdGroup:idgroup},
+                success: function(response) {
+                    $('#mDeleteGroup'+idgroup).find('modal-body').append('<div class="text-center"><h3>Group deleted!</h3></div>');
+                    $("#"+idgroup+".panel.panel-primary").parent().remove();
+                    setTimeout(function() {
+                        $('.mDeleteGroup').modal('hide');
+                    }, 200);
+                }
+            });
+           
+        });
 });

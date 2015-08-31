@@ -2,21 +2,26 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class UserGroupModel extends CI_Model {
-    public function insertGroup($groupName)
+    public function createNewGroup($groupName)
     {
         $query = "
                 INSERT INTO `Group`(`GroupName`)
                 
-                VALUES ?
+                VALUES (?)
             ";
             
         $this->db->query($query, [$groupName]);
+        $IdGroup = $this->db->insert_id();
+        
+        return $IdGroup;
     }
     
     public function deleteGroup($idGroup)
     {
         $query = "
-                DELETE FROM `Group` 
+                DELETE 
+                
+                FROM `Group` 
                 
                 WHERE `IdGroup` = ?
             ";
@@ -24,7 +29,9 @@ class UserGroupModel extends CI_Model {
         $this->db->query($query, [$idGroup]);
         
         $query2 = "
-                DELETE FROM `UserGroup`
+                DELETE 
+                
+                FROM `UserGroup`
                 
                  WHERE `IdGroup` = ?
             ";
