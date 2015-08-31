@@ -11,10 +11,14 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class Files extends Frontend_Controller{
 
+    private $msg = '';
 
     public function __construct() {
         $this->class_name = get_class($this);
         parent::__construct();
+        if(isset($_GET['msg_type'])){
+            $this->msg = $this->generate_alert($_GET['msg_type'], $_GET['msg']);
+        }
     }
     /**
      * Default action for opening files controller
@@ -28,6 +32,9 @@ class Files extends Frontend_Controller{
         $data['menu'] = $this->getMenu(0);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
+        if(!empty($this->msg)){
+            $data['msg']=  $this->msg;
+        }
         $this->load_view('filesView', $data);
     }
     public function favourites(){
@@ -41,20 +48,24 @@ class Files extends Frontend_Controller{
         $data['menu'] = $this->getMenu(2);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
+        if(!empty($this->msg)){
+            $data['msg']=  $this->msg;
+        }
         $this->load_view('sharedWithYouView', $data);
         
     }
     
     public function shared_with_others(){
         $this->load->model("ShareModel");
-        $files=  $this->ShareModel->sharedByUser($this->get_user_id());
         $data = array();
         $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
         $data['mask'] = $mask;
         $data['menu'] = $this->getMenu(3);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
-        $data['shared_files'] = $files;
+        if(!empty($this->msg)){
+            $data['msg']=  $this->msg;
+        }
         $this->load_view('sharedWithOthersView', $data);
     }
     
@@ -126,6 +137,15 @@ class Files extends Frontend_Controller{
         }
         
         return $html;
+    }
+    
+    protected function generate_alert($msg_type,$msg){
+    $tekst = '';
+    $tekst.= '<div class="alert alert-'.$msg_type.' alert-dismissible" role="alert">';
+    $tekst.= '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+    $tekst.= $msg;
+    $tekst.= "</div>";
+     return $tekst;  
     }
 
 }
