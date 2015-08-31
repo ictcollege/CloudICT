@@ -225,9 +225,34 @@ class UserGroupModel extends CI_Model {
                                                 )
             ";
             
-            $result = $this->db->query($query, [$idGroup])->result_array();
+        $result = $this->db->query($query, [$idGroup])->result_array();
+
+        return $result;
+    }
+    
+    public function getUsers()
+    {
+        $query = " 
+                    SELECT	`UserName`,
+                                `IdUser`
+			
+                        FROM 	`User`
+                ";
             
-            return $result;
+        $result = $this->db->query($query)->result_array();
+
+        $data = array();
+
+        if(!empty($result))
+        {
+            $i=0;
+            foreach($result as $row)
+            {
+                $data['Users'][$i++] = $row;
+            }
+        }
+
+        return $data;
     }
 }
 

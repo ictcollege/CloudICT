@@ -156,159 +156,177 @@ class Admin extends Backend_Controller {
         $data['usergroups'] = "";
         $i=0;
         
-        foreach($groups['Group'] as $g)
-        {  
-            if($i%3==0)
-            {
-               $data['usergroups'] .= ' <div class="row">';  
-            }
-            $data['usergroups'] .= '<div class="col-lg-4">';
-            $data['usergroups'] .= '<div id="'.$g['IdGroup'].'" class="panel panel-primary">';
-            $data['usergroups'] .= '<div class="panel-heading">';
-            $data['usergroups'] .= $g['GroupName'];
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '<div class="panel-body">';
-            $data['usergroups'] .= '<div class="group-admin">';
-            
-            foreach($usergroups['UserGroup'] as $ug)
-            {
-                if($ug['IdGroup'] == $g['IdGroup'])
+        if(isset($groups['Group']))
+        {
+            foreach($groups['Group'] as $g)
+            {  
+                if($i%3==0)
                 {
-                   if($ug['Admin']==1)
-                   {
-                       $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-primary btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
-                   }
+                   $data['usergroups'] .= ' <div class="row">';  
                 }
-            }
-            
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '<hr/>';
-            
-            $data['usergroups'] .= '<div class="group-user">';
-            foreach($usergroups['UserGroup'] as $ug)
-            {
-                if($ug['IdGroup'] == $g['IdGroup'])
+                $data['usergroups'] .= '<div class="col-lg-4">';
+                $data['usergroups'] .= '<div id="'.$g['IdGroup'].'" class="panel panel-primary">';
+                $data['usergroups'] .= '<div class="panel-heading">';
+                $data['usergroups'] .= $g['GroupName'];
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '<div class="panel-body">';
+                $data['usergroups'] .= '<div class="group-admin">';
+                
+                if(isset($usergroups['UserGroup']))
                 {
-                   if($ug['Admin']==0)
-                   {
-                       $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-info btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
-                   }
+                    foreach($usergroups['UserGroup'] as $ug)
+                    {
+                        if($ug['IdGroup'] == $g['IdGroup'])
+                        {
+                           if($ug['Admin']==1)
+                           {
+                               $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-primary btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
+                           }
+                        }
+                    }
                 }
-                
-                
-            }
-            
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '<div class="panel-footer group-panel-footer">';
-            $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'.$g['IdGroup'].'">Edit</button>';
-            $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'.$g['IdGroup'].'">Delete</button>';
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '</div>';
-            $data['usergroups'] .= '</div>';
-            
-            $i++;
-            if($i%3==0)
-            {
-                $data['usergroups'] .= '</div>'; 
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '<hr/>';
+
+                $data['usergroups'] .= '<div class="group-user">';
+                if(isset($usergroups['UserGroup']))
+                {
+                    foreach($usergroups['UserGroup'] as $ug)
+                    {
+                        if($ug['IdGroup'] == $g['IdGroup'])
+                        {
+                           if($ug['Admin']==0)
+                           {
+                               $data['usergroups'] .= '<button type="button" id="'.$ug['IdUser'].'" class="btn btn-info btn-xs btn-no-hover btn-admin">'.$ug['UserName'].'</button>';
+                           }
+                        }
+                    }
+                }
+
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '<div class="panel-footer group-panel-footer">';
+                $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'.$g['IdGroup'].'">Edit</button>';
+                $data['usergroups'] .= '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'.$g['IdGroup'].'">Delete</button>';
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '</div>';
+                $data['usergroups'] .= '</div>';
+
+                $i++;
+                if($i%3==0)
+                {
+                    $data['usergroups'] .= '</div>'; 
+                }
             }
         }
-        
         $data['deltemodal'] = "";
         $data['editmodal'] = "";
         
-        foreach($groups['Group'] as $g)
-        { 
-            $data['deltemodal'] .= '<div class="modal fade mDeleteGroup" id="mDeleteGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
-            $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
-            $data['deltemodal'] .= '<div class="modal-content">';
-            $data['deltemodal'] .= '<div class="modal-header">';
-            $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-            $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
-            $data['deltemodal'] .= '</div>';
-            $data['deltemodal'] .= '<div class="modal-body text-center">';
-            $data['deltemodal'] .= 'Delete group '.$g['GroupName'].'?';
-            $data['deltemodal'] .= '</div>';
-            $data['deltemodal'] .= '<div class="modal-footer text-center">';
-            $data['deltemodal'] .= '<button type="button" class="btn btn-primary btnDeleteGroupYes">Yes</button>';
-            $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
-            $data['deltemodal'] .= '<input type="hidden" id="'.$g['IdGroup'].'" class="hdId"/>';
-            $data['deltemodal'] .= '</div>';
-            $data['deltemodal'] .= '</div>';
-            $data['deltemodal'] .= '</div>';
-            $data['deltemodal'] .= '</div>';
-            
-            $data['editmodal'] .= '<div class="modal fade '.$g['IdGroup'].'" id="mEditGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
-            $data['editmodal'] .= '<div class="modal-dialog" role="document">';
-            $data['editmodal'] .= '<div class="modal-content">';
-            $data['editmodal'] .= '<div class="modal-header">';
-            $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-            $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit Group</h4>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '<div class="modal-body">';
-            $data['editmodal'] .= '<div class="form-group">';
-            $data['editmodal'] .= '<label>Group Name</label>';
-            $data['editmodal'] .= '<input class="form-control" placeholder="'.$g['GroupName'].'" />';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '<div class="form-group">';
-            $data['editmodal'] .= '<label>Admins</label>';
-            
-            $data['editmodal'] .= '<div class="admins">';
-            foreach($usergroups['UserGroup'] as $ug)
-            {
-                if($ug['IdGroup'] == $g['IdGroup'])
+        if(isset($groups['Group']))
+        {
+            foreach($groups['Group'] as $g)
+            { 
+                $data['deltemodal'] .= '<div class="modal fade mDeleteGroup" id="mDeleteGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
+                $data['deltemodal'] .= '<div class="modal-content">';
+                $data['deltemodal'] .= '<div class="modal-header">';
+                $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '<div class="modal-body text-center">';
+                $data['deltemodal'] .= 'Delete group '.$g['GroupName'].'?';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '<div class="modal-footer text-center">';
+                $data['deltemodal'] .= '<button type="button" class="btn btn-primary btnDeleteGroupYes">Yes</button>';
+                $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+                $data['deltemodal'] .= '<input type="hidden" id="'.$g['IdGroup'].'" class="hdId"/>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
+
+                $data['editmodal'] .= '<div class="modal fade '.$g['IdGroup'].'" id="mEditGroup'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit Group</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Group Name</label>';
+                $data['editmodal'] .= '<input class="form-control" placeholder="'.$g['GroupName'].'" />';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Admins</label>';
+
+                $data['editmodal'] .= '<div class="admins">';
+                
+                if(isset($usergroups['UserGroup']))
                 {
-                   if($ug['Admin']==1)
-                   {
-                       $data['editmodal'] .= '<button type="button" class="btn btn-primary btn-admin">'.$ug['UserName'].'   <i class="fa fa-minus icon-remove-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
-                   }
+                    foreach($usergroups['UserGroup'] as $ug)
+                    {
+                        if($ug['IdGroup'] == $g['IdGroup'])
+                        {
+                           if($ug['Admin']==1)
+                           {
+                               $data['editmodal'] .= '<button type="button" class="btn btn-primary btn-admin">'.$ug['UserName'].'   <i class="fa fa-minus icon-remove-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+                           }
+                        }
+                    }
                 }
-            }
-            $data['editmodal'] .= '</div>';
-            
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '<div class="form-group">';
-            $data['editmodal'] .= '<label>Members</label>';
-            
-            $data['editmodal'] .= '<div class="users">';
-            foreach($usergroups['UserGroup'] as $ug)
-            {
-                if($ug['IdGroup'] == $g['IdGroup'])
+                $data['editmodal'] .= '</div>';
+
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Members</label>';
+
+                $data['editmodal'] .= '<div class="users">';
+                if(isset($usergroups['UserGroup']))
                 {
-                   if($ug['Admin']==0)
-                   {
-                       $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$ug['UserName'].'   <i class="fa fa-trash-o icon-remove-user" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
-                   }
+                    foreach($usergroups['UserGroup'] as $ug)
+                    {
+                        if($ug['IdGroup'] == $g['IdGroup'])
+                        {
+                           if($ug['Admin']==0)
+                           {
+                               $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$ug['UserName'].'   <i class="fa fa-trash-o icon-remove-user" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-admin" id="'.$ug['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+                           }
+                        }
+                    }
                 }
+                
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>New Memers</label>';
+                $data['editmodal'] .= '<input class="form-control tbSearchNewUser" placeholder="search..." id="'.$g["IdGroup"].'" />';
+                $data['editmodal'] .= '</div">';
+                $data['editmodal'] .= '<div class="newusers">';
+
+                $usersnotingroup = $this->UserGroupModel->getUsersThatAreNotInTheGroup($g['IdGroup']);
+                
+                if(isset($usersnotingroup['UsersNotInGroup']))
+                {
+                    foreach($usersnotingroup['UsersNotInGroup'] as $unig)
+                    {
+                        $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$unig['UserName'].'<input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-newuser" id="'.$unig['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
+                    }
+                }
+
+
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer">';
+                $data['editmodal'] .= '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+                $data['editmodal'] .= '<button type="button" class="btn btn-primary btnNewGroup">Save</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
             }
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '<div class="form-group">';
-            $data['editmodal'] .= '<label>New Memers</label>';
-            $data['editmodal'] .= '<input class="form-control tbSearchNewUser" placeholder="search..." id="'.$g["IdGroup"].'" />';
-            $data['editmodal'] .= '</div">';
-            $data['editmodal'] .= '<div class="newusers">';
-            
-            $usersnotingroup = $this->UserGroupModel->getUsersThatAreNotInTheGroup($g['IdGroup']);
-            
-            foreach($usersnotingroup['UsersNotInGroup'] as $unig)
-            {
-                $data['editmodal'] .= '<button type="button" class="btn btn-default btn-user">'.$unig['UserName'].'<input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-newuser" id="'.$unig['IdUser'].'"><input type="hidden" id="'.$g['IdGroup'].'" class="hdIdGroup"/></i></button>';
-            }
-            
-            
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '<div class="modal-footer">';
-            $data['editmodal'] .= '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
-            $data['editmodal'] .= '<button type="button" class="btn btn-primary btnNewGroup">Save</button>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
-            $data['editmodal'] .= '</div>';
         }
-        
         //data to view
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Groups";
@@ -416,6 +434,24 @@ class Admin extends Backend_Controller {
         
         echo json_encode($response);
         
+    }
+    
+    public function getUsers()
+    {
+        $idgroup = $this->input->post('IdGroup');
+        
+        $this->load->model("UserGroupModel");
+        
+        $users = $this->UserGroupModel->getUsers();
+        
+        $response = "";
+        
+        foreach($users['Users'] as $u)
+        {
+            $response .= '<button type="button" class="btn btn-default btn-user">'.$u['UserName'].'<input type="hidden" id="'.$idgroup.'" class="hdIdGroup"/></i> <i class="fa fa-plus icon-add-newuser" id="'.$u['IdUser'].'"><input type="hidden" id="'.$idgroup.'" class="hdIdGroup"/></i></button>';
+        }
+        
+        echo json_encode($response);
     }
     
     public function deleteGroup()

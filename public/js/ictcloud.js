@@ -332,9 +332,11 @@ $(document).ready(function() {
         });
         
         $(document).on("keyup", ".tbSearchNewUser", function() {
-            var username = $(".tbSearchNewUser").val(),
-                idgroup = $(this).attr("id");
+            var idgroup = $(this).attr("id"),
+                username = $(this).val(),
+                idnewcreatedgroup;
                 
+                alert(username);
             $.ajax({
                 url: 'admin/searchNewUser',
                 type: 'post',
@@ -342,7 +344,7 @@ $(document).ready(function() {
                 data:{Username:username,IdGroup:idgroup},
                 success: function(response) {
                     $(".modal."+idgroup).find(".newusers").text("");
-                     $(".modal."+idgroup).find(".newusers").append(response);
+                    $(".modal."+idgroup).find(".newusers").append(response);
                 } 
             });
         });
@@ -388,18 +390,26 @@ $(document).ready(function() {
                     dataType: 'json',
                     data:{GroupName:groupname.val()},
                     success: function(response) {
+                    
+                    $.ajax({
+                            url: 'admin/getUsers',
+                            type: 'post',
+                            dataType: 'json',
+                            data:{IdGroup:response},
+                            success: function(users) {
                        $('#mNewGroup').find('modal-body').append('<div class="text-center"><h3>Group '+groupname.val()+' added</h3></div>');
                      
                         var numberofcolums = $(".main-panel").find(".panel-body").find(".row .col-lg-4").length,
                             newgroupcontent = "",
                             newgroupeditmodal = "",
-                            newgroupdeletemodal = "";
+                            newgroupdeletemodal = "",
+                            idnewcreatedgroup = response;
                     
                         if(numberofcolums%3 == 0) {
                             newgroupcontent += '<div class="row">';
                         }
                         newgroupcontent += '<div class="col-lg-4">';
-                        newgroupcontent += '<div id="'+response+'" class="panel panel-primary">';
+                        newgroupcontent += '<div id="'+idnewcreatedgroup+'" class="panel panel-primary">';
                         newgroupcontent += ' <div class="panel-heading">'+groupname.val()+'</div>';
                         newgroupcontent += '<div class="panel-body">';
                         newgroupcontent += '<div class="group-admin">';
@@ -408,8 +418,8 @@ $(document).ready(function() {
                         newgroupcontent += '</div>';
                         newgroupcontent += '</div>';
                         newgroupcontent += '<div class="panel-footer group-panel-footer">';
-                        newgroupcontent += ' <button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'+response+'">Edit</button>';
-                        newgroupcontent += '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'+response+'">Delete</button>';
+                        newgroupcontent += ' <button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroup'+idnewcreatedgroup+'">Edit</button>';
+                        newgroupcontent += '<button type="button" class="btn btn-outline btn-danger btn-xs pull-right" data-toggle="modal" data-target="#mDeleteGroup'+idnewcreatedgroup+'">Delete</button>';
                         newgroupcontent += '</div></div>';
                         
                         if(numberofcolums%3 == 0) {
@@ -424,7 +434,7 @@ $(document).ready(function() {
                         
                        
                         
-                        newgroupeditmodal += '<div class="modal fade '+response+'" id="mEditGroup'+response+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                        newgroupeditmodal += '<div class="modal fade '+idnewcreatedgroup+'" id="mEditGroup'+idnewcreatedgroup+'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
                         newgroupeditmodal += '<div class="modal-dialog" role="document">';
                         newgroupeditmodal += '<div class="modal-content">';
                         newgroupeditmodal += '<div class="modal-header">';
@@ -437,7 +447,11 @@ $(document).ready(function() {
                         newgroupeditmodal += '</div></div>';
                         newgroupeditmodal += '<div class="form-group"><label>Members</label><div class="users">';
                         newgroupeditmodal += '</div>';
-                        newgroupeditmodal += '<div class="form-group"><label>New Memers</label><input class="form-control tbSearchNewUser" placeholder="search..." id="1"><div class="newusers">';
+                        newgroupeditmodal += '<div class="form-group"><label>New Memers</label><input class="form-control tbSearchNewUser" placeholder="search..." id="'+idnewcreatedgroup+'"><div class="newusers">';
+                        
+                         
+                        newgroupeditmodal += users;
+                        
                         newgroupeditmodal += '</div></div></div></div><div class="modal-footer">';
                         newgroupeditmodal += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
                         newgroupeditmodal += '<button type="button" class="btn btn-primary btnNewGroup">Save</button></div></div></div></div>';
@@ -449,7 +463,9 @@ $(document).ready(function() {
                             $('#mNewGroup').modal('hide');
                         }, 200);
                         
-                    } 
+                        } 
+                    });
+                } 
                 });
                 } else {
                     $('#mNewGroup').find('modal-body').append('<div class="text-center"><h3>Group already exists!</h3></div>');
