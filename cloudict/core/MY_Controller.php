@@ -60,6 +60,17 @@ class MY_Controller extends CI_Controller{
      * @param type $menu
      */
     public function load_view($view,$data=array()){
+		if($this->session->userdata('userid')!=null){
+			$data['userid']=$this->session->userdata('userid');
+			$this->load->model('NotificationModel');
+			$data['notifications']=  $this->NotificationModel->getInitialNotifications($data['userid']);
+			$count=0;
+			foreach($data['notifications'] as $red){
+				if($red['UserNotificationTimeExpires']==0) $count++;
+			}
+			$data['count']=$count;
+		}
+		
         $this->load->view('header',$data);
         $this->load->view('menu',$data);
         $this->load->view($view, $data);
