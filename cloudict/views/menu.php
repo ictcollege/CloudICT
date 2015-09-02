@@ -123,7 +123,7 @@ $(document).ready(function () {
 		
 			foreach($notifications as $red){
 				echo "<li>";
-				echo"<a href='".$base_url.$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
+				echo"<a href='".base_url().$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
 				echo"<span class='image' style='margin-right:10px'>";
 				echo"<i class='".$red['NotificationTypeIcon']."'></i>";
 				echo"</span>";
@@ -148,7 +148,7 @@ $(document).ready(function () {
                                     <li>
                                         <div class="text-center">
                                             <a>
-                                                <strong><a href="<?php echo $base_url; ?>Notifications/allNotifications">See All Alerts</strong>
+                                                <strong><a href="<?php echo base_url(); ?>Notifications/allNotifications">See All Alerts</strong>
                                                 <i class="fa fa-angle-right"></i>
                                             </a>
                                         </div>
