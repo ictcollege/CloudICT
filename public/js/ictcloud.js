@@ -509,7 +509,6 @@ $(document).ready(function() {
         
         //modal close event 
         
-        
         $(document).on(".modal", "hidden.bs.modal", function(){
             $(".tbGroupName").val("");
                 $(".tbGroupName").parent().removeClass("has-error");
@@ -520,4 +519,67 @@ $(document).ready(function() {
                 $(".tbGroupName").parent().removeClass("has-error");
                 $(".tbGroupName").parent().removeClass("has-success");
         });
+        
+        //generate new user, insert new user in db
+        $(".user-exists").hide();
+        
+        $(".btnGenerateKey").click(function () {
+            var _this = $(this),
+                email = $(".tbEmail"),
+                regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
+                error = false;
+                
+            if(email.val().match(regEmail)) {
+                email.parent().addClass("has-success");
+                email.parent().removeClass("has-error");
+                error = false;
+            } else {
+                email.parent().removeClass("has-success");
+                email.parent().addClass("has-error");
+                error = true;
+            }
+            
+            if(!error) {
+                $.ajax({
+                    url: 'admin/checkIfEmailExists',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{Email:email.val()},
+                    success: function(response) {
+                        if(response == 0) {
+                            $(".user-exists").hide(400);
+                            $.ajax({
+                                url: 'admin/insertUser',
+                                type: 'post',
+                                dataType: 'json',
+                                data:{Email:email.val()},
+                                success: function(response) {
+                                    $(".tbKey").attr("placeholder", response);
+                                    $(".btnSendKey").removeClass("disabled");
+                                    $(".btnGenerateKey").hide(400);
+                                }
+                            });
+                        } else {
+                            email.parent().removeClass("has-success");
+                            email.parent().addClass("has-error");
+                            $(".user-exists").show(400);
+                        }
+                    }
+                });
+            }
+        });
+        
+        //user bootstrap datatables
+        
+        
+        var url = window.location.href,
+            pop = url.split("/"),
+            controller = pop[pop.length-1];
+            
+        if(controller == "users"){
+            $(".tableusers").DataTable( {
+                "ajax": 'admin/getAllUsers'
+            });
+        }
+        
 });

@@ -64,67 +64,6 @@ class Admin extends Backend_Controller {
         $this->load->view('applications', $data);
     }
     
-    public function allfiles()
-    {
-        //helpers
-        $this->load->helper('url');
-        $this->load->helper('form');
-        
-        //variables
-        $base_url = base_url();
-        
-        //data to view
-        $data['base_url']= $base_url;
-        $data['title'] = "ICT Cloud | Admin | All Files";
-        
-        //views
-        $this->load->view('header', $data);
-        $this->load->view('menu', $data);
-        $this->load->view('maincontent', $data);
-    }
-    
-    public function newuser()
-    {
-        //helpers
-        $this->load->helper('url');
-        $this->load->helper('form');
-        
-        //variables
-        $base_url = base_url();
-            //form elements
-            $form_attr = array(
-                "id" => "formRegister",
-                "role" => "form"  
-            );
-            
-            $email_attr = array(
-                "class" => "form-control tbEmail" ,
-                "placeholder" => "Email" ,
-                "name" => "Email" ,
-                "autofocus" => "autofocus"
-            );
-        
-            $key_attr = array(
-                "class" => "form-control tbKey disabled" ,
-                "placeholder" => "Generated Key" ,
-                "name" => "key",
-                "readonly" => "true"
-            );
-        
-        //data to view
-        $data['base_url']= $base_url;
-        $data['title'] = "ICT Cloud | Admin | New User";
-             //data for form
-            $data['form_attr'] = $form_attr;
-            $data['email_attr'] = $email_attr;
-            $data['key_attr'] = $key_attr;
-        
-        //views
-        $this->load->view('header', $data);
-        $this->load->view('menu', $data);
-        $this->load->view('newuser', $data);
-    }
-    
     public function groups()
     {
         //helpers
@@ -484,7 +423,7 @@ class Admin extends Backend_Controller {
         
         //model
         $this->load->model('MenuModel');
-        
+       
         $menu = $this->MenuModel->getMenuOfApplication(3);
         
         $data['menu'] = "";
@@ -496,11 +435,51 @@ class Admin extends Backend_Controller {
             $data['menu'] .= '</li>';
         }
         
-         //data to view
+        //data to view
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Groups";
-        
+            
         //views
-        $this->load_view('groups', $data);
+        $this->load_view('users', $data);
+    }
+    
+    public function getAllUsers()
+    {
+        $this->load->model("UserModel");
+        
+        $users = $this->UserModel->getAllUsers();
+        
+        $data['data'] = $users;
+        
+       
+    }
+    
+    public function checkIfEmailExists()
+    {
+        $email = $this->input->post('Email');
+        
+        $this->load->model("UserModel");
+        
+        $response = $this->UserModel->checkIfEmailExists($email);
+        
+        echo json_encode($response);
+    }
+    
+    public function insertUser()
+    {
+        $email = $this->input->post('Email');
+        
+        $this->load->model("UserModel");
+        
+        $id = $this->UserModel->insertUser($email);
+        $key = $this->UserModel->getUserKey($id);
+        
+        $i=0;
+        foreach($key["Key"] as $k)
+        {
+            $response[$i++] = $k["UserKey"];
+        }
+        
+        echo json_encode($response);
     }
 }

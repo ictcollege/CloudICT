@@ -236,3 +236,7 @@ a {
 .btnChangeGroupName{
     margin-top: 5px;
 }
+
+.user-exists {
+    color: red;
+}

@@ -257,10 +257,10 @@ class UserModel extends CI_Model {
 				`UserKeyExpires` = ?
 			
 			WHERE IdUser = ?;
-		";
-		$updateData = "user$IdUser";
+		";	
+	$updateData = "user$IdUser";
 		$this->db->query($updateQuery, [$updateData,$updateData,$updateData,5,time(),$IdUser]);
-		return $IdUser;
+                return $IdUser;
 	}
 	
 	/**
@@ -324,11 +324,27 @@ class UserModel extends CI_Model {
         public function getAllUsers()
         {
             $query = "
-                    SELECT * 
-                    FROM `User`
+                        SELECT * 
+                    
+                        FROM `User`
                     ";
             
-            $result = $this->db->query($query)->result_array();
+            $result = $this->db->query($query)->result();
+            
+            return $result;
+        }
+        
+        public function getUserKey($idUser)
+        {
+            $query = "
+                    SELECT      `UserKey`
+                    
+                    FROM        `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$idUser])->result_array();
             
             $data = array();
             
@@ -337,7 +353,7 @@ class UserModel extends CI_Model {
                 $i=0;
                 foreach($result as $row)
                 {
-                    $data['Users'][$i++] = $row;
+                    $data['Key'][$i++] = $row;
                 }
             }
             
