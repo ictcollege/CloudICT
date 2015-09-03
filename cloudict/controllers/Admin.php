@@ -40,7 +40,7 @@ class Admin extends Backend_Controller {
                $data['applications'] .= ' <div class="row">';  
             }
             $data['applications'] .= '<div class="col-sm-4 text-center">';
-            $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'">';
+            $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
             $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
             $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
             $data['applications'] .= '</div></a>';
@@ -481,5 +481,116 @@ class Admin extends Backend_Controller {
         }
         
         echo json_encode($response);
+    }
+    
+    public function privileges()
+    {
+        //helpers
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+        //model
+        $this->load->model('MenuModel');
+        $this->load->model('GroupApplicationModel');
+        $this->load->model('UserGroupModel');
+        $this->load->model('ApplicationModel');
+       
+        $menu = $this->MenuModel->getMenuOfApplication(3);
+        
+        $data['menu'] = "";
+        
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+        
+        $groupapplications = $this->GroupApplicationModel->getGroupApplications();
+        $groups = $this->UserGroupModel->getGroups();
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['groupsapplications'] = "";
+        $data['editmodal'] = "";
+        
+        $i = 0;
+        if(isset($groups['Group']))
+        {
+            foreach($groups['Group'] as $g)
+            {  
+                if($i%3==0)
+                {
+                   $data['groupsapplications'] .= ' <div class="row">';  
+                }
+                $data['groupsapplications'] .= '<div class="col-lg-4">';
+                $data['groupsapplications'] .= '<div id="'.$g['IdGroup'].'" class="panel panel-primary">';
+                $data['groupsapplications'] .= '<div class="panel-heading">';
+                $data['groupsapplications'] .= $g['GroupName'];
+                $data['groupsapplications'] .= '</div>';
+                $data['groupsapplications'] .= '<div class="panel-body">';
+                
+                if(isset($groupapplications['GroupApplications']))
+                {
+                    foreach($groupapplications['GroupApplications'] as $ga)
+                    {
+                        if($ga["IdGroup"] == $g["IdGroup"])
+                        {
+                            $data['groupsapplications'] .= '<button type="button" id="'.$ga['IdApp'].'" class="btn btn-no-hover btn-admin" style="background-color: '.$ga["AppColor"].'"><i class="fa '.$ga['AppIcon'].' fa-fw"></i> '.$ga['AppName'].'</button>';
+                        }
+                    }
+                }
+                
+                $data['groupsapplications'] .= '</div>';
+                $data['groupsapplications'] .= '<div class="panel-footer group-panel-footer">';
+                $data['groupsapplications'] .= '<button type="button" class="btn btn-outline btn-primary btn-xs pull-left" data-toggle="modal" data-target="#mEditGroupApplication'.$g['IdGroup'].'">Edit</button>';
+                
+                $data['groupsapplications'] .= '</div>';
+                $data['groupsapplications'] .= '</div>';
+                $data['groupsapplications'] .= '</div>';
+
+                $i++;
+                if($i%3==0)
+                {
+                    $data['groupsapplications'] .= '</div>'; 
+                }
+                
+               
+                $data['editmodal'] .= '<div class="modal fade mEditGroupApplication" id="mEditGroupApplication'.$g['IdGroup'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit Privileges</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body text-center">';
+                
+                if(isset($groupapplications['GroupApplications']))
+                {
+                    foreach($groupapplications['GroupApplications'] as $ga)
+                    {
+                        $data['editmodal'] .= '<button type="button" id="'.$ga['IdApp'].'" class="btn btn-no-hover btn-admin" style="background-color: '.$ga["AppColor"].'"><i class="fa '.$ga['AppIcon'].' fa-fw"></i> '.$ga['AppName'].'</button>';
+                    }
+                }
+                
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer text-center">';
+                $data['editmodal'] .= '<input type="hidden" id="'.$g['IdGroup'].'" class="hdId"/>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+            }
+        }
+        
+        
+        //data to view
+        $data['base_url']= $base_url;
+        $data['title'] = "ICT Cloud | Admin | Privileges";
+            
+        //views
+        $this->load_view('privileges', $data);
     }
 }

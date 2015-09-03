@@ -14,7 +14,8 @@ class ApplicationModel extends CI_Model{
                            `AppLink`,
                            `AppIcon`,
                            `AppStatus`,
-                           `AppOrder`
+                           `AppOrder`,
+                           `AppColor`
                     
                     FROM `App`
                     
@@ -44,7 +45,8 @@ class ApplicationModel extends CI_Model{
                            `AppLink`,
                            `AppIcon`,
                            `AppStatus`,
-                           `AppOrder`
+                           `AppOrder`,
+                           `AppColor`
                     
                     FROM `App`
                     
