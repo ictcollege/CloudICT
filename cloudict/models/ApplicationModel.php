@@ -36,5 +36,37 @@ class ApplicationModel extends CI_Model{
             return $data;
             
         }
+        
+        public function getApplications($status)
+        {
+            $query = "
+                    SELECT `AppName`,
+                           `AppLink`,
+                           `AppIcon`,
+                           `AppStatus`,
+                           `AppOrder`
+                    
+                    FROM `App`
+                    
+                    WHERE `AppStatus` = ?
+                    
+                    ORDER BY AppOrder
+            ";
+                    
+            $result = $this->db->query($query, [$status])->result_array();
+            
+            $data['Applications'] = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['Application'][$i++] = $row;
+                }
+            }
+            return $data;
+            
+        }
 }
 

@@ -384,12 +384,12 @@ $(document).ready(function() {
                         newgroupeditmodal += '<span aria-hidden="true">×</span></button>';
                         newgroupeditmodal += '<h4 class="modal-title" id="myModalLabel">Edit Group</h4></div>';
                         newgroupeditmodal += '<div class="modal-body"><div class="form-group"><label>Group Name</label>';
-                        newgroupeditmodal += '<input class="form-control tbGroupName" placeholder="'+groupname.val()+'" id="'+idnewcreatedgroup+'" ><button type="button" class="btn btn-success pull-right btnChangeGroupName">Change Name</button></div>';
-                        newgroupeditmodal += '<div class="form-group"><label>Admins</label><div class="admins">';
+                        newgroupeditmodal += '<input class="form-control tbGroupName" placeholder="'+groupname.val()+'" id="'+idnewcreatedgroup+'" ><button type="button" class="btn btn-success pull-right btnChangeGroupName" id="'+idnewcreatedgroup+'">Change Name</button></div>';
+                        newgroupeditmodal += '<div class="form-group"><label>Admins</label><div class="admins '+idnewcreatedgroup+'">';
                         newgroupeditmodal += '</div></div>';
-                        newgroupeditmodal += '<div class="form-group"><label>Members</label><div class="users">';
+                        newgroupeditmodal += '<div class="form-group"><label>Members</label><div class="users '+idnewcreatedgroup+'">';
                         newgroupeditmodal += '</div>';
-                        newgroupeditmodal += '<div class="form-group"><label>New Memers</label><input class="form-control tbSearchNewUser" placeholder="search..." id="'+idnewcreatedgroup+'"><div class="newusers">';
+                        newgroupeditmodal += '<div class="form-group"><label>New Memers</label><input class="form-control tbSearchNewUser" placeholder="search..." id="'+idnewcreatedgroup+'"><div class="newusers '+idnewcreatedgroup+'">';
                         
                          
                         newgroupeditmodal += users;
@@ -495,6 +495,7 @@ $(document).ready(function() {
                                
                                _this.parent().addClass("has-success");
                                _this.parent().removeClass("has-error");
+                               _this.parent().find(".tbGroupName").attr("placeholder", newgroupname); 
                              }
                         });
                     } else {
@@ -504,5 +505,19 @@ $(document).ready(function() {
                     }
                 }
             });
+        });
+        
+        //modal close event 
+        
+        
+        $(document).on(".modal", "hidden.bs.modal", function(){
+            $(".tbGroupName").val("");
+                $(".tbGroupName").parent().removeClass("has-error");
+                $(".tbGroupName").parent().removeClass("has-success");
+        });
+        $('.modal').on('hidden.bs.modal', function () {
+                $(".tbGroupName").val("");
+                $(".tbGroupName").parent().removeClass("has-error");
+                $(".tbGroupName").parent().removeClass("has-success");
         });
 });
