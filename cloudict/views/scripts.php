@@ -14,6 +14,9 @@
     
     <!-- Form Validation scripts -->
     <script src="<?php echo base_url();?>public/js/forms/login.js"></script>
+	
+    <!-- Notification scripts -->
+    <script src="<?php echo base_url();?>public/js/notify.js"></script>
     
     
     
