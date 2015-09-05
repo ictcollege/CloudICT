@@ -329,7 +329,7 @@ class UserModel extends CI_Model {
                         FROM `User`
                     ";
             
-            $result = $this->db->query($query)->result();
+            $result = $this->db->query($query)->result_array();
             
             return $result;
         }

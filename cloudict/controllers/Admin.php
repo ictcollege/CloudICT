@@ -33,7 +33,7 @@ class Admin extends Backend_Controller {
         $data['applications'] = "";
         $data['applications'] .= ' <div class="row">';  
         $i= 0;
-        foreach($applications['Application'] as $a)
+        foreach($applications['Applications'] as $a)
         {
             if($i%3==0)
             {
@@ -449,9 +449,29 @@ class Admin extends Backend_Controller {
         
         $users = $this->UserModel->getAllUsers();
         
-        $data['data'] = $users;
+        $data = array();
         
-       
+        $i = 0;
+        foreach($users as $user)
+        {
+            $data['data'][$i][] = $user["IdUser"];
+            $data['data'][$i][] = $user["IdRole"];
+            $data['data'][$i][] = $user["UserName"];
+            $data['data'][$i][] = $user["UserPassword"];
+            $data['data'][$i][] = $user["UserFullname"];
+            $data['data'][$i][] = $user["UserEmail"];
+            $data['data'][$i][] = $user["UserDiskQuota"];
+            $data['data'][$i][] = $user["UserDiskUsed"];
+            $data['data'][$i][] = $user["UserStatus"];
+            $data['data'][$i][] = $user["UserKey"];
+            $data['data'][$i][] = $user["UserKeyExpires"];
+            
+            $i++;
+        }
+        
+        header("Content-Type:application/json");
+        
+        echo json_encode($data);
     }
     
     public function checkIfEmailExists()
@@ -567,11 +587,24 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-body text-center">';
                 
-                if(isset($groupapplications['GroupApplications']))
+                if(isset($applications['Applications']))
                 {
-                    foreach($groupapplications['GroupApplications'] as $ga)
+                    foreach($applications['Applications'] as $a)
                     {
-                        $data['editmodal'] .= '<button type="button" id="'.$ga['IdApp'].'" class="btn btn-no-hover btn-admin" style="background-color: '.$ga["AppColor"].'"><i class="fa '.$ga['AppIcon'].' fa-fw"></i> '.$ga['AppName'].'</button>';
+                        $data['editmodal'] .= '<button for="'.$a['IdApp'].'" type="button" id="'.$a['IdApp'].'" class="btn btn-no-hover btn-application" style="background-color: '.$a["AppColor"].'"><i class="fa '.$a['AppIcon'].' fa-fw"></i> '.$a['AppName'].'<input type="checkbox" class="chbAppGroup" ';
+                        
+                        if(isset($groupapplications['GroupApplications']))
+                        {
+                            foreach($groupapplications['GroupApplications'] as $ga)
+                            {
+                                if($a["IdApp"] == $ga["IdApp"] && $g["IdGroup"] == $ga["IdGroup"])
+                                {
+                                    $data['editmodal'] .= 'checked="checked"' ;
+                                }
+                            }
+                        }
+                        
+                        $data['editmodal'] .= 'id="'.$a['IdApp'].'"/><input type="hidden" id="'.$g["IdGroup"].'" class="hdIdGroup"/></button>';
                     }
                 }
                 
@@ -592,5 +625,82 @@ class Admin extends Backend_Controller {
             
         //views
         $this->load_view('privileges', $data);
+    }
+    
+    public function removeApplicationForGroup()
+    {
+        $idgroup = $this->input->post('IdGroup');
+        $idapp = $this->input->post('IdApp');
+        
+        $this->load->model("GroupApplicationModel");
+        
+        $this->GroupApplicationModel->removeApplicationForGroup($idapp, $idgroup);
+    }
+    
+    public function addApplicationForGroup()
+    {
+        $idgroup = $this->input->post('IdGroup');
+        $idapp = $this->input->post('IdApp');
+        
+        $this->load->model("GroupApplicationModel");
+        
+        
+        $this->GroupApplicationModel->addApplicationForGroup($idapp, $idgroup);
+    }
+    
+     public function applications()
+    {
+        //helpers
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+        //model
+        $this->load->model('MenuModel');
+        $this->load->model('ApplicationModel');
+        
+        $menu = $this->MenuModel->getMenuOfApplication(4);
+        
+        $data['menu'] = "";
+        
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['applications'] = "";
+        
+        $i= 0;
+        foreach($applications['Applications'] as $a)
+        {
+            if($i%3==0)
+            {
+               $data['applications'] .= ' <div class="row">';  
+            }
+            $data['applications'] .= '<div class="col-sm-4 text-center">';
+            $data['applications'] .= '<div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
+            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+            $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '</div>';
+            $data['applications'] .= ' </div>';
+            $i++;
+            if($i%3==0)
+            {
+                $data['applications'] .= '</div>'; 
+            }
+        }
+        
+        //data to view
+        $data['base_url']= $base_url;
+        $data['title'] = "ICT Cloud | Admin | System";
+            
+        //views
+        $this->load_view('systemapplications', $data);
     }
 }

@@ -10,7 +10,8 @@ class ApplicationModel extends CI_Model{
         public function getAllApplications()
         {
             $query = "
-                    SELECT `AppName`,
+                    SELECT `IdApp`,
+                           `AppName`,
                            `AppLink`,
                            `AppIcon`,
                            `AppStatus`,
@@ -24,14 +25,14 @@ class ApplicationModel extends CI_Model{
                     
             $result = $this->db->query($query)->result_array();
             
-            $data['Applications'] = array();
+            $data = array();
             
             if(!empty($result))
             {
                 $i=0;
                 foreach($result as $row)
                 {
-                    $data['Application'][$i++] = $row;
+                    $data['Applications'][$i++] = $row;
                 }
             }
             return $data;
@@ -57,14 +58,14 @@ class ApplicationModel extends CI_Model{
                     
             $result = $this->db->query($query, [$status])->result_array();
             
-            $data['Applications'] = array();
+            $data = array();
             
             if(!empty($result))
             {
                 $i=0;
                 foreach($result as $row)
                 {
-                    $data['Application'][$i++] = $row;
+                    $data['Applications'][$i++] = $row;
                 }
             }
             return $data;

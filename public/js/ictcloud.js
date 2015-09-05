@@ -570,16 +570,103 @@ $(document).ready(function() {
         });
         
         //user bootstrap datatables
-        
-        
         var url = window.location.href,
             pop = url.split("/"),
             controller = pop[pop.length-1];
-            
         if(controller == "users"){
+            
             $(".tableusers").DataTable( {
-                "ajax": 'admin/getAllUsers'
+                "ajax": 'admin/getAllUsers',
+                responsive: true
             });
         }
+        
+        $(".chbAppGroup").click(function() {
+           var idapp = $(this).attr("id"),
+               idgroup = $(this).parent().find(".hdIdGroup").attr("id");
+           
+           if($(this).prop('checked')) {
+               $.ajax({
+                    url: 'admin/addApplicationForGroup',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{IdApp:idapp,IdGroup:idgroup},
+                    success: function(response) {
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: 'admin/removeApplicationForGroup',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{IdApp:idapp,IdGroup:idgroup},
+                    success: function(response) {
+                    }
+                });
+            }
+        });
+        
+        //check or uncheck on btn click
+        
+        $(".btn-application").click(function() {
+            var chb = $(this).find(".chbAppGroup").prop("checked"),
+                idapp = $(this).find(".chbAppGroup").attr("id"),
+                idgroup = $(this).parent().find(".hdIdGroup").attr("id");
+            
+            if(chb) {
+                $(this).find(".chbAppGroup").prop("checked", false);
+                $.ajax({
+                    url: 'admin/removeApplicationForGroup',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{IdApp:idapp,IdGroup:idgroup},
+                    success: function(response) {
+                    }
+                });
+            } else {
+                $(this).find(".chbAppGroup").prop("checked", true);
+                $.ajax({
+                    url: 'admin/addApplicationForGroup',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{IdApp:idapp,IdGroup:idgroup},
+                    success: function(response) {
+                    }
+                });
+            }
+        });
+        
+        //refresh on close modal 
+        
+        $('.mEditGroupApplication').on('hidden.bs.modal', function () {
+                window.location.href = "admin/privileges";
+        });
+        
+        //colorpicker
+        $(function(){
+            $('.demo2').colorpicker();
+        });
+        
+        // font awsome json in ddl
+        
+        $(".btnNewApplication").click(function() {
+            $.getJSON( "public/json/font-awesome-data.json", function( data ) {
+                var items = "";
+
+                items += "<select class='ddlColor form-control'>";
+
+                $.each( data, function( key, val ) {
+                    items += "<option value='"+key+"'><i class='fa " + key + "'></i></option> ";
+                });
+            
+                items += "</select>";
+            
+                $(".ddlColor").append(items);
+            });
+            
+            
+        });
+            
+            
         
 });

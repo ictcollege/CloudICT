@@ -10,16 +10,23 @@
                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mNewUser">New User</button>  
                         </div>
                     </div>
-                    <div class="panel-body panel-groups">
-                        <div class="col-lg-12 table-responsive">
-                            <table class="table table-striped tableusers table-hover">
+                    <div class="panel-body panel-users">
+                        <div class="table-responsive">
+                            
+                            <table class="table table-striped tableusers table-hover dt-responsive nowrap">
                                 <thead>
-                                    <th>#USER ID</th>
-                                    <th>#ROLE ID</th>
-                                    <th>Username</th>
-                                    <th>Full Name</th>
-                                    <th>Email</th>
-                                    <th>Disk Quota</th>
+                                    <tr>
+                                        <th>#USER ID</th>
+                                        <th>#ROLE ID</th>
+                                        <th>Username</th>
+                                        <th>Password md5</th>
+                                        <th>Email</th>
+                                        <th>Disk Quota</th>
+                                        <th>Disk Used %</th>
+                                        <th>User Status</th>
+                                        <th>User Key</th>
+                                        <th>Key Expires</th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     

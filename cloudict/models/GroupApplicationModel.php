@@ -10,7 +10,7 @@ class GroupApplicationModel extends CI_Model{
         public function getGroupApplications()
         {
             $query = " 
-                SELECT	`IdGroup`,
+                SELECT 	`IdGroup`,
                         `GroupName`,
                         `IdApp`,
                         `AppName`,
@@ -42,5 +42,34 @@ class GroupApplicationModel extends CI_Model{
             }
             
             return $data;
+        }
+        
+        public function removeApplicationForGroup($idApp, $idGroup)
+        {
+            $query = " 
+                DELETE
+                
+                FROM `GroupApp`
+                
+                WHERE `IdGroup` = ? 
+                
+                AND `IdApp` = ?
+            ";
+            
+        
+            $result = $this->db->query($query, [$idGroup, $idApp]);
+        }
+        
+        
+        public function addApplicationForGroup($idApp, $idGroup)
+        {
+            $query = " 
+                INSERT INTO     `GroupApp`(`IdGroup`,`IdApp`)
+                
+                VALUES          (?, ?)
+            ";
+            
+        
+            $result = $this->db->query($query, [$idGroup, $idApp]);
         }
 }

@@ -205,6 +205,11 @@ a {
     margin-top: 5px;
 }
 
+.btn-application{
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
 .btn-no-hover {
     cursor: initial;
 }
@@ -240,3 +245,11 @@ a {
 .user-exists {
     color: red;
 }
+
+.chbAppGroup{
+    position: relative;
+    top: -18px;
+    left: 18px;
+}
+
+    
