@@ -17,6 +17,9 @@
     
     <!-- Bootstrap ColorPicker CSS -->
      <link href="public/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+     
+     <!-- FontAwsome IconPicker CSS -->
+     <link href="public/css/fontawesome-iconpicker.min.css" rel="stylesheet">
 
     <!-- MetisMenu CSS -->
     <link href="public/css/metisMenu.min.css" rel="stylesheet">

@@ -359,6 +359,19 @@ class UserModel extends CI_Model {
             
             return $data;
         }
+        
+        public function initialPasswordChange($newPassword)
+        {
+            $query = "
+                    UPDATE      `User`      
+                    
+                    SET         `UserPassword` = ?        
+                    
+                    WHERE `IdUser` = 1
+                    ";
+            
+            $result = $this->db->query($query, [md5($newPassword)]);
+        }
 }
 
 /* End of file UserModel.php */

@@ -175,27 +175,31 @@ $(document).ready(function () {
                 <!-- /.dropdown -->
             </ul>
             <!-- /.navbar-top-links -->
+            <?php
+                if(isset($menu))
+                {
+                    echo '<div class="navbar-default sidebar" role="navigation">';
+                    echo '<div class="sidebar-nav navbar-collapse">';
+                    echo '<ul class="nav" id="side-menu">';
+                    echo '<li class="sidebar-search">';
+                    echo '<div class="input-group custom-search-form">';       
+                    echo '<input type="text" class="form-control" placeholder="Search...">';                
+                    echo ' <span class="input-group-btn">';                  
+                    echo '<button class="btn btn-default" type="button">';                   
+                    echo '<i class="fa fa-search"></i>';                       
+                    echo '</button>';                   
+                    echo ' </span>';             
+                    echo '</div>';              
+                    echo '<!-- /input-group -->';             
+                    echo '</li>';         
 
-            <div class="navbar-default sidebar" role="navigation">
-                <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav" id="side-menu">
-                        <li class="sidebar-search">
-                            <div class="input-group custom-search-form">
-                                <input type="text" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                            </div>
-                            <!-- /input-group -->
-                        </li>
-                        <?php
-                            echo $menu;
-                        ?>
-                    </ul>
-                </div>
-                <!-- /.sidebar-collapse -->
-            </div>
+                    echo $menu;
+
+                    echo '</ul>';   
+                    echo '</div>';
+                    echo '<!-- /.sidebar-collapse -->'; 
+                    echo '</div>';
+                }
+            ?>
             <!-- /.navbar-static-side -->
         </nav>

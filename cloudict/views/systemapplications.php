@@ -37,9 +37,14 @@
                         </div>
                     </div>
                     
-                    <div class="form-group ddlColor">
+                    <div class="form-group ddlColorPicker">
                         
                     </div>
+                    
+                    <div class="input-group iconpicker-container">
+                                    <input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input" value="fa-archive" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-archive"></i></span>
+                                </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary btnCreateApplication" type="button">Create</button>

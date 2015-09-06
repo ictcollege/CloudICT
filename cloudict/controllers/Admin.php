@@ -56,11 +56,13 @@ class Admin extends Backend_Controller {
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Applications";
         $data['admin'] = true;
+        $data['count'] = 3;
             //data for form
             
         
         //views
         $this->load->view('header', $data);
+        $this->load->view('menu', $data);
         $this->load->view('applications', $data);
     }
     

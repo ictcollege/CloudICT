@@ -252,4 +252,9 @@ a {
     left: 18px;
 }
 
+.login-error{
+    color: red;
+    margin-top: 20px;
+    margin-left: 5px;
+}
     

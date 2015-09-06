@@ -10,6 +10,9 @@
     
     <!-- Bootstrap ColorPicker JavaScript -->
     <script src="<?php echo base_url();?>public/js/bootstrap-colorpicker.min.js"></script>
+    
+     <!-- FontAwsome IconPicker JavaScript -->
+    <script src="<?php echo base_url();?>public/js/fontawesome-iconpicker.min.js"></script>
 
     <!-- Metis Menu Plugin JavaScript -->
     <script src="<?php echo base_url();?>public/js/metisMenu.min.js"></script>

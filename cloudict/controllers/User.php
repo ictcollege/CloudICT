@@ -80,9 +80,31 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
             );
             
             $this->session->set_userdata($session);
+            
+            if($username == "admin" && $user["User"]["Password"] == md5("admin"))
+            {
+                echo json_encode(-1);
+            }
+            else 
+            {
+                echo json_encode($session);
+            }
         }
+        else
+        {
+            echo json_encode(0);
+        }
+    }
+    
+    public function initialPasswordChange()
+    {
+        $newpassword = $this->input->post('NewPassword');
         
-        echo json_encode($session);
+        $this->load->model("UserModel");
+        
+        $this->UserModel->initialPasswordChange($newpassword);
+        
+        echo json_encode(true);
     }
     
     public function applications()
@@ -102,7 +124,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         $data['applications'] = "";
         $data['applications'] .= ' <div class="row">';  
         $i= 0;
-        foreach($applications['Application'] as $a)
+        foreach($applications['Applications'] as $a)
         {
             if($i%3==0)
             {
