@@ -56,14 +56,11 @@ class Admin extends Backend_Controller {
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Applications";
         $data['admin'] = true;
-        $data['count'] = 3;
             //data for form
             
         
         //views
-        $this->load->view('header', $data);
-        $this->load->view('menu', $data);
-        $this->load->view('applications', $data);
+        $this->load_view('applications', $data);
     }
     
     public function groups()
@@ -677,6 +674,7 @@ class Admin extends Backend_Controller {
         $applications = $this->ApplicationModel->getAllApplications();
         
         $data['applications'] = "";
+        $data['editmodal'] = "";
         
         $i= 0;
         foreach($applications['Applications'] as $a)
@@ -685,17 +683,51 @@ class Admin extends Backend_Controller {
             {
                $data['applications'] .= ' <div class="row">';  
             }
+            
+            $data['applications'] .= '<a data-toggle="modal" data-target="#mEditApplication'.$a['IdApp'].'">';
             $data['applications'] .= '<div class="col-sm-4 text-center">';
             $data['applications'] .= '<div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
             $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
-            $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '<h3 class="app-name2">'.$a['AppName'].'</h3>';
             $data['applications'] .= '</div>';
             $data['applications'] .= ' </div>';
+            $data['applications'] .= ' </a>';
+            
             $i++;
             if($i%3==0)
             {
                 $data['applications'] .= '</div>'; 
             }
+            
+             $data['editmodal'] .= '<div class="modal fade mEditApplication" id="mEditApplication'.$a['IdApp'].'" tabindex="-1" role="dialog" aria-labelledby="'.$a['IdApp'].'">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit "'.$a['AppName'].'" Application</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Application Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$a['AppName'].'"> </div><div class="form-group"><label>Link</label>';
+                $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer text-center">';
+                $data['editmodal'] .= '<div class="form-group input-group pull-left">';
+                $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
         }
         
         //data to view
@@ -704,5 +736,222 @@ class Admin extends Backend_Controller {
             
         //views
         $this->load_view('systemapplications', $data);
+    }
+    
+    public function addNewApplication()
+    {
+        $appname = $this->input->post('Name');
+        $applink = $this->input->post('Link');
+        $appicon = $this->input->post('Icon');
+        $appcolor = $this->input->post('Color');
+        
+        $this->load->model("ApplicationModel");
+        
+        $this->ApplicationModel->addNewApplication($appname, $applink, $appicon, $appcolor);
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['applications'] = "";
+        $data['editmodal'] = "";
+        
+        $i= 0;
+        foreach($applications['Applications'] as $a)
+        {
+            if($i%3==0)
+            {
+               $data['applications'] .= ' <div class="row">';  
+            }
+            
+            $data['applications'] .= '<a data-toggle="modal" data-target="#mEditApplication'.$a['IdApp'].'">';
+            $data['applications'] .= '<div class="col-sm-4 text-center">';
+            $data['applications'] .= '<div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
+            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+            $data['applications'] .= '<h3 class="app-name2">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '</div>';
+            $data['applications'] .= ' </div>';
+            $data['applications'] .= ' </a>';
+            
+            $i++;
+            if($i%3==0)
+            {
+                $data['applications'] .= '</div>'; 
+            }
+            
+             $data['editmodal'] .= '<div class="modal fade mEditApplication" id="mEditApplication'.$a['IdApp'].'" tabindex="-1" role="dialog" aria-labelledby="'.$a['IdApp'].'">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit "'.$a['AppName'].'" Application</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Application Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$a['AppName'].'"> </div><div class="form-group"><label>Link</label>';
+                $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer text-center">';
+                $data['editmodal'] .= '<div class="form-group input-group pull-left">';
+                $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+        }
+        
+        echo json_encode($data);
+    }
+    
+    public function editApplication()
+    {
+        $idapp = $this->input->post('IdApp');
+        $appname = $this->input->post('Name');
+        $applink = $this->input->post('Link');
+        $appicon = $this->input->post('Icon');
+        $appcolor = $this->input->post('Color');
+        
+        $this->load->model("ApplicationModel");
+        
+        $this->ApplicationModel->editApplication($appname, $applink, $appicon, $appcolor, $idapp);
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['applications'] = "";
+        $data['editmodal'] = "";
+        
+        $i= 0;
+        foreach($applications['Applications'] as $a)
+        {
+            if($i%3==0)
+            {
+               $data['applications'] .= ' <div class="row">';  
+            }
+            
+            $data['applications'] .= '<a data-toggle="modal" data-target="#mEditApplication'.$a['IdApp'].'">';
+            $data['applications'] .= '<div class="col-sm-4 text-center">';
+            $data['applications'] .= '<div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
+            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+            $data['applications'] .= '<h3 class="app-name2">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '</div>';
+            $data['applications'] .= ' </div>';
+            $data['applications'] .= ' </a>';
+            
+            $i++;
+            if($i%3==0)
+            {
+                $data['applications'] .= '</div>'; 
+            }
+            
+             $data['editmodal'] .= '<div class="modal fade mEditApplication" id="mEditApplication'.$a['IdApp'].'" tabindex="-1" role="dialog" aria-labelledby="'.$a['IdApp'].'">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit "'.$a['AppName'].'" Application</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Application Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$a['AppName'].'"> </div><div class="form-group"><label>Link</label>';
+                $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer text-center">';
+                $data['editmodal'] .= '<div class="form-group input-group pull-left">';
+                $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+        }
+        
+        echo json_encode($data);
+    }
+    
+    public function deleteApplication()
+    {
+        $idapp = $this->input->post('IdApp');
+        
+        $this->load->model("ApplicationModel");
+        
+        $this->ApplicationModel->deleteApplication($idapp);
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $data['applications'] = "";
+        $data['editmodal'] = "";
+        
+        $i= 0;
+        foreach($applications['Applications'] as $a)
+        {
+            if($i%3==0)
+            {
+               $data['applications'] .= ' <div class="row">';  
+            }
+            
+            $data['applications'] .= '<a data-toggle="modal" data-target="#mEditApplication'.$a['IdApp'].'">';
+            $data['applications'] .= '<div class="col-sm-4 text-center">';
+            $data['applications'] .= '<div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
+            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+            $data['applications'] .= '<h3 class="app-name2">'.$a['AppName'].'</h3>';
+            $data['applications'] .= '</div>';
+            $data['applications'] .= ' </div>';
+            $data['applications'] .= ' </a>';
+            
+            $i++;
+            if($i%3==0)
+            {
+                $data['applications'] .= '</div>'; 
+            }
+            
+             $data['editmodal'] .= '<div class="modal fade mEditApplication" id="mEditApplication'.$a['IdApp'].'" tabindex="-1" role="dialog" aria-labelledby="'.$a['IdApp'].'">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit "'.$a['AppName'].'" Application</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Application Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$a['AppName'].'"> </div><div class="form-group"><label>Link</label>';
+                $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer text-center">';
+                $data['editmodal'] .= '<div class="form-group input-group pull-left">';
+                $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+        }
+        
+        echo json_encode($data);
     }
 }

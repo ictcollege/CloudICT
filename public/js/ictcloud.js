@@ -2,12 +2,15 @@ $(document).ready(function() {
 	
 	//Animacija na aplikacionoj stranici 
 	
-	$(".app-name").hide(0);
-	$(".app").hover(function() {
-		$(this).find(".app-name").stop(true,true).fadeIn(500); 
-	}, function() {
-		$(this).find(".app-name").stop(true,true).fadeOut(500);
-	});
+	$(".app-name").hide();
+	
+        $(document).on("mouseenter", ".app", function(){
+            $(this).find(".app-name").stop(true,true).fadeIn(500); 
+        });
+        
+        $(document).on("mouseleave", ".app", function(){
+            $(this).find(".app-name").stop(true,true).fadeOut(500);
+        });
 
 	$(".fa-star").click(function() {
 		if($(this).hasClass("favorited")) {
@@ -649,36 +652,167 @@ $(document).ready(function() {
         
         //iconpicker
         
-        $(".iconpicker-element").iconpicker({title: false, // Popover title (optional) only if specified in the template
-    selected: false, // use this value as the current item and ignore the original
-    defaultValue: false, // use this value as the current item if input or element value is empty
-    placement: 'bottom', // (has some issues with auto and CSS). auto, top, bottom, left, right
-    collision: 'none', // If true, the popover will be repositioned to another position when collapses with the window borders
-    animation: true, // fade in/out on show/hide ?
-    //hide iconpicker automatically when a value is picked. it is ignored if mustAccept is not false and the accept button is visible
-    hideOnSelect: false,
-    showFooter: false,
-    searchInFooter: false, // If true, the search will be added to the footer instead of the title
-    mustAccept: false, // only applicable when there's an iconpicker-btn-accept button in the popover footer
-    selectedCustomClass: 'bg-primary', // Appends this class when to the selected item
-    icons: [], // list of icon classes (declared at the bottom of this script for maintainability)
-    fullClassFormatter: function(val) {
-        return 'fa ' + val;
-    },
-    input: 'input,.iconpicker-input', // children input selector
-    inputSearch: false, // use the input as a search box too?
-    container: false, //  Appends the popover to a specific element. If not set, the selected element or element parent is used
-    component: '.input-group-addon,.iconpicker-component', // children component jQuery selector or object, relative to the container element
-    // Plugin templates:
-    templates: {
-        popover: '<div class="iconpicker-popover popover"><div class="arrow"></div>' +
-            '<div class="popover-title"></div><div class="popover-content"></div></div>',
-        footer: '<div class="popover-footer"></div>',
-        buttons: '<button class="iconpicker-btn iconpicker-btn-cancel btn btn-default btn-sm">Cancel</button>' +
-            ' <button class="iconpicker-btn iconpicker-btn-accept btn btn-primary btn-sm">Accept</button>',
-        search: '<input type="search" class="form-control iconpicker-search" placeholder="Type to filter" />',
-        iconpicker: '<div class="iconpicker"><div class="iconpicker-items"></div></div>',
-        iconpickerItem: '<i class="iconpicker-item></i>',
-    }});
+        $(".iconpicker-element").iconpicker();
         
+        // creating application 
+        $(document).on("click", ".btnCreateApplication", function() {
+            var name = $(".tbNewApplicationName"),
+                color = $(".tbColor"),
+                icon = $(".tbIcon"),
+                link = $(".tbLink"),
+                error = false;
+            
+            if(name.val() == "") {
+                name.parent().removeClass("has-success");
+                name.parent().addClass("has-error");
+                error = true;
+            } else {
+                name.parent().addClass("has-success");
+                name.parent().removeClass("has-error");
+                error = false;
+            }
+            
+            if(color.val() == "") {
+                color.parent().removeClass("has-success");
+                color.parent().addClass("has-error");
+                error = true;
+            } else {
+                color.parent().addClass("has-success");
+                color.parent().removeClass("has-error");
+                error = false;
+            }
+            
+            if(link.val() == "") {
+                link.parent().removeClass("has-success");
+                link.parent().addClass("has-error");
+                error = true;
+            } else {
+                link.parent().addClass("has-success");
+                link.parent().removeClass("has-error");
+                error = false;
+            }
+            
+            if(!error)
+            {
+                $.ajax({
+                    url: 'admin/addNewApplication',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{Name:name.val(),Link:link.val(),Color:color.val(),Icon:icon.val()},
+                    success: function(resposne) {
+                        $('#mNewApplication').modal('hide');
+                        name.val(" ");
+                        link.val(" ");
+                        color.val(" ");
+                        icon.val(" ");
+                        
+                        $(".panel-body.panel-applications").text(" ");
+                        $(".panel-body.panel-applications").append(resposne.applications);
+                        
+                        $(".editmodals").text(" ");
+                        $(".editmodals").append(resposne.editmodal);
+                        
+                        $(".iconpicker-element").iconpicker();
+                        
+                        $(function(){
+                            $('.demo2').colorpicker();
+                        });
+                    }
+                });
+            }
+        });
+        
+        $(document).on('click' , '.btnEditApplication', function () {
+            var id = $(this).parent().parent().parent().parent().parent().attr("aria-labelledby"),
+                name = $(this).parent().parent().parent().find(".tbApplicationName"),
+                color = $(this).parent().parent().parent().find(".tbColor").val(),
+                icon = $(this).parent().parent().parent().find(".tbIcon").val(),
+                link = $(this).parent().parent().parent().find(".tbLink");
+            
+            
+            if(name.val() == "") {
+                name = name.attr("placeholder");
+            } else {
+                name = name.val();
+            }
+            
+            if(link.val() == "") {
+                link = link.attr("placeholder");
+            } else{
+                link = link.val();
+            }
+            
+            $.ajax({
+                url: 'admin/editApplication',
+                type: 'post',
+                dataType: 'json',
+                data:{IdApp:id,Name:name,Link:link,Color:color,Icon:icon},
+                success: function(resposne) {
+                    $('#mEditApplication'+id).modal('hide');
+                    
+                    setTimeout(function() {
+                        $(".panel-body.panel-applications").text(" ");
+                        $(".panel-body.panel-applications").append(resposne.applications);
+
+                        $(".editmodals").text(" ");
+                        $(".editmodals").append(resposne.editmodal);
+                        
+                        $(".iconpicker-element").iconpicker();
+                        
+                        $(function(){
+                            $('.demo2').colorpicker();
+                        });
+                    }, 300);
+                }
+            });
+        });
+        
+        
+        $(document).on("click", ".bntDeleteApplication", function() {
+            var id = $(this).find("i").attr("id");
+            
+            $.ajax({
+                url: 'admin/deleteApplication',
+                type: 'post',
+                dataType: 'json',
+                data:{IdApp:id},
+                success: function(resposne) {
+                    $('#mEditApplication'+id).modal('hide');
+                    
+                    setTimeout(function() {
+                        $(".panel-body.panel-applications").text(" ");
+                        $(".panel-body.panel-applications").append(resposne.applications);
+
+                        $(".editmodals").text(" ");
+                        $(".editmodals").append(resposne.editmodal);
+                        
+                        $(".iconpicker-element").iconpicker();
+                        
+                        $(function(){
+                            $('.demo2').colorpicker();
+                        });
+                    }, 300);
+                }
+            });
+            
+        });
+        
+        $('.modal').on('hidden.bs.modal', function () {
+                $(".tbNewApplicationName").val("");
+                $(".tbLink").val("");
+                $(".tbColor").val("");
+                $(".tbIcon").val("fa-archive");
+                
+                $(".tbNewApplicationName").parent().removeClass("has-error");
+                $(".tbNewApplicationName").parent().removeClass("has-success");
+                
+                $(".tbLink").parent().removeClass("has-error");
+                $(".tbLink").parent().removeClass("has-success");
+                
+                $(".tbColor").parent().removeClass("has-error");
+                $(".tbColor").parent().removeClass("has-success");
+                
+                $(".tbIcon").parent().parent().removeClass("has-error");
+                $(".tbIcon").parent().parent().removeClass("has-success");
+        });
 });

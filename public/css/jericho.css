@@ -99,6 +99,13 @@ body{
   	padding-bottom: 54px;
 }
 
+.app-name2{
+    color: white;
+    margin: 0px auto;
+    margin-top: -90px;
+    padding-bottom: 54px;
+}
+
 .fa-star{
 	color: rgb(244, 216, 128);
 }
@@ -214,6 +221,12 @@ a {
     cursor: initial;
 }
 
+.btn-application-edit{
+   position: relative;
+    top: -4px;
+    left: 9px; 
+}
+    
 .icon-remove-user {
     color: #357ebd;
 }

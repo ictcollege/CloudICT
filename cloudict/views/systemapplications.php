@@ -3,14 +3,14 @@
                 <div class="panel panel-default main-panel">
                     <div class="panel-heading">
                         <div class="pull-left">
-                            <h4><i class="fa fa-user fa-fw"></i></h4>
+                            <h4><i class="fa fa-puzzle-piece fa-fw"></i></h4>
                         </div>
 
                         <div class="pull-right">
                             <button type="button" class="btn btn-primary btnNewApplication" data-toggle="modal" data-target="#mNewApplication">New Application</button>  
                         </div>
                     </div>
-                    <div class="panel-body panel-users">
+                    <div class="panel-body panel-applications">
                         <?php
                             echo $applications;
                         ?>
@@ -31,22 +31,26 @@
                         <input class="form-control tbNewApplicationName" placeholder="Name">
                     </div>
                     <div class="form-group">
+                        <label>Link</label>
+                        <input class="form-control tbLink" placeholder="Link">
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
                         <div class="input-group demo2">
-                            <input type="text" value="" class="form-control" />
+                            <input type="text" value="" class="form-control tbColor" />
                             <span class="input-group-addon"><i></i></span>
                         </div>
                     </div>
-                    
-                    <div class="form-group ddlColorPicker">
-                        
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <div class="input-group iconpicker-container">
+                            <input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="fa-archive" type="text">
+                            <span class="input-group-addon"><i class="fa fa-archive"></i></span>
+                        </div>
                     </div>
-                    
-                    <div class="input-group iconpicker-container">
-                                    <input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input" value="fa-archive" type="text">
-                                    <span class="input-group-addon"><i class="fa fa-archive"></i></span>
-                                </div>
                 </div>
                 <div class="modal-footer">
+                    <button class="btn btn-danger btnCancel pull-left" type="button" data-dismiss="modal">Cancel</button>
                     <button class="btn btn-primary btnCreateApplication" type="button">Create</button>
                 </div>
             </div>
@@ -57,7 +61,7 @@
     <!--modal-->
     <div class="editmodals">
         <?php
-             //echo $editmodal;
+            echo $editmodal;
         ?>
     </div>
     <!-- /#modal -->

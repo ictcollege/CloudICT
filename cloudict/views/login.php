@@ -20,7 +20,7 @@
                             </fieldset>
                         </form>
                         
-                        <div class="login-error">
+                        <div class="error">
                         </div>
                     </div>
                 </div>

@@ -41,6 +41,11 @@ $(document).ready(function(){
                     if(response["role"] == 3) {
                         window.location = "Admin";
                     } else if(response == 0) {
+                        username.parent().removeClass('has-success');
+                        username.parent().addClass('has-error');
+                        password.parent().removeClass('has-success');
+                        password.parent().addClass('has-error');
+                        
                         $(".error").text(" ");
                         $(".error").append("<p class='login-error'>Invalid user</p>");
                         $(".error").show(400);

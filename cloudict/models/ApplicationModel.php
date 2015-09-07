@@ -71,5 +71,47 @@ class ApplicationModel extends CI_Model{
             return $data;
             
         }
+        
+        public function addNewApplication($appName, $appLink, $appIcon, $appColor)
+        {
+            $query = "
+                    INSERT INTO `App`(`AppName`, `AppLink`, `AppIcon`, `AppOrder`, `AppColor`)
+                    
+                    VALUES (?,?,?,0,?)
+            ";
+                    
+            $result = $this->db->query($query, [$appName, $appLink, $appIcon, $appColor]);
+        }
+        
+        public function editApplication($appName, $appLink, $appIcon, $appColor, $idApp)
+        {
+            
+            
+            $query = "
+                    UPDATE      `App`
+                    
+                    SET         `AppName` = '".$appName."', 
+                                `AppLink` = '".$appLink."', 
+                                `AppIcon` = '".$appIcon."', 
+                                `AppColor` = '".$appColor."'
+                    
+                    WHERE       `IdApp` = ".$idApp."
+            ";
+            
+            $result = $this->db->query($query);
+        }
+        
+        public function deleteApplication($idApp)
+        {
+            $query = "
+                    DELETE 
+                    
+                    FROM `App`
+                    
+                    WHERE `IdApp` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$idApp]);
+        }
 }
 
