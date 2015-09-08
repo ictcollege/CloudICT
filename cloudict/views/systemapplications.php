@@ -37,14 +37,14 @@
                     <div class="form-group">
                         <label>Color</label>
                         <div class="input-group demo2">
-                            <input type="text" value="" class="form-control tbColor" />
+                            <input type="text" value="" class="form-control tbNewColor" />
                             <span class="input-group-addon"><i></i></span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Icon</label>
                         <div class="input-group iconpicker-container">
-                            <input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="fa-archive" type="text">
+                            <input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="fa-archive" type="text">
                             <span class="input-group-addon"><i class="fa fa-archive"></i></span>
                         </div>
                     </div>

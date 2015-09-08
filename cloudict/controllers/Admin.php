@@ -28,7 +28,7 @@ class Admin extends Backend_Controller {
         //model
         $this->load->model('ApplicationModel');
         
-        $applications = $this->ApplicationModel->getAllApplications();
+        $applications = $this->ApplicationModel->getApplicationsFromPrivileges($this->session->userdata('userid'));
         
         $data['applications'] = "";
         $data['applications'] .= ' <div class="row">';  

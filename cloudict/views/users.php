@@ -1,3 +1,14 @@
+<script>
+$(document).ready(function(){
+     $(".tableusers").DataTable( {
+                "ajax": 'admin/getAllUsers',
+                "scrollX" : true, 
+                "deferRender" : true
+            });
+         
+});
+</script>
+
 <div id="page-wrapper">
             <div class="row row-padding-top">
                 <div class="panel panel-default main-panel">
@@ -11,11 +22,10 @@
                         </div>
                     </div>
                     <div class="panel-body panel-users">
-                        <div class="table-responsive">
+                        <div class="table-responsiv">
                             
-                            <table class="table table-striped tableusers table-hover dt-responsive nowrap">
+                            <table class="table-responsive tableusers table table-striped table-bordered nowrap">
                                 <thead>
-                                    <tr>
                                         <th>#USER ID</th>
                                         <th>#ROLE ID</th>
                                         <th>Username</th>
@@ -26,7 +36,6 @@
                                         <th>User Status</th>
                                         <th>User Key</th>
                                         <th>Key Expires</th>
-                                    </tr>
                                 </thead>
                                 <tbody>
                                     

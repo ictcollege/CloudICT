@@ -14,6 +14,7 @@
 
     <!-- Bootstrap Core CSS -->
     <link href="public/css/bootstrap.min.css" rel="stylesheet">
+    <link href="public/css/responsive.bootstrap.min.css" rel="stylesheet">
     
     <!-- Bootstrap ColorPicker CSS -->
      <link href="public/css/bootstrap-colorpicker.min.css" rel="stylesheet">

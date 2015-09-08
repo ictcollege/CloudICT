@@ -572,18 +572,6 @@ $(document).ready(function() {
             }
         });
         
-        //user bootstrap datatables
-        var url = window.location.href,
-            pop = url.split("/"),
-            controller = pop[pop.length-1];
-        if(controller == "users"){
-            
-            $(".tableusers").DataTable( {
-                "ajax": 'admin/getAllUsers',
-                responsive: true
-            });
-        }
-        
         $(".chbAppGroup").click(function() {
            var idapp = $(this).attr("id"),
                idgroup = $(this).parent().find(".hdIdGroup").attr("id");
@@ -669,30 +657,42 @@ $(document).ready(function() {
             } else {
                 name.parent().addClass("has-success");
                 name.parent().removeClass("has-error");
-                error = false;
+                error = 0;
             }
             
             if(color.val() == "") {
                 color.parent().removeClass("has-success");
                 color.parent().addClass("has-error");
-                error = true;
+                error++;
             } else {
                 color.parent().addClass("has-success");
                 color.parent().removeClass("has-error");
-                error = false;
+                error--;
             }
             
             if(link.val() == "") {
                 link.parent().removeClass("has-success");
                 link.parent().addClass("has-error");
-                error = true;
+                error++;
             } else {
                 link.parent().addClass("has-success");
                 link.parent().removeClass("has-error");
-                error = false;
+                error--;
             }
             
-            if(!error)
+            if(icon.val() == "") {
+                icon.parent().removeClass("has-success");
+                icon.parent().addClass("has-error");
+                error++;
+            } else {
+                icon.parent().addClass("has-success");
+                icon.parent().removeClass("has-error");
+                error--;
+            }
+            
+            alert(icon.val() +" "+color.val());
+            
+            if(error<0)
             {
                 $.ajax({
                     url: 'admin/addNewApplication',
@@ -725,9 +725,9 @@ $(document).ready(function() {
         $(document).on('click' , '.btnEditApplication', function () {
             var id = $(this).parent().parent().parent().parent().parent().attr("aria-labelledby"),
                 name = $(this).parent().parent().parent().find(".tbApplicationName"),
-                color = $(this).parent().parent().parent().find(".tbColor").val(),
-                icon = $(this).parent().parent().parent().find(".tbIcon").val(),
-                link = $(this).parent().parent().parent().find(".tbLink");
+                link = $(this).parent().parent().parent().find(".tbLink"),
+                color = $(this).parent().parent().parent().find(".tbNewColor").val(),
+                icon = $(this).parent().parent().parent().find(".tbNewIcon").val();
             
             
             if(name.val() == "") {
@@ -800,8 +800,6 @@ $(document).ready(function() {
         $('.modal').on('hidden.bs.modal', function () {
                 $(".tbNewApplicationName").val("");
                 $(".tbLink").val("");
-                $(".tbColor").val("");
-                $(".tbIcon").val("fa-archive");
                 
                 $(".tbNewApplicationName").parent().removeClass("has-error");
                 $(".tbNewApplicationName").parent().removeClass("has-success");
@@ -809,10 +807,11 @@ $(document).ready(function() {
                 $(".tbLink").parent().removeClass("has-error");
                 $(".tbLink").parent().removeClass("has-success");
                 
-                $(".tbColor").parent().removeClass("has-error");
-                $(".tbColor").parent().removeClass("has-success");
+                $(".tbNewColor").parent().removeClass("has-error");
+                $(".tbNewColor").parent().removeClass("has-success");
                 
-                $(".tbIcon").parent().parent().removeClass("has-error");
-                $(".tbIcon").parent().parent().removeClass("has-success");
+                $(".tbNewIcon").parent().removeClass("has-error");
+                $(".tbNewIcon").parent().removeClass("has-success");
+                
         });
 });

@@ -119,7 +119,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         //model
         $this->load->model('ApplicationModel');
         
-        $applications = $this->ApplicationModel->getApplications(0);
+        $applications = $this->ApplicationModel->getApplicationsFromPrivileges($this->session->userdata('userid'));
         
         $data['applications'] = "";
         $data['applications'] .= ' <div class="row">';  

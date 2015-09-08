@@ -36,7 +36,6 @@ class ApplicationModel extends CI_Model{
                 }
             }
             return $data;
-            
         }
         
         public function getApplications($status)
@@ -70,6 +69,43 @@ class ApplicationModel extends CI_Model{
             }
             return $data;
             
+        }
+        
+        public function getApplicationsFromPrivileges($idUser)
+        {
+            $query =   "SELECT DISTINCT      `IdApp`, 
+                                            `AppName`, 
+                                            `AppLink`,
+                                            `AppIcon`,
+                                            `AppStatus`, 
+                                            `AppOrder`, 
+                                            `AppColor` 
+                                            
+                        FROM                `App` 
+                        
+                        JOIN                `GroupApp` 
+                        USING               (`IdApp`) 
+                        
+                        JOIN                `UserGroup` 
+                        USING (`IdGroup`) 
+                        
+                        JOIN `User` 
+                        USING (`IdUser`) 
+                        
+                        WHERE `IdUser` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$idUser])->result_array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['Applications'][$i++] = $row;
+                }
+            }
+            return $data;
         }
         
         public function addNewApplication($appName, $appLink, $appIcon, $appColor)
