@@ -372,6 +372,17 @@ class UserModel extends CI_Model {
             
             $result = $this->db->query($query, [md5($newPassword)]);
         }
+        
+        public function editUser($username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
+        {
+            $query = "
+                    UPDATE      `User`      
+                    
+                    SET         `UserPassword` = ?        
+                    
+                    WHERE `IdUser` = 1
+                    ";
+        }
 }
 
 /* End of file UserModel.php */

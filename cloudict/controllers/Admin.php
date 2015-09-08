@@ -422,6 +422,7 @@ class Admin extends Backend_Controller {
         
         //model
         $this->load->model('MenuModel');
+        $this->load->model("UserModel");
        
         $menu = $this->MenuModel->getMenuOfApplication(3);
         
@@ -433,6 +434,90 @@ class Admin extends Backend_Controller {
             $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
             $data['menu'] .= '</li>';
         }
+        
+        $users = $this->UserModel->getAllUsers();
+        
+        $data['editmodal'] = ""; 
+        
+        foreach($users as $u)
+        {
+                $data['editmodal'] .= '<div class="modal fade '.$u['IdUser'].'" id="mEditUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+                $data['editmodal'] .= '<div class="modal-content">';
+                $data['editmodal'] .= '<div class="modal-header">';
+                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit User</h4>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-body">';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>#USER ID</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserId" placeholder="'.$u['IdUser'].'"  disabled/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>#ROLE ID</label>';
+                $data['editmodal'] .= '<input class="form-control tbRouleId" placeholder="'.$u['IdRole'].'" disabled/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Username</label>';
+                $data['editmodal'] .= '<input class="form-control tbEditUsername" placeholder="'.$u['UserName'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Password md5</label>';
+                $data['editmodal'] .= '<input class="form-control tbEditPassword" placeholder="'.$u['UserPassword'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>User Full Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserFullName" placeholder="'.$u['UserFullname'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>User Full Name</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserEmail" placeholder="'.$u['UserEmail'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Disk Quota</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserDiskQuota" placeholder="'.$u['UserDiskQuota'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Disk Used %</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$u['UserDiskUsed'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>User Status</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserStatus" placeholder="'.$u['UserStatus'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>User Key</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserKey" placeholder="'.$u['UserKey'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '<div class="form-group">';
+                $data['editmodal'] .= '<label>Key Expires</label>';
+                $data['editmodal'] .= '<input class="form-control tbUserKeyExpires" placeholder="'.$u['UserKeyExpires'].'"/>';
+                $data['editmodal'] .= '</div>';
+                
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<div class="modal-footer">';
+                $data['editmodal'] .= '<button type="button" class="btn btn-primary pull-right btnSaveChanges" id="'.$u['IdUser'].'">Save Changes</button>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '</div>';
+                
+        }
+         
         
         //data to view
         $data['base_url']= $base_url;
@@ -452,7 +537,7 @@ class Admin extends Backend_Controller {
         
         $i = 0;
         foreach($users as $user)
-        {
+        { 
             $data['data'][$i][] = $user["IdUser"];
             $data['data'][$i][] = $user["IdRole"];
             $data['data'][$i][] = $user["UserName"];
@@ -464,6 +549,7 @@ class Admin extends Backend_Controller {
             $data['data'][$i][] = $user["UserStatus"];
             $data['data'][$i][] = $user["UserKey"];
             $data['data'][$i][] = $user["UserKeyExpires"];
+            $data['data'][$i][] = '<div class="options"><button type="button" id="'.$user['IdUser'].'" class="btn btn-primary btnEditUser" data-toggle="modal" data-target="#mEditUser'.$user["IdUser"].'"><i class="fa fa-edit fa-fw"></i></button><button type="button" id="'.$user['IdUser'].'" class="btn btn-danger btnDeleteUser"><i class="fa fa-trash-o fa-fw"></i></button></div>';
             
             $i++;
         }
@@ -500,6 +586,25 @@ class Admin extends Backend_Controller {
         }
         
         echo json_encode($response);
+    }
+    
+    public function editUser()
+    {
+        $username =  $this->input->post('Username');
+        $password = $this->input->post('Password');
+        $userfullname =  $this->input->post('Userfullname');
+        $email =  $this->input->post('Email');
+        $diskquota = $this->input->post('Diskquota');
+        $diskused = $this->input->post('Diskused');
+        $userstatus = $this->input->post('Userstatus');
+        $userkey = $this->input->post('Userkey');
+        $keyexpires = $this->input->post('KeyExpires');
+        
+        $this->load->model("UserModel");
+        
+        $this->UserModel->editUser($username, $password, $userfullname, $email, $diskquota, $diskused, $diskused, $userstatus, $userstatus, $userkey, $keyexpires);
+        
+        echo json_encode(true);
     }
     
     public function privileges()

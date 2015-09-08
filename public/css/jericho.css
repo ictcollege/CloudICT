@@ -226,6 +226,10 @@ a {
     top: -4px;
     left: 9px; 
 }
+
+.btnDeleteUser {
+    margin-left: 5px;
+}
     
 .icon-remove-user {
     color: #357ebd;
@@ -270,4 +274,7 @@ a {
     margin-top: 20px;
     margin-left: 5px;
 }
-    
+
+.options {
+    width: 100px;
+}

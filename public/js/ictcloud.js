@@ -814,4 +814,81 @@ $(document).ready(function() {
                 $(".tbNewIcon").parent().removeClass("has-success");
                 
         });
+        
+        //save changes, edit modal
+        $(document).on("click", ".btnSaveChanges", function() {
+            var username = $(this).parent().parent().find(".tbEditUsername"),
+                password = $(this).parent().parent().find(".tbEditPassword"),
+                userfullname = $(this).parent().parent().find(".tbUserFullName"),
+                email = $(this).parent().parent().find(".tbUserEmail"),
+                diskquota = $(this).parent().parent().find(".tbUserDiskQuota"),
+                diskused = $(this).parent().parent().find(".tbUserDiskUsed"),
+                userstatus = $(this).parent().parent().find(".tbUserStatus"), 
+                userkey = $(this).parent().parent().find(".tbUserKey"),
+                keyexpires  = $(this).parent().parent().find(".tbUserKeyExpires");
+                
+            if(username.val() == "") {
+                username = username.attr("placeholder");
+            } else {
+                username = username.val();
+            }
+            
+            if(password.val() == "") {
+                password = password.attr("placeholder");
+            } else {
+                password = password.val();
+            }
+            
+            if(userfullname.val() == "") {
+                userfullname = userfullname.attr("placeholder");
+            } else {
+                userfullname = userfullname.val();
+            }
+            
+            if(email.val() == "") {
+                email = email.attr("placeholder");
+            } else {
+                email = email.val();
+            }
+            
+            if(diskquota.val() == "") {
+                diskquota = diskquota.attr("placeholder");
+            } else {
+                diskquota = diskquota.val();
+            }
+            
+            if(diskused.val() == "") {
+                diskused = diskused.attr("placeholder");
+            } else {
+                diskused = diskused.val();
+            }
+            
+            if(userstatus.val() == "") {
+                userstatus = userstatus.attr("placeholder");
+            } else {
+                userstatus = userstatus.val();
+            }
+            
+            if(userkey.val() == "") {
+                userkey = userkey.attr("placeholder");
+            } else {
+                userkey = userkey.val();
+            }
+            
+            if(keyexpires.val() == "") {
+                keyexpires = keyexpires.attr("placeholder");
+            } else {
+                keyexpires = keyexpires.val();
+            }
+            
+            $.ajax({
+                url: 'admin/editUser',
+                type: 'post',
+                dataType: 'json',
+                data:{Username:username,Password:password,Userfullname:userfullname,Email:email,Diskquota:diskquota,Diskused:diskused,Userstatus:userstatus,Userkey:userkey,KeyExpires:keyexpires},
+                success: function(resposne) {
+                    
+                }
+            });
+        });
 });

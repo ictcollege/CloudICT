@@ -30,12 +30,14 @@ $(document).ready(function(){
                                         <th>#ROLE ID</th>
                                         <th>Username</th>
                                         <th>Password md5</th>
+                                        <th>User Full Name</th>
                                         <th>Email</th>
                                         <th>Disk Quota</th>
                                         <th>Disk Used %</th>
                                         <th>User Status</th>
                                         <th>User Key</th>
                                         <th>Key Expires</th>
+                                        <th>Options</th>
                                 </thead>
                                 <tbody>
                                     
@@ -86,7 +88,7 @@ $(document).ready(function(){
     <!--modal-->
     <div class="editmodals">
         <?php
-            // echo $editmodal;
+            echo $editmodal;
         ?>
     </div>
     <!-- /#modal -->
