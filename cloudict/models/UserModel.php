@@ -373,15 +373,89 @@ class UserModel extends CI_Model {
             $result = $this->db->query($query, [md5($newPassword)]);
         }
         
-        public function editUser($username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
+        public function editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
         {
             $query = "
                     UPDATE      `User`      
                     
-                    SET         `UserPassword` = ?        
-                    
-                    WHERE `IdUser` = 1
+                    SET         `UserName` = ?,
+                                `UserPassword` = ?,
+                                `UserFullname` = ?,
+                                `UserEmail` = ?,
+                                `UserDiskQuota` = ?,
+                                `UserDiskUsed` = ?,
+                                `UserStatus` = ?,
+                                `UserKey` = ?,
+                                `UserKeyExpires` = ?
+                                
+                    WHERE `IdUser` = ?
                     ";
+            
+            $result = $this->db->query($query, [$username, md5($password), $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires, $iduser]);
+        }
+        
+        public function deleteUser($iduser)
+        {
+            $query = "
+                    DELETE 
+                    
+                    FROM `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+            $result = $this->db->query($query, [$iduser]);
+        }
+        
+        public function getUserById($iduser)
+        {
+            $query = "
+                    SELECT * 
+                    
+                    FROM `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+            $result = $this->db->query($query, [$iduser])->result_array();
+            
+            return $result;
+        }
+        
+        public function checkIfPasswordExists($password, $idUser)
+        {
+            
+            $query = "
+                    SELECT * 
+                    
+                    FROM `User`
+                    
+                    WHERE `UserPassword` = '".$password."' AND `IdUser` = '".$idUser."'
+                    ";
+            
+            $result = $this->db->query($query)->result_array();
+            
+            if(!empty($result))
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
+        
+        public function changePassword($password, $idUser) {
+            
+            $query = "
+                    UPDATE `User`
+                    
+                    SET `UserPassword` = ?
+                    
+                    WHERE `IdUser` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$password, $idUser]);
+            
+            return $result;
         }
 }
 

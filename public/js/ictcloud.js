@@ -517,60 +517,24 @@ $(document).ready(function() {
                 $(".tbGroupName").parent().removeClass("has-error");
                 $(".tbGroupName").parent().removeClass("has-success");
         });
+        
         $('.modal').on('hidden.bs.modal', function () {
                 $(".tbGroupName").val("");
                 $(".tbGroupName").parent().removeClass("has-error");
                 $(".tbGroupName").parent().removeClass("has-success");
         });
         
+        $('#mNewUser').on('hidden.bs.modal', function () {
+                $(".tbEmail").val("");
+                $(".tbEmail").parent().removeClass("has-error");
+                $(".tbEmail").parent().removeClass("has-success");
+                $(".tbKey ").attr("placeholder", " ");
+        });
+        
         //generate new user, insert new user in db
         $(".user-exists").hide();
         
-        $(".btnGenerateKey").click(function () {
-            var _this = $(this),
-                email = $(".tbEmail"),
-                regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
-                error = false;
-                
-            if(email.val().match(regEmail)) {
-                email.parent().addClass("has-success");
-                email.parent().removeClass("has-error");
-                error = false;
-            } else {
-                email.parent().removeClass("has-success");
-                email.parent().addClass("has-error");
-                error = true;
-            }
-            
-            if(!error) {
-                $.ajax({
-                    url: 'admin/checkIfEmailExists',
-                    type: 'post',
-                    dataType: 'json',
-                    data:{Email:email.val()},
-                    success: function(response) {
-                        if(response == 0) {
-                            $(".user-exists").hide(400);
-                            $.ajax({
-                                url: 'admin/insertUser',
-                                type: 'post',
-                                dataType: 'json',
-                                data:{Email:email.val()},
-                                success: function(response) {
-                                    $(".tbKey").attr("placeholder", response);
-                                    $(".btnSendKey").removeClass("disabled");
-                                    $(".btnGenerateKey").hide(400);
-                                }
-                            });
-                        } else {
-                            email.parent().removeClass("has-success");
-                            email.parent().addClass("has-error");
-                            $(".user-exists").show(400);
-                        }
-                    }
-                });
-            }
-        });
+        
         
         $(".chbAppGroup").click(function() {
            var idapp = $(this).attr("id"),
@@ -645,8 +609,8 @@ $(document).ready(function() {
         // creating application 
         $(document).on("click", ".btnCreateApplication", function() {
             var name = $(".tbNewApplicationName"),
-                color = $(".tbColor"),
-                icon = $(".tbIcon"),
+                color = $(".tbNewColor"),
+                icon = $(".tbNewIcon"),
                 link = $(".tbLink"),
                 error = false;
             
@@ -690,8 +654,6 @@ $(document).ready(function() {
                 error--;
             }
             
-            alert(icon.val() +" "+color.val());
-            
             if(error<0)
             {
                 $.ajax({
@@ -728,7 +690,6 @@ $(document).ready(function() {
                 link = $(this).parent().parent().parent().find(".tbLink"),
                 color = $(this).parent().parent().parent().find(".tbNewColor").val(),
                 icon = $(this).parent().parent().parent().find(".tbNewIcon").val();
-            
             
             if(name.val() == "") {
                 name = name.attr("placeholder");
@@ -815,80 +776,98 @@ $(document).ready(function() {
                 
         });
         
-        //save changes, edit modal
-        $(document).on("click", ".btnSaveChanges", function() {
-            var username = $(this).parent().parent().find(".tbEditUsername"),
-                password = $(this).parent().parent().find(".tbEditPassword"),
-                userfullname = $(this).parent().parent().find(".tbUserFullName"),
-                email = $(this).parent().parent().find(".tbUserEmail"),
-                diskquota = $(this).parent().parent().find(".tbUserDiskQuota"),
-                diskused = $(this).parent().parent().find(".tbUserDiskUsed"),
-                userstatus = $(this).parent().parent().find(".tbUserStatus"), 
-                userkey = $(this).parent().parent().find(".tbUserKey"),
-                keyexpires  = $(this).parent().parent().find(".tbUserKeyExpires");
-                
-            if(username.val() == "") {
-                username = username.attr("placeholder");
-            } else {
-                username = username.val();
-            }
-            
-            if(password.val() == "") {
-                password = password.attr("placeholder");
-            } else {
-                password = password.val();
-            }
-            
-            if(userfullname.val() == "") {
-                userfullname = userfullname.attr("placeholder");
-            } else {
-                userfullname = userfullname.val();
-            }
-            
-            if(email.val() == "") {
-                email = email.attr("placeholder");
-            } else {
-                email = email.val();
-            }
-            
-            if(diskquota.val() == "") {
-                diskquota = diskquota.attr("placeholder");
-            } else {
-                diskquota = diskquota.val();
-            }
-            
-            if(diskused.val() == "") {
-                diskused = diskused.attr("placeholder");
-            } else {
-                diskused = diskused.val();
-            }
-            
-            if(userstatus.val() == "") {
-                userstatus = userstatus.attr("placeholder");
-            } else {
-                userstatus = userstatus.val();
-            }
-            
-            if(userkey.val() == "") {
-                userkey = userkey.attr("placeholder");
-            } else {
-                userkey = userkey.val();
-            }
-            
-            if(keyexpires.val() == "") {
-                keyexpires = keyexpires.attr("placeholder");
-            } else {
-                keyexpires = keyexpires.val();
-            }
-            
-            $.ajax({
-                url: 'admin/editUser',
-                type: 'post',
-                dataType: 'json',
-                data:{Username:username,Password:password,Userfullname:userfullname,Email:email,Diskquota:diskquota,Diskused:diskused,Userstatus:userstatus,Userkey:userkey,KeyExpires:keyexpires},
-                success: function(resposne) {
-                    
+        
+        
+        
+        
+        
+       
+        //user profile all
+        $(".pNewOldPassword").hide();
+        $(".pConfirmPassword").hide();
+        
+        $(".btnChangePasswordYes").click(function() {
+           var id =$(this).attr("id"),
+               oldpassword = $(".tbOldPassword"),
+               newpassword = $(".tbNewPassword"),
+               confirmpassword = $(".tbConfirmPassword"),
+               error = 0;
+               
+               if(oldpassword.val() == ""){
+                   oldpassword.parent().addClass("has-error");
+                   oldpassword.parent().removeClass("has-success");
+                   
+                   error++;
+               } else {
+                   $.ajax({
+                        url: 'user/checkIfPasswordExists',
+                        type: 'post',
+                        dataType: 'json',
+                        data:{Password:oldpassword.val(),IdUser:id},
+                        success: function(resposne) {
+                            if(resposne) {
+                                oldpassword.parent().removeClass("has-error");
+                                oldpassword.parent().addClass("has-success");
+                                
+                                $(".pNewOldPassword").slideUp(400);
+                                
+                                if(newpassword.val() == "" || confirmpassword.val() == "") {
+                                    newpassword.parent().addClass("has-error");
+                                    newpassword.parent().removeClass("has-success");
+                                    
+                                    confirmpassword.parent().addClass("has-error");
+                                    confirmpassword.parent().removeClass("has-success");
+                                    
+                                    error ++;
+                                } else {
+                                   if(newpassword.val() == confirmpassword.val()) {
+                                        $(".pConfirmPassword").slideUp(400);
+                                       
+                                        newpassword.parent().addClass("has-success");
+                                        newpassword.parent().removeClass("has-error");
+
+                                        confirmpassword.parent().addClass("has-success");
+                                        confirmpassword.parent().removeClass("has-error");
+                                   } else {
+                                        $(".pConfirmPassword").slideDown(400);
+                                       
+                                        newpassword.parent().addClass("has-error");
+                                        newpassword.parent().removeClass("has-success");
+
+                                        confirmpassword.parent().addClass("has-error");
+                                        confirmpassword.parent().removeClass("has-success");
+                                        
+                                        error ++;
+                                   }
+                                }
+                            } else {
+                                oldpassword.parent().addClass("has-error");
+                                oldpassword.parent().removeClass("has-success");
+                                
+                                 $(".pNewOldPassword").slideDown(400);
+                                 
+                                 error++;
+                            }
+                            
+                            if(error == 0){
+                                $.ajax({
+                                    url: 'user/changePassword',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data:{Password:newpassword.val(),IdUser:id},
+                                    success: function(resposne) {
+                                        if(resposne) {
+                                            setTimeout(function() {
+                                                $(".mChangePassword").modal('hide');
+                                            }, 400);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
                 }
-            });
         });
+        
+    
 });

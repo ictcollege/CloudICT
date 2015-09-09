@@ -104,8 +104,10 @@ class ApplicationModel extends CI_Model{
                 {
                     $data['Applications'][$i++] = $row;
                 }
+                
+                return $data;
             }
-            return $data;
+            
         }
         
         public function addNewApplication($appName, $appLink, $appIcon, $appColor)

@@ -438,6 +438,7 @@ class Admin extends Backend_Controller {
         $users = $this->UserModel->getAllUsers();
         
         $data['editmodal'] = ""; 
+        $data['deltemodal'] = "";
         
         foreach($users as $u)
         {
@@ -516,6 +517,23 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 
+                $data['deltemodal'] .= '<div class="modal fade mDeleteUser" id="mDeleteUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+                $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
+                $data['deltemodal'] .= '<div class="modal-content">';
+                $data['deltemodal'] .= '<div class="modal-header">';
+                $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+                $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '<div class="modal-body text-center">';
+                $data['deltemodal'] .= 'Delete user '.$u['UserName'].'?';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '<div class="modal-footer text-center">';
+                $data['deltemodal'] .= '<button type="button" id="'.$u['IdUser'].'" class="btn btn-primary btnDeleteUserYes">Yes</button>';
+                $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
+                $data['deltemodal'] .= '</div>';
         }
          
         
@@ -549,8 +567,8 @@ class Admin extends Backend_Controller {
             $data['data'][$i][] = $user["UserStatus"];
             $data['data'][$i][] = $user["UserKey"];
             $data['data'][$i][] = $user["UserKeyExpires"];
-            $data['data'][$i][] = '<div class="options"><button type="button" id="'.$user['IdUser'].'" class="btn btn-primary btnEditUser" data-toggle="modal" data-target="#mEditUser'.$user["IdUser"].'"><i class="fa fa-edit fa-fw"></i></button><button type="button" id="'.$user['IdUser'].'" class="btn btn-danger btnDeleteUser"><i class="fa fa-trash-o fa-fw"></i></button></div>';
-            
+            $data['data'][$i][] = '<div class="options"><button type="button" id="'.$user['IdUser'].'" class="btn btn-primary btnEditUser" data-toggle="modal" data-target="#mEditUser'.$user["IdUser"].'"><i class="fa fa-edit fa-fw"></i></button><button type="button" id="'.$user['IdUser'].'" class="btn btn-danger btnDeleteUser" data-toggle="modal" data-target="#mDeleteUser'.$user["IdUser"].'"><i class="fa fa-trash-o fa-fw"></i></button></div>';
+           
             $i++;
         }
         
@@ -590,6 +608,7 @@ class Admin extends Backend_Controller {
     
     public function editUser()
     {
+        $iduser = $this->input->post('IdUser');
         $username =  $this->input->post('Username');
         $password = $this->input->post('Password');
         $userfullname =  $this->input->post('Userfullname');
@@ -602,7 +621,18 @@ class Admin extends Backend_Controller {
         
         $this->load->model("UserModel");
         
-        $this->UserModel->editUser($username, $password, $userfullname, $email, $diskquota, $diskused, $diskused, $userstatus, $userstatus, $userkey, $keyexpires);
+        $this->UserModel->editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $diskused, $userstatus, $userstatus, $userkey, $keyexpires);
+        
+        echo json_encode(true);
+    }
+    
+    public function deleteUser()
+    {
+        $iduser = $this->input->post('IdUser');
+        
+        $this->load->model("UserModel");
+        
+        $this->UserModel->deleteUser($iduser);
         
         echo json_encode(true);
     }
@@ -819,9 +849,9 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
-                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbNewColor" />';
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
-                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
@@ -897,9 +927,9 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
-                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbNewColor" />';
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
-                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
@@ -971,9 +1001,9 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
-                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbNewColor" />';
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
-                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
@@ -1041,9 +1071,9 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<input class="form-control tbLink" placeholder="'.$a['AppLink'].'">';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="form-group"><label>Color</label><div class="input-group demo2">';
-                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbColor" />';
+                $data['editmodal'] .= '<input type="text" value="'.$a['AppColor'].'" class="form-control tbNewColor" />';
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
-                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbIcon" value="'.$a['AppIcon'].'" type="text">';
+                $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';

@@ -70,6 +70,11 @@ class MY_Controller extends CI_Controller{
 			}
 			$data['count']=$count;
 		}
+                
+        //helpers
+            $this->load->helper('url');
+        //variables   
+        $data['base_url']= base_url();
 		
         $this->load->view('header',$data);
         $this->load->view('menu',$data);

@@ -42,6 +42,10 @@ body{
     font-family: 'Patua One', cursive;
 }
 
+.user-panel {
+    margin-top: 65px;
+}
+
 .app{
 	margin: 10px; 
 	cursor: pointer;
@@ -53,7 +57,7 @@ body{
 }
 
 .app1{
-	background-color: #18bc9c;
+	background-color: #213E38;
 }
 
 .app2{
@@ -82,6 +86,11 @@ body{
 
 .app-panel{
 	  margin-top: 17%;
+}
+
+.app-name-none {
+    position: relative;
+    top: -56px;
 }
 
 .main-panel{
@@ -230,6 +239,10 @@ a {
 .btnDeleteUser {
     margin-left: 5px;
 }
+
+.btnSaveChanges{
+    margin-top: 10px;
+}
     
 .icon-remove-user {
     color: #357ebd;
@@ -259,6 +272,14 @@ a {
     margin-top: 5px;
 }
 
+.btnChangePassword {
+    margin-top: -3px;
+}
+
+.btnUserProfileSaveChanges {
+    margin-top: 10px;
+}
+
 .user-exists {
     color: red;
 }
@@ -277,4 +298,13 @@ a {
 
 .options {
     width: 100px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.pConfirmPassword {
+    margin-top: 0px;
 }
