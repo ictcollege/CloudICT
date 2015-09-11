@@ -33,10 +33,20 @@ class UserGroupModel extends CI_Model {
                 
                 FROM `UserGroup`
                 
-                 WHERE `IdGroup` = ?
+                WHERE `IdGroup` = ?
             ";
         
         $this->db->query($query2, [$idGroup]);
+        
+        $query3 = "
+                DELETE 
+                
+                FROM `GroupApp`
+                
+                WHERE `IdGroup` = ?
+                ";
+        
+        $this->db->query($query3, [$idGroup]);
     }
     
     public function changeGroupName($idGroup, $newName)

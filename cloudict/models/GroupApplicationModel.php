@@ -72,4 +72,32 @@ class GroupApplicationModel extends CI_Model{
         
             $result = $this->db->query($query, [$idGroup, $idApp]);
         }
+        
+        public function getApplicationsMenu($idApp)
+        {
+            $query = " 
+                SELECT 	*
+
+                FROM	`AppMenu`
+
+                WHERE `IdApp` = ?
+            
+            ";
+            
+        
+            $result = $this->db->query($query, [$idApp])->result_array();
+            
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['ApplicationMenu'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+        }
 }

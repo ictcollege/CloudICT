@@ -151,7 +151,7 @@ $(document).ready(function(){
                     success: function(response) {
                         $(".panel-body").children().remove();
                         $(".panel-body").hide();
-                        $(".panel-body").append('<h3>Passwrod Change Successfully</h3>');
+                        $(".panel-body").append('<h3 class="h3-succes text-center">Passwrod Change Successfully</h3>');
                         $(".panel-body").append('<a  href="admin/" class="btn btn-lg btn-success btn-block btnChangePassword">Proceed To Cloud</a>');
                         $(".panel-body").slideDown(800);
                     }

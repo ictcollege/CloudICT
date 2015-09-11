@@ -1,4 +1,4 @@
-<script>
+<script type="text/javascript">
 $(document).ready(function(){
      var datatable =$(".tableusers").DataTable( {
                         "ajax": 'admin/getAllUsers',
@@ -108,7 +108,7 @@ $(document).ready(function(){
             });
         });
         
-        $(".btnGenerateKey").click(function () {
+        $(".btnGenerateKey").click(function() {
             var _this = $(this),
                 email = $(".tbEmail"),
                 regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
@@ -139,9 +139,12 @@ $(document).ready(function(){
                                 dataType: 'json',
                                 data:{Email:email.val()},
                                 success: function(response) {
-                                    $(".tbKey").attr("placeholder", response);
+                                    $(".tbKey").attr("placeholder", response.key);
                                     $(".btnSendKey").removeClass("disabled");
                                     $(".btnGenerateKey").hide(400);
+                                    
+                                    $(".editmodals").append(response.editmodal);
+                                    $(".deletemodals").append(response.deltemodal);
                                     
                                     datatable.ajax.reload();
                                 }
@@ -155,8 +158,26 @@ $(document).ready(function(){
                 });
             }
         });
-         
+        
+        // send key to email
+        
+        $(".btnSendKey").click(function() {
+            var key = $(".tbKey").attr("placeholder"),
+                email = $(".tbEmail").val();
+            
+            $.ajax({
+                url: 'admin/sendKey',
+                type: 'post',
+                dataType: 'json',
+                data:{Key:key,Email:email},
+                success: function(response) {
+                alert(response);
+                }
+            });
+        });
+        
 });
+
 </script>
 
 <div id="page-wrapper">

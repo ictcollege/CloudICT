@@ -264,40 +264,6 @@ class UserModel extends CI_Model {
 	}
 	
 	/**
-	* Update User
-	* 
-	* Returns int
-	* 
-	* Structure of returned data:
-	*      0: user was not updated
-	*	   1: user was updated
-	* 
-	* @param int $IdUser
-	* @param array($IdRole, $Username, $UserPassword, $UserFullname, $UserEmail, $UserStatus)
-	* @return int
-	*/
-	public function updateUser($IdUser, $UserArray)
-	{
-		$IdRole = $UserArray[0];
-		$Username = $UserArray[1];
-		$UserPassword = $UserArray[2];
-		$UserFullname = $UserArray[3];
-		$UserEmail = $UserArray[4];
-		$UserStatus = $UserArray[5];
-		$updateQuery = "
-			UPDATE `User` SET `IdRole` = ?,
-				`UserName` = ?,
-				`UserPassword` = ?,
-				`UserFullname` = ?,
-				`UserEmail` = ?,
-				`UserStatus` = ?
-			WHERE IdUser = ?;
-		";
-		$result = $this->db->query($updateQuery, [$IdRole,$Username,$UserPassword,$UserFullname,$UserEmail,$UserStatus,$IdUser]);
-		return !empty($result)?1:0; 
-	}
-	
-	/**
 	* Update Used Space By User
 	* 
 	* Returns int
@@ -457,6 +423,87 @@ class UserModel extends CI_Model {
             
             return $result;
         }
+        
+        public function checkIfKeyExists($key)
+        {
+            $query = "
+			SELECT	* 				
+
+			FROM 	`User`
+
+			WHERE	`UserKey` = '".$key."' 
+                           
+                        AND `UserKeyExpires` != 0
+		";
+		
+		$result = $this->db->query($query)->result_array();
+		
+                if(!empty($result))
+                {
+                    return true;
+                }
+                else 
+                {
+                    return false;
+                }
+        }
+        
+        public function registerUser($username, $password, $key)
+	{
+		
+		$query = "
+			UPDATE `User` 
+                        
+                        SET     `UserName` = ?,
+				`UserPassword` = ?,
+                                `UserKeyExpires` = 0
+                        
+                        WHERE `UserKey` = ?;
+		";
+		$result = $this->db->query($query, [$username,md5($password),$key]);
+                
+               
+	}
+        
+        public function getUserByKey($key)
+        {
+            $query = "
+			SELECT	* 				
+
+			FROM 	`User`
+
+			WHERE	`UserKey` = '".$key."' 
+		";
+		
+		$result = $this->db->query($query)->result_array();
+		
+            $data = array();
+            
+            if(!empty($result))
+            {
+                $i=0;
+                foreach($result as $row)
+                {
+                    $data['User'][$i++] = $row;
+                }
+            }
+            
+            return $data;
+        }
+        
+        public function updateUser($username, $fullname, $email, $iduser)
+	{
+		$query = "
+			UPDATE  `User` 
+                        
+                        SET     
+				`UserName` = ?,
+				`UserFullname` = ?,
+				`UserEmail` = ?
+			WHERE IdUser = ?;
+		";
+		$result = $this->db->query($query, [$username, $fullname, $email, $iduser]);
+	}
 }
 
 /* End of file UserModel.php */

@@ -529,12 +529,11 @@ $(document).ready(function() {
                 $(".tbEmail").parent().removeClass("has-error");
                 $(".tbEmail").parent().removeClass("has-success");
                 $(".tbKey ").attr("placeholder", " ");
+                $(".btnGenerateKey").show();
         });
         
         //generate new user, insert new user in db
         $(".user-exists").hide();
-        
-        
         
         $(".chbAppGroup").click(function() {
            var idapp = $(this).attr("id"),
@@ -869,5 +868,134 @@ $(document).ready(function() {
                 }
         });
         
+        
+        //register validation 
+        
+        $(".btnRegister").click(function() {
+            var username = $(".tbUsername"), 
+                password = $(".tbPassword"),
+                confirmpassword = $(".tbConfirmPassword"),
+                pop = window.location.href.split("/"),
+                key = pop[pop.length-1],
+                error = false;
+            
+            if(username.val()== ""){
+            username.parent().removeClass('has-success');
+            username.parent().addClass('has-error');
+            error = true;
+            } else {
+                username.parent().removeClass('has-error');
+                username.parent().addClass('has-success');
+            }
+
+            if(password.val()== ""){
+                password.parent().removeClass('has-success');
+                password.parent().addClass('has-error');
+                error = true;
+            } else {
+                password.parent().removeClass('has-error');
+                password.parent().addClass('has-success');
+            }
+            
+            if(confirmpassword.val()== ""){
+                confirmpassword.parent().removeClass('has-success');
+                confirmpassword.parent().addClass('has-error');
+                error = true;
+            } else {
+                confirmpassword.parent().removeClass('has-error');
+                confirmpassword.parent().addClass('has-success');
+            } 
+            
+            if(password.val() != confirmpassword.val()){
+                $(".error").append("<p>Password And Confirm Password Do Not Match");
+                $(".error").show(400);
+                
+                password.parent().removeClass('has-success');
+                password.parent().addClass('has-error');
+                confirmpassword.parent().removeClass('has-success');
+                confirmpassword.parent().addClass('has-error');
+                
+                error = true;
+            } else {
+                $(".error").hide(400);
+                $(".error").text(" ");
+            }
+            
+            if(!error){
+                $.ajax({
+                    url: 'user/registerUser',
+                    type: 'post',
+                    dataType: 'json',
+                    data:{Username:username.val(),Password:password.val(),Key:key},
+                    success: function(response) {
+                        $(".login-panel ").find(".panel-body").text(" ");
+                        $(".login-panel ").find(".panel-body").append('<h3 class="text-center">Profile Created <br/><br/><a href="user/" class="btn btn-lg btn-success btn-block">Procede To Cloud</a></h3>');
+                        
+                } 
+            });
+            }
+        });
+        
+        $(".btnUserProfileSaveChanges").click(function() {
+            var username = $(".tbEditUsername"),
+                fullname = $(".tbFullName"),
+                email = $(".tbUserEmail"),
+                regEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i,
+                error = false;
+                
+                if(username.val() == "") {
+                    username = username.attr("placeholder");
+                } else {
+                    username = username.val();
+                }
+                
+                if(fullname.val() == "") {
+                    fullname = fullname.attr("placeholder");
+                } else {
+                    fullname = fullname.val();
+                }
+                
+                if(email.val() == "") {
+                    email = email.attr("placeholder");
+                    $(".error").hide(400);
+                } else {
+                    if(email.val().match(regEmail)) {
+                        $(".error").hide(400);
+                    } else {
+                        $(".error").show(400);
+                        
+                        error = true;
+                    }
+                }
+                
+                if(!error) {
+                    $.ajax({
+                        url: 'user/updateUser',
+                        type: 'post',
+                        dataType: 'json',
+                        data:{Username:username,Fullname:fullname,Email:email},
+                        success: function(resposne) {
+                            $(".update-success").hide();
+                            $(".update-success").text(" ");
+                            $(".update-success").append("<h3 class='green'>Profile Updated Successfully</h3>");
+                            $(".update-success").slideDown(400);
+                            
+                            setTimeout(function(){
+                                $(".update-success").slideUp(400);
+                            }, 3000);
+                            
+                            $(".tbEditUsername").attr("placeholder", username);
+                            $(".tbFullName").attr("placeholder", fullname);
+                            $(".tbUserEmail").attr("placeholder", email);
+                            
+                            $(".tbEditUsername").val("");
+                            $(".tbFullName").val("");
+                            $(".tbUserEmail").val("");
+                        }
+                    });
+                }
+                
+                    
+        })
     
 });

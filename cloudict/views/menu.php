@@ -89,7 +89,7 @@ $(document).ready(function () {
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="admin/"><img src="public/img/ict.png" class="logo"/> <span class="cloud">Cloud</span></a>
+                <a class="navbar-brand" href="<?php if($this->session->userdata('role')==3) echo "admin/"; else echo"user/applications";?>"><img src="public/img/ict.png" class="logo"/> <span class="cloud">Cloud</span></a>
             </div>
             <!-- /.navbar-header -->
 

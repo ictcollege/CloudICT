@@ -57,7 +57,7 @@ body{
 }
 
 .app1{
-	background-color: #213E38;
+	/* background-color: #213E38; */
 }
 
 .app2{
@@ -290,7 +290,7 @@ a {
     left: 18px;
 }
 
-.login-error{
+.login-error p{
     color: red;
     margin-top: 20px;
     margin-left: 5px;
@@ -305,6 +305,22 @@ a {
     margin-top: 10px;
 }
 
+.error p{
+    color: red;
+}
+
+p.error {
+    color: red;
+}
+
 .pConfirmPassword {
     margin-top: 0px;
+}
+
+.h3-success {
+    margin-bottom: 25px;
+}
+
+.green {
+    color: #5cb85c;
 }

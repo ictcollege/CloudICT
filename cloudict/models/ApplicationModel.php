@@ -1,4 +1,4 @@
-<?php
+deleteApplication<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class ApplicationModel extends CI_Model{
@@ -150,6 +150,16 @@ class ApplicationModel extends CI_Model{
                     ";
             
             $result = $this->db->query($query, [$idApp]);
+            
+            $query2 = "
+                    DELETE 
+                    
+                    FROM `GroupApp`
+                    
+                    WHERE `IdApp` = ?
+                    ";
+            
+            $result = $this->db->query($query2, [$idApp]);
         }
 }
 

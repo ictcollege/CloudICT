@@ -33,23 +33,37 @@ class Admin extends Backend_Controller {
         $data['applications'] = "";
         $data['applications'] .= ' <div class="row">';  
         $i= 0;
-        foreach($applications['Applications'] as $a)
+        
+        if(isset($applications['Applications']))
         {
-            if($i%3==0)
+            foreach($applications['Applications'] as $a)
             {
-               $data['applications'] .= ' <div class="row">';  
+                if($i%3==0)
+                {
+                   $data['applications'] .= ' <div class="row">';  
+                }
+                $data['applications'] .= '<div class="col-sm-4 text-center">';
+                $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
+                $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
+                $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
+                $data['applications'] .= '</div></a>';
+                $data['applications'] .= ' </div>';
+                $i++;
+                if($i%3==0)
+                {
+                    $data['applications'] .= '</div>'; 
+                }
             }
-            $data['applications'] .= '<div class="col-sm-4 text-center">';
-            $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
-            $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
-            $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
+        } 
+        else {
+            $data['applications'] .= ' <div class="row">';  
+            $data['applications'] .= '<div class="col-sm-12 text-center">';
+            $data['applications'] .= '<a><div class="app">';
+            $data['applications'] .= '<h2></h2>';
+            $data['applications'] .= '<h3 class="app-name-none">None Avalable Applications For This Account</br>Contact Administrator</h3>';
             $data['applications'] .= '</div></a>';
             $data['applications'] .= ' </div>';
-            $i++;
-            if($i%3==0)
-            {
-                $data['applications'] .= '</div>'; 
-            }
+            $data['applications'] .= '</div>';
         }
         
         //data to view
@@ -597,13 +611,135 @@ class Admin extends Backend_Controller {
         $id = $this->UserModel->insertUser($email);
         $key = $this->UserModel->getUserKey($id);
         
+        $data['key'] = "";
+        
         $i=0;
         foreach($key["Key"] as $k)
         {
-            $response[$i++] = $k["UserKey"];
+            $data['key'] .= $k["UserKey"];
         }
         
-        echo json_encode($response);
+        $users = $this->UserModel->getUserByKey($data['key']);
+        
+        $data['editmodal'] = "";
+        $data['deltemodal'] = "";
+        
+        foreach($users["User"] as $u)
+        {
+            $data['editmodal'] .= '<div class="modal fade '.$u['IdUser'].'" id="mEditUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['editmodal'] .= '<div class="modal-dialog" role="document">';
+            $data['editmodal'] .= '<div class="modal-content">';
+            $data['editmodal'] .= '<div class="modal-header">';
+            $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+            $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit User</h4>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="modal-body">';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>#USER ID</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserId" placeholder="'.$u['IdUser'].'"  disabled/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>#ROLE ID</label>';
+            $data['editmodal'] .= '<input class="form-control tbRouleId" placeholder="'.$u['IdRole'].'" disabled/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Username</label>';
+            $data['editmodal'] .= '<input class="form-control tbEditUsername" placeholder="'.$u['UserName'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Password md5</label>';
+            $data['editmodal'] .= '<input class="form-control tbEditPassword" placeholder="'.$u['UserPassword'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>User Full Name</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserFullName" placeholder="'.$u['UserFullname'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>User Full Name</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserEmail" placeholder="'.$u['UserEmail'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Disk Quota</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserDiskQuota" placeholder="'.$u['UserDiskQuota'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Disk Used %</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$u['UserDiskUsed'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>User Status</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserStatus" placeholder="'.$u['UserStatus'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>User Key</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserKey" placeholder="'.$u['UserKey'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '<div class="form-group">';
+            $data['editmodal'] .= '<label>Key Expires</label>';
+            $data['editmodal'] .= '<input class="form-control tbUserKeyExpires" placeholder="'.$u['UserKeyExpires'].'"/>';
+            $data['editmodal'] .= '</div>';
+
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '<div class="modal-footer">';
+            $data['editmodal'] .= '<button type="button" class="btn btn-primary pull-right btnSaveChanges" id="'.$u['IdUser'].'">Save Changes</button>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+            $data['editmodal'] .= '</div>';
+
+            $data['deltemodal'] .= '<div class="modal fade mDeleteUser" id="mDeleteUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
+            $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
+            $data['deltemodal'] .= '<div class="modal-content">';
+            $data['deltemodal'] .= '<div class="modal-header">';
+            $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
+            $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '<div class="modal-body text-center">';
+            $data['deltemodal'] .= 'Delete user '.$u['UserName'].'?';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '<div class="modal-footer text-center">';
+            $data['deltemodal'] .= '<button type="button" id="'.$u['IdUser'].'" class="btn btn-primary btnDeleteUserYes">Yes</button>';
+            $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+            $data['deltemodal'] .= '</div>';
+        }
+        
+        echo json_encode($data);
+    }
+    
+    public function sendKey() 
+    {
+        $key = $this->input->post('Key');
+        $email = $this->input->post('Email');
+        
+        $this->load->library('email');
+        $this->load->helper('url');
+        
+        $this->email->from('filip.radojkovic.26.12@ict.edu.rs', 'Filip Radojkovic');
+        $this->email->to($email); 
+
+        $this->email->subject('ICT Cloud Registration Key');
+        $this->email->message(base_url()."user/register/".$key);	
+
+        $this->email->send();
+
+        echo json_encode(base_url()."user/register/".$key);
     }
     
     public function editUser()
@@ -794,6 +930,7 @@ class Admin extends Backend_Controller {
         //model
         $this->load->model('MenuModel');
         $this->load->model('ApplicationModel');
+        $this->load->model('GroupApplicationModel');
         
         $menu = $this->MenuModel->getMenuOfApplication(4);
         
@@ -853,6 +990,25 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
                 $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                
+                $data['editmodal'] .= '<div class="appmenu">';
+                
+                $applicationsmenu = $this->GroupApplicationModel->getApplicationsMenu($a['IdApp']);
+                
+                if(isset($applicationsmenu["ApplicationMenu"]))
+                {
+                    foreach($applicationsmenu["ApplicationMenu"] as $am)
+                    {
+                        $data['editmodal'] .= '<div class="form-group">';
+                        $data['editmodal'] .= '<label>Application Menu Name</label>';
+                        $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$am['AppMenuLink'].'"> </div><div class="form-group"><label>Link</label>';
+                        $data['editmodal'] .= '</div>';
+                       
+                    }
+                }
+                
+                $data['editmodal'] .= '</div>';
+                
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
                 $data['editmodal'] .= '<div class="form-group input-group pull-left">';

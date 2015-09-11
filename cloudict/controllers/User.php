@@ -132,7 +132,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                    $data['applications'] .= ' <div class="row">';  
                 }
                 $data['applications'] .= '<div class="col-sm-4 text-center">';
-                $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'">';
+                $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
                 $data['applications'] .= '<h2><i class="fa '.$a['AppIcon'].' fa-fw"></i></h2>';
                 $data['applications'] .= '<h3 class="app-name">'.$a['AppName'].'</h3>';
                 $data['applications'] .= '</div></a>';
@@ -155,7 +155,6 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         }
         
         //data to view
-        $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Applications";
         $data['admin'] = true;
             //data for form
@@ -205,6 +204,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                 $data['usereditform'] .= '<div class="form-group">';
                 $data['usereditform'] .= '<label>Email</label>';
                 $data['usereditform'] .= '<input class="form-control tbUserEmail" placeholder="'.$u['UserEmail'].'"/>';
+                $data['usereditform'] .= '<p class="error">Email Format Is Wrong!</p>';
                 $data['usereditform'] .= '</div>';
                 
                 $data['usereditform'] .= '<div class="form-group">';
@@ -216,6 +216,8 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                 $data['usereditform'] .= '<label>Disk Used %</label>';
                 $data['usereditform'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$u['UserDiskUsed'].'" disabled/>';
                 $data['usereditform'] .= '<button type="button" class="btn btn-primary pull-right btnUserProfileSaveChanges" id="'.$u['IdUser'].'">Save Changes</button>';
+                $data['usereditform'] .= '</div>';
+                $data['usereditform'] .= '<div class="update-success">';
                 $data['usereditform'] .= '</div>';
                 
                 $data['passwordchangemodal'] .= '<div class="modal fade mChangePassword" id="mChangePassword" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
@@ -257,6 +259,21 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         $this->load_view("profile", $data);
     }
     
+    public function updateUser()
+    {
+        $username = $this->input->post('Username');
+        $fullname = $this->input->post('Fullname');
+        $email = $this->input->post('Email');
+        $iduser = $this->session->userdata('userid');
+        
+        $this->load->model('UserModel');
+        
+        $this->UserModel->updateUser($username, $fullname, $email, $iduser);
+        
+        echo json_encode(true);
+        
+    }
+    
     public function checkIfPasswordExists()
     {
         $password = $this->input->post('Password');
@@ -287,5 +304,34 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         exit;
         //redirect(base_url()); //CI_Version
 
+    }
+    
+    public function register($key) {
+        
+        $this->load->model('UserModel');
+        
+        if($this->UserModel->checkIfKeyExists($key))
+        {
+            $data["exists"] = true;
+        }
+        else 
+        {
+            $data["exists"] = false;
+        }
+        
+            $this->load->view("header");
+            $this->load->view("register", $data);
+    }
+    
+    public function registerUser() {
+        $username = $this->input->post("Username");
+        $password = $this->input->post("Password");
+        $key = $this->input->post("Key");
+        
+        $this->load->model('UserModel');
+        
+        $this->UserModel->registerUser($username, $password, $key);
+        
+        echo json_encode(true);
     }
 }
