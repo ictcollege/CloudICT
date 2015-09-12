@@ -437,6 +437,26 @@ class Admin extends Backend_Controller {
         //model
         $this->load->model('MenuModel');
         $this->load->model("UserModel");
+//        $this->load->model("ApplicationModel");
+//        
+//        if(!$this->ApplicationModel->canUserUseApp($this->session->userdata('userid'), 3)) 
+//        {
+//            if($this->isAdmin())
+//            {
+//                header("location:".base_url()."admin/");
+//                exit;
+//            }
+//            else if($this->isUser())
+//            {
+//                 header("location:".base_url()."");
+//                exit;
+//            }
+//            else if($this->isLogged())
+//            {
+//                 header("location:".base_url());
+//                exit;
+//            }
+//        }
        
         $menu = $this->MenuModel->getMenuOfApplication(3);
         
@@ -553,7 +573,7 @@ class Admin extends Backend_Controller {
         
         //data to view
         $data['base_url']= $base_url;
-        $data['title'] = "ICT Cloud | Admin | Groups";
+        $data['title'] = "ICT Cloud | Admin | Users";
             
         //views
         $this->load_view('users', $data);
@@ -1465,6 +1485,22 @@ class Admin extends Backend_Controller {
         }
         
         echo json_encode($data);
+    }
+    
+    public function getApplications() 
+    {
+        $this->load->model('ApplicationModel');
+        
+        $applications = $this->ApplicationModel->getAllApplications();
+        
+        $response = array();
+        
+        foreach($applications['Applications'] as $a)
+        {
+            $response[] = $a['AppName'];
+        }
+        
+        echo json_encode($response);
     }
     
     public function deleteApplicationMenu()

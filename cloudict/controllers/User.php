@@ -155,7 +155,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         }
         
         //data to view
-        $data['title'] = "ICT Cloud | Admin | Applications";
+        $data['title'] = "ICT Cloud | User | Applications";
         $data['admin'] = true;
             //data for form
             
@@ -256,6 +256,8 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
             }
         }
         
+        $data['title'] = "ICT Cloud | Admin | User Profile";
+        
         $this->load_view("profile", $data);
     }
     
@@ -333,5 +335,31 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         $this->UserModel->registerUser($username, $password, $key);
         
         echo json_encode(true);
+    }
+    
+    public function aboutus()
+    {
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+        $data['title'] = "ICT Cloud | User | About Us";
+        //views
+        $this->load_view('aboutus', $data);
+    }
+    
+    public function aboutictcloud()
+    {
+        $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
+        
+        $data['title'] = "ICT Cloud | User | About ICT Cloud";
+        //views
+        $this->load_view('aboutictcloud', $data);
     }
 }

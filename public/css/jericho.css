@@ -324,3 +324,32 @@ p.error {
 .green {
     color: #5cb85c;
 }
+
+.jumbotron img {
+    max-height: 145px;
+    position: relative;
+    top: -45px;
+    left: 45px;
+}
+
+@media(max-width: 450px){
+	.jumbotron img {
+		max-height: 65px;
+                top: 5px;
+                left: 20px;
+	}	
+}
+
+.more {
+    font-size: 14px;
+    right: 0;
+    top: -145px;
+    margin-right: -44px;
+    margin-bottom: 0px;
+    position: relative;
+    width: 430px;
+}
+
+.more2 {
+    font-size: 14px;
+}

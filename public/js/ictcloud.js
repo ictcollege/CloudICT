@@ -620,6 +620,26 @@ $(document).ready(function() {
                 link = $(".tbLink"),
                 error = false;
             
+            $.ajax({
+                url: 'admin/getApplications',
+                type: 'post',
+                dataType: 'json',
+                success: function(resposne) {
+                    var i;
+                    
+                    for(i=0;i<resposne.length;i++) {
+                        if(name.val()==resposne[i]) {
+                            name.parent().removeClass("has-success");
+                            name.parent().addClass("has-error");
+                            error = true;
+                        } else {
+                            name.parent().addClass("has-success");
+                            name.parent().removeClass("has-error");
+                        }
+                    }
+                }
+            });
+            
             if(name.val() == "") {
                 name.parent().removeClass("has-success");
                 name.parent().addClass("has-error");
@@ -627,40 +647,36 @@ $(document).ready(function() {
             } else {
                 name.parent().addClass("has-success");
                 name.parent().removeClass("has-error");
-                error = 0;
             }
             
             if(color.val() == "") {
                 color.parent().removeClass("has-success");
                 color.parent().addClass("has-error");
-                error++;
+                error = true;
             } else {
                 color.parent().addClass("has-success");
                 color.parent().removeClass("has-error");
-                error--;
             }
             
             if(link.val() == "") {
                 link.parent().removeClass("has-success");
                 link.parent().addClass("has-error");
-                error++;
+                error = true;
             } else {
                 link.parent().addClass("has-success");
                 link.parent().removeClass("has-error");
-                error--;
             }
             
             if(icon.val() == "") {
                 icon.parent().removeClass("has-success");
                 icon.parent().addClass("has-error");
-                error++;
+                error = true;
             } else {
                 icon.parent().addClass("has-success");
                 icon.parent().removeClass("has-error");
-                error--;
             }
             
-            if(error<0)
+            if(!error)
             {
                 $.ajax({
                     url: 'admin/addNewApplication',
@@ -1095,4 +1111,37 @@ $(document).ready(function() {
                 }
             });
         });
+        
+        //about us animation
+        $(".more").hide();
+        $(".more2").hide();
+        
+        if($(window).width()>992){
+            
+
+            $(".jumbotron").hover(function() {
+                var _this = $(this);
+
+                $(this).find(".img-circle").stop(true,true).animate({
+                  marginRight: '+450px' 
+               }, function () {
+                   _this.find(".more").stop(true,true).slideDown(400);
+               });
+            }, function() {
+                 var _this = $(this);
+                $(this).find(".more").stop(true,true).slideUp(500);
+
+                setTimeout(function() {
+                     _this.find(".img-circle").stop(true,true).animate({
+                        marginRight: '0px' 
+                    }, function(){
+                    });
+                }, 500);
+            });
+        } else {
+            $(".jumbotron").click(function() {
+                $(this).find(".more2").toggle(400);
+            });
+            
+        }
 });

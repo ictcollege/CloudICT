@@ -94,6 +94,21 @@ $(document).ready(function () {
             <!-- /.navbar-header -->
 
             <ul class="nav navbar-top-links navbar-right">
+                
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-question-circle fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-messages">
+                        <li><a href="user/aboutus"><i class="fa fa-graduation-cap fa-fw"></i> About Us</a>
+                        </li>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="user/aboutictcloud"><i class="fa fa-cloud fa-fw"></i> About ICT Cloud</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
                 <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>

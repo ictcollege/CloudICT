@@ -107,7 +107,43 @@ class ApplicationModel extends CI_Model{
                 
                 return $data;
             }
+        }
+        
+        public function canUserUseApp($idUser, $idApp)
+        {
+            $query =   "SELECT DISTINCT      `IdApp`, 
+                                            `AppName`, 
+                                            `AppLink`,
+                                            `AppIcon`,
+                                            `AppStatus`, 
+                                            `AppOrder`, 
+                                            `AppColor` 
+                                            
+                        FROM                `App` 
+                        
+                        JOIN                `GroupApp` 
+                        USING               (`IdApp`) 
+                        
+                        JOIN                `UserGroup` 
+                        USING (`IdGroup`) 
+                        
+                        JOIN `User` 
+                        USING (`IdUser`) 
+                        
+                        WHERE `IdUser` = ? 
+                        AND `IdApp` = ?
+                    ";
             
+            $result = $this->db->query($query, [$idUser, $idApp])->result_array();
+            
+            if(!empty($result))
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
         }
         
         public function addNewApplication($appName, $appLink, $appIcon, $appColor)
