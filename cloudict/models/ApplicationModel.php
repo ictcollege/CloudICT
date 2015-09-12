@@ -1,4 +1,4 @@
-deleteApplication<?php
+<?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class ApplicationModel extends CI_Model{
@@ -160,6 +160,49 @@ class ApplicationModel extends CI_Model{
                     ";
             
             $result = $this->db->query($query2, [$idApp]);
+        }
+        
+        public function deleteApplicationMenu($idAppMenu)
+        {
+            $query = "
+                    DELETE 
+                    
+                    FROM `AppMenu`
+                    
+                    WHERE `IdAppMenu` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$idAppMenu]);
+        }
+        
+        public function updateApplicationMenu($idAppMenu, $idApp, $appMenuName, $appMenuLink, $appMenuIcon) 
+        {
+            $query = "
+                    UPDATE      `AppMenu`
+                    
+                    SET         `AppMenuName` = ?,
+                                `AppMenuLink` = ?,
+                                `AppMenuIcon` = ?
+                                
+                    WHERE       `IdAppMenu` = ? 
+                    AND         `IdApp` = ?
+                    ";
+            
+            $result = $this->db->query($query, [$appMenuName, $appMenuLink, $appMenuIcon, $idAppMenu, $idApp]);
+        }
+        
+        public function insertApplicationMenu($idApp, $appMenuName, $appMenuLink, $appMenuIcon)
+        {
+            $query = "
+                    INSERT INTO     `AppMenu`(`IdApp`,`AppMenuName`, `AppMenuLink`, `AppMenuIcon`)
+
+                    VALUES          (?,?,?,?)
+                   ";
+            $result = $this->db->query($query, [$idApp, $appMenuName, $appMenuLink, $appMenuIcon]);
+            
+            $insert_id = $this->db->insert_id();
+
+            return  $insert_id;
         }
 }
 

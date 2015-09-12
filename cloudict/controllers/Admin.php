@@ -991,29 +991,65 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
                 
-                $data['editmodal'] .= '<div class="appmenu">';
+                $data['editmodal'] .= '<hr/><div class="appmenu">';
                 
                 $applicationsmenu = $this->GroupApplicationModel->getApplicationsMenu($a['IdApp']);
                 
                 if(isset($applicationsmenu["ApplicationMenu"]))
                 {
+                    $data['editmodal'] .= "<div class='row'>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Manage</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Application Menu Name</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Link</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Icon</label>';
+                    $data['editmodal'] .= " </div></div></div>";
+                    
                     foreach($applicationsmenu["ApplicationMenu"] as $am)
                     {
-                        $data['editmodal'] .= '<div class="form-group">';
-                        $data['editmodal'] .= '<label>Application Menu Name</label>';
-                        $data['editmodal'] .= '<input class="form-control tbApplicationName" placeholder="'.$am['AppMenuLink'].'"> </div><div class="form-group"><label>Link</label>';
-                        $data['editmodal'] .= '</div>';
-                       
+                        $data['editmodal'] .= "<div class='row menu".$am['IdAppMenu']."'>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<button class="btn btn-danger float-right btnDeleteAppMenu" type="button"><i class="fa  fa-minus" id="'.$am['IdAppMenu'].'"></i></button>';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" id="hdIdAppMenu" placeholder='.$am['IdAppMenu'].' type="hidden" />';
+                        $data['editmodal'] .= '<input class="form-control" placeholder='.$am['AppMenuName'].' type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" placeholder="'.$am['AppMenuLink'].'" type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<div class="input-group iconpicker-container">';
+                        $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$am['AppMenuIcon'].'" type="text">';
+                        $data['editmodal'] .= '<span class="input-group-addon">';
+                        $data['editmodal'] .= '<i class="fa fa-archive"></i></span>';
+                        $data['editmodal'] .= "</div></div></div></div>";
                     }
                 }
                 
-                $data['editmodal'] .= '</div>';
+                $data['editmodal'] .= '<button class="btn btn-primary float-right btnAddNewAppMenu" type="button"><i class="fa  fa-plus"></i></button>';
                 
+                
+                $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
                 $data['editmodal'] .= '<div class="form-group input-group pull-left">';
                 $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
-                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-floppy-o" id="'.$a['IdApp'].'"></i> Save</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
@@ -1037,6 +1073,7 @@ class Admin extends Backend_Controller {
         $appcolor = $this->input->post('Color');
         
         $this->load->model("ApplicationModel");
+        $this->load->model('GroupApplicationModel');
         
         $this->ApplicationModel->addNewApplication($appname, $applink, $appicon, $appcolor);
         
@@ -1087,11 +1124,66 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
                 $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                
+                $data['editmodal'] .= '<hr/><div class="appmenu">';
+                
+                $applicationsmenu = $this->GroupApplicationModel->getApplicationsMenu($a['IdApp']);
+                
+                if(isset($applicationsmenu["ApplicationMenu"]))
+                {
+                    $data['editmodal'] .= "<div class='row'>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Manage</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Application Menu Name</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Link</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Icon</label>';
+                    $data['editmodal'] .= " </div></div></div>";
+                    
+                    foreach($applicationsmenu["ApplicationMenu"] as $am)
+                    {
+                        $data['editmodal'] .= "<div class='row'>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" id="hdIdAppMenu" placeholder='.$am['IdAppMenu'].' type="hidden" />';
+                        $data['editmodal'] .= '<button class="btn btn-danger float-right btnDeleteAppMenu" type="button"><i class="fa  fa-minus" id="'.$am['IdAppMenu'].'"></i></button>';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" placeholder='.$am['AppMenuName'].' type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" placeholder="'.$am['AppMenuLink'].'" type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<div class="input-group iconpicker-container">';
+                        $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$am['AppMenuIcon'].'" type="text">';
+                        $data['editmodal'] .= '<span class="input-group-addon">';
+                        $data['editmodal'] .= '<i class="fa fa-archive"></i></span>';
+                        $data['editmodal'] .= "</div></div></div></div>";
+                    }
+                }
+                
+                $data['editmodal'] .= '<button class="btn btn-primary float-right btnAddNewAppMenu" type="button"><i class="fa  fa-plus"></i></button>';
+                
+                
+                $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
                 $data['editmodal'] .= '<div class="form-group input-group pull-left">';
                 $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
-                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-floppy-o" id="'.$a['IdApp'].'"></i> Save</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
@@ -1109,12 +1201,30 @@ class Admin extends Backend_Controller {
         $applink = $this->input->post('Link');
         $appicon = $this->input->post('Icon');
         $appcolor = $this->input->post('Color');
+        $appmenus = $this->input->post('AppMenus');
         
         $this->load->model("ApplicationModel");
+        $this->load->model('GroupApplicationModel');
         
         $this->ApplicationModel->editApplication($appname, $applink, $appicon, $appcolor, $idapp);
         
         $applications = $this->ApplicationModel->getAllApplications();
+        
+        $idappmenu = "";
+        $appmenuname = "";
+        $appmenulink = "";
+        $appmenuicon = "";
+        
+        $appmenus = array_chunk($appmenus, 4);
+        
+        foreach($appmenus as $am) {
+            $idappmenu = $am[0];
+            $appmenuname = $am[1];
+            $appmenulink = $am[2];
+            $appmenuicon = $am[3];
+            
+            $this->ApplicationModel->updateApplicationMenu($idappmenu, $idapp, $appmenuname, $appmenulink, $appmenuicon);
+        }
         
         $data['applications'] = "";
         $data['editmodal'] = "";
@@ -1161,11 +1271,66 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
                 $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                
+                $data['editmodal'] .= '<hr/><div class="appmenu">';
+                
+                $applicationsmenu = $this->GroupApplicationModel->getApplicationsMenu($a['IdApp']);
+                
+                if(isset($applicationsmenu["ApplicationMenu"]))
+                {
+                    $data['editmodal'] .= "<div class='row'>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Manage</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Application Menu Name</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Link</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Icon</label>';
+                    $data['editmodal'] .= " </div></div></div>";
+                    
+                    foreach($applicationsmenu["ApplicationMenu"] as $am)
+                    {
+                        $data['editmodal'] .= "<div class='row'>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<button class="btn btn-danger float-right btnDeleteAppMenu" type="button"><i class="fa  fa-minus" id="'.$am['IdAppMenu'].'"></i></button>';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" id="hdIdAppMenu" placeholder='.$am['IdAppMenu'].' type="hidden" />';
+                        $data['editmodal'] .= '<input class="form-control" placeholder='.$am['AppMenuName'].' type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" placeholder="'.$am['AppMenuLink'].'" type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<div class="input-group iconpicker-container">';
+                        $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$am['AppMenuIcon'].'" type="text">';
+                        $data['editmodal'] .= '<span class="input-group-addon">';
+                        $data['editmodal'] .= '<i class="fa fa-archive"></i></span>';
+                        $data['editmodal'] .= "</div></div></div></div>";
+                    }
+                }
+                
+                $data['editmodal'] .= '<button class="btn btn-primary float-right btnAddNewAppMenu" type="button"><i class="fa  fa-plus"></i></button>';
+                
+                
+                $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
                 $data['editmodal'] .= '<div class="form-group input-group pull-left">';
                 $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
-                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-floppy-o" id="'.$a['IdApp'].'"></i> Save</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
@@ -1181,6 +1346,7 @@ class Admin extends Backend_Controller {
         $idapp = $this->input->post('IdApp');
         
         $this->load->model("ApplicationModel");
+        $this->load->model('GroupApplicationModel');
         
         $this->ApplicationModel->deleteApplication($idapp);
         
@@ -1231,11 +1397,66 @@ class Admin extends Backend_Controller {
                 $data['editmodal'] .= '<span class="input-group-addon"><i></i></span></div></div><div class="form-group"><label>Icon</label><div class="input-group iconpicker-container">';
                 $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$a['AppIcon'].'" type="text">';
                 $data['editmodal'] .= '<span class="input-group-addon"><i class="fa fa-archive"></i></span></div></div>';
+                
+                $data['editmodal'] .= '<hr/><div class="appmenu">';
+                
+                $applicationsmenu = $this->GroupApplicationModel->getApplicationsMenu($a['IdApp']);
+                
+                if(isset($applicationsmenu["ApplicationMenu"]))
+                {
+                    $data['editmodal'] .= "<div class='row'>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Manage</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Application Menu Name</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Link</label>';
+                    $data['editmodal'] .= " </div></div>";
+                    $data['editmodal'] .= "<div class='col-xs-3'>";
+                    $data['editmodal'] .= " <div class='form-group'>";
+                    $data['editmodal'] .= '<label>Icon</label>';
+                    $data['editmodal'] .= " </div></div></div>";
+                    
+                    foreach($applicationsmenu["ApplicationMenu"] as $am)
+                    {
+                        $data['editmodal'] .= "<div class='row'>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<button class="btn btn-danger float-right btnDeleteAppMenu" type="button"><i class="fa  fa-minus" id="'.$am['IdAppMenu'].'"></i></button>';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= " <div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" id="hdIdAppMenu" placeholder='.$am['IdAppMenu'].' type="hidden" />';
+                        $data['editmodal'] .= '<input class="form-control" placeholder='.$am['AppMenuName'].' type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<input class="form-control" placeholder="'.$am['AppMenuLink'].'" type="text" />';
+                        $data['editmodal'] .= "</div></div>";
+                        $data['editmodal'] .= "<div class='col-xs-3'>";
+                        $data['editmodal'] .= "<div class='form-group'>";
+                        $data['editmodal'] .= '<div class="input-group iconpicker-container">';
+                        $data['editmodal'] .= '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="'.$am['AppMenuIcon'].'" type="text">';
+                        $data['editmodal'] .= '<span class="input-group-addon">';
+                        $data['editmodal'] .= '<i class="fa fa-archive"></i></span>';
+                        $data['editmodal'] .= "</div></div></div></div>";
+                    }
+                }
+                
+                $data['editmodal'] .= '<button class="btn btn-primary float-right btnAddNewAppMenu" type="button"><i class="fa  fa-plus"></i></button>';
+                
+                
+                $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '<div class="modal-footer text-center">';
                 $data['editmodal'] .= '<div class="form-group input-group pull-left">';
                 $data['editmodal'] .= '<button class="btn btn-danger bntDeleteApplication" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i> Delete Application</button>';
-                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-trash-o" id="'.$a['IdApp'].'"></i>Save</button>';
+                $data['editmodal'] .= '<button class="btn btn-primary btnEditApplication pull-right" type="button"><i class="fa  fa-floppy-o" id="'.$a['IdApp'].'"></i> Save</button>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
                 $data['editmodal'] .= '</div>';
@@ -1244,5 +1465,38 @@ class Admin extends Backend_Controller {
         }
         
         echo json_encode($data);
+    }
+    
+    public function deleteApplicationMenu()
+    {
+        $idappmenu = $this->input->post('IdAppMenu');
+        
+        $this->load->model("ApplicationModel");
+        
+        $this->ApplicationModel->deleteApplicationMenu($idappmenu);
+        
+        echo json_encode(true);
+    }
+    
+    public function insertApplicationMenu()
+    {
+        $idapp = $this->input->post('IdApp');
+        $appmenuname = $this->input->post('AppMenuName');
+        $appmenulink = $this->input->post('AppMenuLink');
+        $appmenuicon = $this->input->post('AppMenuIcon');
+    
+        $this->load->model("ApplicationModel");
+        
+        $insertedid = $this->ApplicationModel->insertApplicationMenu($idapp, $appmenuname, $appmenulink, $appmenuicon);
+        
+        echo json_encode($insertedid);
+        
+    }
+    
+    public function updateApplicationMenu()
+    {
+        $data = $this->input->post('Data');
+        
+        print_r($data);
     }
 }

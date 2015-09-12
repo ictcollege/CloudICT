@@ -593,7 +593,14 @@ $(document).ready(function() {
         //refresh on close modal 
         
         $('.mEditGroupApplication').on('hidden.bs.modal', function () {
-                window.location.href = "admin/privileges";
+            window.location.href = "admin/privileges";
+        });
+        
+        $('.mEditApplication').on('hidden.bs.modal', function () {
+            $(".tbApplicationName").val("");
+            $(".tbLink").val("");
+            
+            numofnewmenuapplications=0;
         });
         
         //colorpicker
@@ -688,7 +695,8 @@ $(document).ready(function() {
                 name = $(this).parent().parent().parent().find(".tbApplicationName"),
                 link = $(this).parent().parent().parent().find(".tbLink"),
                 color = $(this).parent().parent().parent().find(".tbNewColor").val(),
-                icon = $(this).parent().parent().parent().find(".tbNewIcon").val();
+                icon = $(this).parent().parent().parent().find(".tbNewIcon").val(),
+                data;
             
             if(name.val() == "") {
                 name = name.attr("placeholder");
@@ -702,11 +710,27 @@ $(document).ready(function() {
                 link = link.val();
             }
             
+            var appmenus = [],
+            eachinputfield = $(this).parent().parent().parent().find(".appmenu").find(".row").find(".form-group").find("input.form-control:not(.iconpicker-search)"),
+            i = 0;
+
+            
+            eachinputfield.each(function() {
+               
+                if($(this).val()=="") {
+                    data = $(this).attr("placeholder");
+                } else {
+                    data = $(this).val();
+                }
+                
+                appmenus.push(data);
+            });
+                
             $.ajax({
                 url: 'admin/editApplication',
                 type: 'post',
                 dataType: 'json',
-                data:{IdApp:id,Name:name,Link:link,Color:color,Icon:icon},
+                data:{IdApp:id,Name:name,Link:link,Color:color,Icon:icon,AppMenus:appmenus},
                 success: function(resposne) {
                     $('#mEditApplication'+id).modal('hide');
                     
@@ -994,8 +1018,81 @@ $(document).ready(function() {
                         }
                     });
                 }
+        });
+        
+        
+        //addind new app menu item
+        
+        var numofnewmenuapplications = 0;
+        $(document).on("click", ".btnAddNewAppMenu", function() {
+            var content = '',
+                appmenuname = "New "+numofnewmenuapplications,
+                appmenulink = "Link "+numofnewmenuapplications,
+                appmenuicon = "fa-archive",
+                idapp = $(this).parent().parent().parent().parent().parent().attr("aria-labelledby"),
+                _this = $(this);
                 
+            $.ajax({
+                url: 'admin/insertApplicationMenu',
+                type: 'post',
+                dataType: 'json',
+                data:{IdApp:idapp,AppMenuName:appmenuname,AppMenuLink:appmenulink,AppMenuIcon:appmenuicon},
+                success: function(response) {
+                    content += "<div class='row row"+numofnewmenuapplications+"'>";
+                    content += "<div class='col-xs-3'>";
+                    content += " <div class='form-group'>";
+                    content += '<button class="btn btn-danger float-right btnDeleteAppMenu" type="button"><i class="fa  fa-minus" id="N_'+numofnewmenuapplications+'"></i></button>';
+                    content += "</div></div>";
+                    content += "<div class='col-xs-3'>";
+                    content += " <div class='form-group'>";
+                    content += '<input class="form-control" id="hdIdAppMenu" placeholder="'+response+'" type="hidden" />';
+                    content += '<input class="form-control" placeholder="New '+numofnewmenuapplications+'" type="text" />';
+                    content += "</div></div>";
+                    content += "<div class='col-xs-3'>";
+                    content += "<div class='form-group'>";
+                    content += '<input class="form-control" placeholder="Link '+numofnewmenuapplications+'" type="text" />';
+                    content += "</div></div>";
+                    content += "<div class='col-xs-3'>";
+                    content += "<div class='form-group'>";
+                    content += '<div class="input-group iconpicker-container">';
+                    content += '<input data-placement="bottomRight" class="form-control icp icp-auto iconpicker-element iconpicker-input tbNewIcon" value="fa-archive" type="text">';
+                    content += '<span class="input-group-addon">';
+                    content += '<i class="fa fa-archive"></i></span>';
+                    content += "</div></div></div></div>";
                     
-        })
-    
+                    _this.hide();
+            
+                    _this.parent().append(content);
+                    _this.parent().append('<button class="btn btn-primary float-right btnAddNewAppMenu" type="button"><i class="fa  fa-plus"></i></button>');
+
+                    _this.remove();
+
+                    $(".row"+numofnewmenuapplications).hide(0);
+
+                    $(".row"+numofnewmenuapplications).slideDown(1000);
+
+                    $(".iconpicker-element").iconpicker();
+                }
+            });
+            
+            numofnewmenuapplications++;
+        });
+        
+        $(document).on("click", ".btnDeleteAppMenu", function() {
+            var id = $(this).find("i").attr("id");
+            
+            $(this).parent().parent().parent().hide(400);
+            setTimeout(function() {
+                $(this).parent().parent().parent().remove();
+            }, 800);
+            
+            $.ajax({
+                url: 'admin/deleteApplicationMenu',
+                type: 'post',
+                dataType: 'json',
+                data:{IdAppMenu:id},
+                success: function(response) {
+                }
+            });
+        });
 });
