@@ -369,6 +369,6 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                 
         $data['title'] = "ICT Cloud | User | User Notifications";
         
-        $this->load->view("")
+        $this->load->view("");
     }
 }

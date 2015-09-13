@@ -57,7 +57,7 @@
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a href="#" id="newFolder">Folder</a></li>
-                                    <li><a href="#">File</a></li>
+                                    <li><a href="#" id="newFile">File</a></li>
                                 </ul>
                             </div> 
                             <!-- The global file processing state -->
@@ -415,6 +415,29 @@
         });
     }
     $(document).ready(function(){
+        //kreiranje novog file-a
+        //new file
+        $("#newFile").click(function (e){
+            e.preventDefault();
+            var IdFolder = $("#current_dir").val();
+            var Mask = $("#current_path").val();
+            var file = prompt("File name");
+            if(file.length>0){
+                $("#errorMsg").text('');
+                $.ajax({
+			url: "<?php echo base_url();?>CloudFiles/",
+                        data:{action:"newFile",Mask:Mask,File:file,IdFolder : IdFolder},
+			success: function(data) {
+                           window.location.reload();
+			}
+			
+		});
+            }
+            else{
+              $("#errorMsg").text("Please give file some name!");  
+            }
+        });
+        
         //kreiranje foldera
         //new folder 
         $("#newFolder").click(function (e){

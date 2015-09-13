@@ -604,14 +604,15 @@ $(document).ready(function() {
         });
         
         //colorpicker
-        $(function(){
-            $('.demo2').colorpicker();
-        });
-        
+        if($('.demo2').length>0){
+            $(function(){
+                $('.demo2').colorpicker();
+            });
+        }
         //iconpicker
-        
+        if($(".iconpicker-element").length>0){
         $(".iconpicker-element").iconpicker();
-        
+        }
         // creating application 
         $(document).on("click", ".btnCreateApplication", function() {
             var name = $(".tbNewApplicationName"),
