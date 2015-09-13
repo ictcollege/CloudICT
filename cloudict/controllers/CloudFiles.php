@@ -40,6 +40,11 @@ class CloudFiles extends File_Controller{
                     $IdFile = intval($_GET['IdFile']);
                     $this->renameFile($IdFile, $newName);
                     break;
+                case "newFile":
+                    $clean = trim($_GET['File']);
+                    $newFile = rawurlencode(preg_replace('/\s+/', '_', $clean));
+                    $this->newFile($newFile,$_GET['Mask'],intval($_GET['IdFolder']));
+                    break;
             }
             
         }
@@ -83,7 +88,39 @@ class CloudFiles extends File_Controller{
         }
     }
 
-    
+    protected function newFile($fileName,$FilePath='',$IdFolder=0) {
+        if($IdFolder == 0){
+            $filepath = $this->get_upload_path($fileName);
+        }
+        else{
+            
+            $filepath = $this->get_upload_path($FilePath.$fileName);
+        }
+        if(file_exists($filepath)){
+            $filepath = $this->upcount_name($filepath);
+        }
+        $filepath = strtolower($filepath);
+        $create = fopen($filepath,"w");
+        fclose($create);
+        if(file_exists($filepath)){
+            $size = $this->get_file_size($filepath);
+            $ext = pathinfo($filepath,PATHINFO_EXTENSION);
+            $mime = $this->get_mime($fileName);
+            $this->load->model("FileModel");
+            $file_type = $this->FileModel->getFileType($mime);
+             $this->FileModel->insertUserFile($this->get_user_id(),$file_type,$IdFolder,$ext,$fileName,$filepath,$size);
+            die(TRUE);
+        }
+       
+
+        
+       
+
+       
+        
+       
+        
+    }
     
         /**
      * generates random string
@@ -283,21 +320,78 @@ class CloudFiles extends File_Controller{
         return parent::get_download_url($file_name, $this->Mask.$version, $direct);
     }
     
+    protected function get_mime($filename) {
+        if(!function_exists('mime_content_type')) {
+            return $this->my_mime_content_type($filename);
+        }
+        else{
+            return mime_content_type($filename);
+        }
+    }
     
-    
-    
-    
-    
-    
-    
-  
+    protected  function my_mime_content_type($filename){
+        $mime_types = array(
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'php' => 'text/html',
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'swf' => 'application/x-shockwave-flash',
+            'flv' => 'video/x-flv',
+            // images
+            'png' => 'image/png',
+            'jpe' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/vnd.microsoft.icon',
+            'tiff' => 'image/tiff',
+            'tif' => 'image/tiff',
+            'svg' => 'image/svg+xml',
+            'svgz' => 'image/svg+xml',
+            // archives
+            'zip' => 'application/zip',
+            'rar' => 'application/x-rar-compressed',
+            'exe' => 'application/x-msdownload',
+            'msi' => 'application/x-msdownload',
+            'cab' => 'application/vnd.ms-cab-compressed',
+            // audio/video
+            'mp3' => 'audio/mpeg',
+            'qt' => 'video/quicktime',
+            'mov' => 'video/quicktime',
+            // adobe
+            'pdf' => 'application/pdf',
+            'psd' => 'image/vnd.adobe.photoshop',
+            'ai' => 'application/postscript',
+            'eps' => 'application/postscript',
+            'ps' => 'application/postscript',
+            // ms office
+            'doc' => 'application/msword',
+            'rtf' => 'application/rtf',
+            'xls' => 'application/vnd.ms-excel',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            // open office
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        );
+
+        $tmp = explode('.', $filename);
+        $ext = strtolower(array_pop($tmp));
+        if (array_key_exists($ext, $mime_types)) {
+            return $mime_types[$ext];
+        } elseif (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME);
+            $mimetype = finfo_file($finfo, $filename);
+            finfo_close($finfo);
+            return $mimetype;
+        } else {
+            return 'text/plain';
+        }
+    }
     
 
-    
-    
-
-    
-
-
-    
 }
