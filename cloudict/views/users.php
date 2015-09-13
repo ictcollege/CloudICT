@@ -171,7 +171,6 @@ $(document).ready(function(){
                 dataType: 'json',
                 data:{Key:key,Email:email},
                 success: function(response) {
-                alert(response);
                 }
             });
         });

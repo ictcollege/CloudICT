@@ -759,7 +759,7 @@ class Admin extends Backend_Controller {
 
         $this->email->send();
 
-        echo json_encode(base_url()."user/register/".$key);
+        echo json_encode(true);
     }
     
     public function editUser()
@@ -1235,15 +1235,18 @@ class Admin extends Backend_Controller {
         $appmenulink = "";
         $appmenuicon = "";
         
-        $appmenus = array_chunk($appmenus, 4);
-        
-        foreach($appmenus as $am) {
-            $idappmenu = $am[0];
-            $appmenuname = $am[1];
-            $appmenulink = $am[2];
-            $appmenuicon = $am[3];
-            
-            $this->ApplicationModel->updateApplicationMenu($idappmenu, $idapp, $appmenuname, $appmenulink, $appmenuicon);
+        if(isset($appmenus))
+        {
+            $appmenus = array_chunk($appmenus, 4);
+
+            foreach($appmenus as $am) {
+                $idappmenu = $am[0];
+                $appmenuname = $am[1];
+                $appmenulink = $am[2];
+                $appmenuicon = $am[3];
+
+                $this->ApplicationModel->updateApplicationMenu($idappmenu, $idapp, $appmenuname, $appmenulink, $appmenuicon);
+            }
         }
         
         $data['applications'] = "";

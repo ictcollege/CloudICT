@@ -362,4 +362,13 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         //views
         $this->load_view('aboutictcloud', $data);
     }
+    
+    public function allnotifications()
+    {
+        $this->load->model('');
+                
+        $data['title'] = "ICT Cloud | User | User Notifications";
+        
+        $this->load->view("")
+    }
 }

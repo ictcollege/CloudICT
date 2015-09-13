@@ -138,22 +138,26 @@ $(document).ready(function () {
 			foreach($notifications as $red){
 				echo "<li>";
 				echo"<a href='".base_url().$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
-				echo"<span class='image' style='margin-right:10px'>";
+				echo"<span class='image' style='margin-right:30px'>";
 				echo"<i class='".$red['NotificationTypeIcon']."'></i>";
 				echo"</span>";
 				echo"<span>";
 				echo"<span>".$red['NotificationTypeName']."</span>";
-				echo"<span class='time'>".gmdate("d-M H:i", $red['UserNotificationCreated']+2*60*60)."</span>";
 				echo"</span><br/>";
-				echo"<span>from ".$red['UserFullname']."</span>";
-				echo"<span class='message'>";
-				echo $red['UserNotificationDescription'];
-				echo"</span>";
 				echo"</a>";
 				echo"</li>";
-				
+				echo "<i class='divider'></i>";
+                                echo "<li>";
+				echo"<a href='".base_url().$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
+				echo"<span class='image' style='margin-right:30px'>";
+				echo"<i class='".$red['NotificationTypeIcon']."'></i>";
+				echo"</span>";
+				echo"<span>";
+				echo"<span>".$red['NotificationTypeName']."</span>";
+				echo"</span><br/>";
+				echo"</a>";
+				echo"</li>";
 		}
-		
 		?>
 								
                                    
