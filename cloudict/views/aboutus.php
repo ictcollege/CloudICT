@@ -29,9 +29,17 @@
                     
                     <div class="panel-body application-panel">
                        <div class="jumbotron">
-                           <img src="" class="img-circle img-responsive pull-right"/>
-                        <h3>Nikola Matic</h3>
-                    </div> 
+                           <img src="<?php echo $base_url;?>/public/img/nikolam.jpg" class="img-circle img-responsive pull-right"/>
+                            <h3>Nikola Matić</h3>
+                            
+                            <div class="more pull-right">
+                                <p>Back-End Developer na ovom projektu. Radio na dizajnu i održavanju baze podataka, kao i na sistemu obaveštavanja korisnika putem notifikacija.</p>
+                            </div>
+                            
+                            <div class="more2">
+                                <p>Back-End Developer na ovom projektu. Radio na dizajnu i održavanju baze podataka, kao i na sistemu obaveštavanja korisnika putem notifikacija.</p>
+                            </div>
+                        </div>
                    </div>
                     
                     <div class="panel-body application-panel">
@@ -58,7 +66,7 @@
                     <div class="panel-body application-panel">
                        <div class="jumbotron">
                            <img src="" class="img-circle img-responsive pull-right"/>
-                        <h3>Goran X</h3>
+                        <h3>Goran Petrovic</h3>
                     </div> 
                    </div>
                 </div>
