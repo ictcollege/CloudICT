@@ -6,26 +6,38 @@
 
                     <div class="panel-body application-panel">
                         <?php
-                            echo "<ul style='padding-top:15px; list-style-type:none;'>";
-                         foreach($notifications as $red){
-                                             echo "<li style='padding:15px; background-color:#fff; margin-top:5px;'>";
-                                             echo"<a href='".$base_url.$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
-                                             echo"<span class='image' style='margin-right:10px'>";
+                        if(count($notifications)!=0)
+                        {
+                            foreach($notifications as $red)
+                            {
 
-                                             echo"<span class='time'>".gmdate("d-m-Y H:i:s", $red['UserNotificationCreated']+2*60*60)."</span>";
-                                             echo"</span>";
-                                             echo"<span>from ".$red['UserFullname']."</span>&nbsp&nbsp&nbsp";
-                                             echo"<span class='message'>";
-                                             echo $red['UserNotificationDescription'];
-                                             echo"</span>";
-                                             echo"</a>";
-                                             echo"</li>";
+                                echo '<div class="panel panel-primary">';
+                                echo '<div class="panel-heading">';
+                                echo '<div class="row">';
+                                echo '<div class="col-xs-3">';
+                                echo '<i class="fa '.$red['NotificationTypeIcon'].' fa-2x"></i>';
+                                echo '</div>';
+                                echo '<div class="col-xs-9 text-right">';
+                                echo '<div class="small">'.gmdate("d-m-Y H:i:s", $red['UserNotificationCreated']+2*60*60).'</div>';
+                                echo '<div>by '.$red['UserFullname'].'</div>';
+                                echo '</div>';
+                                echo '</div>';
+                                echo '</div>';;
+                                echo '<div class="panel-footer">';
+                                echo '<span class="pull-left" style="color: #333;">'.$red['UserNotificationDescription'].'</span>';
+                                echo '<div class="clearfix"></div>';
+                                echo '</div>';
+                                echo '</div>';
 
-                             }
-                             echo"</ul>";
+                            }
+                        }
+                        else 
+                        {
+                            echo '<h3 class="text-center">No New Notification</h3>';
+                        }
                         ?>
-                    </div>
-                </div>
+                        
+                   </div>
             </div>
             </div>
 </div>

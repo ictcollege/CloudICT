@@ -70,7 +70,7 @@ class NotificationModel extends CI_Model {
 			JOIN `notificationtype`
 			USING(`IdNotificationType`)
 			
-			WHERE `UserNotificationStatus` = 0 AND `IdUser`=?
+			WHERE `UserNotificationStatus` = 0 AND `IdUser`=? AND `UserNotificationTimeExpires` = 0
 		";
 		
 

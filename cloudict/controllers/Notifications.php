@@ -29,13 +29,13 @@ class Notifications extends MY_Controller{
 	
 	
 	
-	public function allNotifications() {
-        $data['base_url']=  base_url();
-       
-		$data['allnotifications']=  $this->NotificationModel->getAllNotifications($this->session->userdata('userid'));
-		
-        $this->load->view('allnotifications',$data);
-    }
+//	public function allNotifications() {
+//        $data['base_url']=  base_url();
+//       
+//		$data['allnotifications']=  $this->NotificationModel->getAllNotifications($this->session->userdata('userid'));
+//		
+//        $this->load->view('allnotifications',$data);
+//    }
 	
 	public function updateExpire(){
 		

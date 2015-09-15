@@ -758,8 +758,8 @@ class Admin extends Backend_Controller {
         $this->email->message(base_url()."user/register/".$key);	
 
         $this->email->send();
-
-        echo json_encode(true);
+        
+        echo $this->email->print_debugger();
     }
     
     public function editUser()
