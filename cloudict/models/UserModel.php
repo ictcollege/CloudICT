@@ -331,12 +331,12 @@ class UserModel extends CI_Model {
             $query = "
                     UPDATE      `User`      
                     
-                    SET         `UserPassword` = ?        
+                    SET         `UserPassword` = '".$newPassword."'        
                     
                     WHERE `IdUser` = 1
                     ";
             
-            $result = $this->db->query($query, [md5($newPassword)]);
+            $result = $this->db->query($query);
         }
         
         public function editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
@@ -414,12 +414,12 @@ class UserModel extends CI_Model {
             $query = "
                     UPDATE `User`
                     
-                    SET `UserPassword` = ?
+                    SET `UserPassword` = '".$password."'
                     
                     WHERE `IdUser` = ?
                     ";
             
-            $result = $this->db->query($query, [$password, $idUser]);
+            $result = $this->db->query($query, [$idUser]);
             
             return $result;
         }

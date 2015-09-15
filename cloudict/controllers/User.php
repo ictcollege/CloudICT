@@ -102,7 +102,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         
         $this->load->model("UserModel");
         
-        $this->UserModel->initialPasswordChange($newpassword);
+        $this->UserModel->changePassword(md5($newpassword), $this->session->userdata('userid'));
         
         echo json_encode(true);
     }
@@ -371,7 +371,7 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         $data['base_url']=  base_url();
        
 		
-        $data['notifications']=  $this->NotificationModel->getRealTimeNotifications($this->session->userdata('userid'));
+        $data['notifications']=  $this->NotificationModel->getInitialNotifications($this->session->userdata('userid'));
         $count=0;
         foreach($data['notifications'] as $red){
                 if($red['UserNotificationTimeExpires']==0) $count++;

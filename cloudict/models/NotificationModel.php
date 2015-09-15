@@ -11,16 +11,18 @@ class NotificationModel extends CI_Model {
 	public function getInitialNotifications($IdUser)
 	{
 		$query = "
-			SELECT	`IdUserNotification`,
-					`NotificationTypeName`,
-					`NotificationTypeIcon`,
-					`AppLink`,
-					`AppIcon`,
-					`IdEvent`,
-					`UserFullname`,
-					`UserNotificationDescription`,
-					`UserNotificationCreated`,
-					`UserNotificationTimeExpires`
+			SELECT	
+                                `IdNotificationType`,
+                                `IdUserNotification`,
+                                `NotificationTypeName`,
+                                `NotificationTypeIcon`,
+                                `AppLink`,
+                                `AppIcon`,
+                                `IdEvent`,
+                                `UserFullname`,
+                                `UserNotificationDescription`,
+                                `UserNotificationCreated`,
+                                `UserNotificationTimeExpires`
 					
 			FROM 	`usernotification`
 			
@@ -30,7 +32,7 @@ class NotificationModel extends CI_Model {
 			JOIN `notificationtype`
 			USING(`IdNotificationType`)
 			
-			WHERE `IdUser`=?
+			WHERE `IdUser`=? AND `UserNotificationTimeExpires` = 0
 			ORDER BY `UserNotificationCreated` DESC
 			LIMIT 6
 		";
@@ -52,15 +54,15 @@ class NotificationModel extends CI_Model {
 	{
 		$query = "
 			SELECT	`IdUserNotification`,
-					`NotificationTypeName`,
-					`NotificationTypeIcon`,
-					`AppLink`,
-					`AppIcon`,
-					`IdEvent`,
-					`UserFullname`,
-					`UserNotificationDescription`,
-					`UserNotificationCreated`,
-					`UserNotificationTimeExpires`
+                                `NotificationTypeName`,
+                                `NotificationTypeIcon`,
+                                `AppLink`,
+                                `AppIcon`,
+                                `IdEvent`,
+                                `UserFullname`,
+                                `UserNotificationDescription`,
+                                `UserNotificationCreated`,
+                                `UserNotificationTimeExpires`
 					
 			FROM 	`usernotification`
 			
@@ -98,15 +100,15 @@ class NotificationModel extends CI_Model {
 	public function getAllNotifications($IdUser){
 		$query = "
 			SELECT	`IdUserNotification`,
-					`NotificationTypeName`,
-					`NotificationTypeIcon`,
-					`AppLink`,
-					`AppIcon`,
-					`IdEvent`,
-					`UserFullname`,
-					`UserNotificationDescription`,
-					`UserNotificationCreated`,
-					`UserNotificationTimeExpires`
+                                `NotificationTypeName`,
+                                `NotificationTypeIcon`,
+                                `AppLink`,
+                                `AppIcon`,
+                                `IdEvent`,
+                                `UserFullname`,
+                                `UserNotificationDescription`,
+                                `UserNotificationCreated`,
+                                `UserNotificationTimeExpires`
 					
 			FROM 	`usernotification`
 			

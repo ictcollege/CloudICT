@@ -11,7 +11,16 @@
                             foreach($notifications as $red)
                             {
 
-                                echo '<div class="panel panel-primary">';
+                                echo '<div class="panel ';
+                                
+                                if($red["IdNotificationType"] == 10) 
+                                {
+                                    echo 'panel-primary">';
+                                }
+                                else if($red["IdNotificationType"] == 2)
+                                {
+                                    echo 'panel-danger">';
+                                }
                                 echo '<div class="panel-heading">';
                                 echo '<div class="row">';
                                 echo '<div class="col-xs-3">';

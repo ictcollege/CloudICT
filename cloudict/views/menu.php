@@ -53,10 +53,12 @@
 								<?php
 		if($count==0){
 		echo "<li><div class='text-center'><strong></strong></div></li>";}
-		
-			foreach($notifications as $red){
+                        if(count($notifications)!=0)
+                        {
+                            foreach($notifications as $red)
+                            {
 				echo "<li>";
-				echo"<a href='".base_url().$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
+				echo"<a href='".base_url()."user/allnotifications'>";
 				echo"<span class='image' style='margin-right:35px'>";
 				echo"<i class='".$red['NotificationTypeIcon']."'></i>";
 				echo"</span>";
@@ -66,21 +68,32 @@
 				echo"</a>";
 				echo"</li>";
 				echo "<i class='divider'></i>";
+                            }
+                        }
+                        else 
+                        {
+                            echo "<li>";
+                            echo "<a href='".base_url()."user/allnotifications'>";
+                            echo "<span>No New Notifications</span>";
+                            echo"</a>";
+                            echo"</li>";
+                        }
+			
                                 
-		}
+		
 		?>
 								
                                    
                                    
                                    
-                                    <li>
+<!--                                    <li>
                                         <div class="text-center">
                                             <a>
                                                 <strong><a href="<?php echo base_url(); ?>user/allnotifications">See All Alerts</strong>
                                                 <i class="fa fa-angle-right"></i>
                                             </a>
                                         </div>
-                                    </li>
+                                    </li>-->
                       <!--  <li class="divider"></li>
                         <li>
                             <a href="#">

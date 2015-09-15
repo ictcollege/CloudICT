@@ -57,7 +57,7 @@ $(document).ready(function(){
                        
                        $(".panel-body").children().remove();
                        $(".panel-body").hide();
-                       $(".panel-body").append('<div class="form-group"><input type="password" class="form-control tbPassword" placeholder="New Password" name="password" /></div>');
+                       $(".panel-body").append('<div class="form-group"><input type="password" class="form-control tbInitialPassword" placeholder="New Password" name="password" /></div>');
                        $(".panel-body").append('<div class="form-group"><input type="password" class="form-control tbConfirmPassword" placeholder="Confirm Password" name="password" /></div>');
                        $(".panel-body").append('<a  class="btn btn-lg btn-success btn-block btnChangePassword">Change Password</a>');
                        $(".panel-body").append('<div class="login-error"></div>');
@@ -93,7 +93,7 @@ $(document).ready(function(){
     });
     
     $(document).on("click", ".btnChangePassword", function() {
-        var newpassword = $(".tbPassword"),
+        var newpassword = $(".tbInitialPassword"),
             newpasswordconfirm = $(".tbConfirmPassword"),
             error = false;
             
@@ -152,7 +152,7 @@ $(document).ready(function(){
                         $(".panel-body").children().remove();
                         $(".panel-body").hide();
                         $(".panel-body").append('<h3 class="h3-succes text-center">Passwrod Change Successfully</h3>');
-                        $(".panel-body").append('<a  href="admin/" class="btn btn-lg btn-success btn-block btnChangePassword">Proceed To Cloud</a>');
+                        $(".panel-body").append('<a  href="admin/" class="btn btn-lg btn-success btn-block">Proceed To Cloud</a>');
                         $(".panel-body").slideDown(800);
                     }
                 }); 
