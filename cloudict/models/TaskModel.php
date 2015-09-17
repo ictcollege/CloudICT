@@ -7,7 +7,8 @@ class TaskModel extends CI_Model
 
     public function getTask($IdTask)
     {
-        return $this->db->get_where('Task', ["IdTask", $IdTask])->result_array();
+        $this->db->where("IdTask", $IdTask);
+        return $this->db->get("Task")->result_array();
     }
 
     /**
@@ -19,7 +20,7 @@ class TaskModel extends CI_Model
     {
 
         $query = "
-            SELECT t.idTask, TaskName, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType, tu.IdUser AS AssignedUser
+            SELECT t.IdTask, TaskName, TaskDescription, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType, tu.IdUser AS AssignedUser
             FROM Task AS  t JOIN TaskUser AS tu ON t.IdTask = tu.IdTask
             WHERE tu.idUser = ?
         ";
@@ -43,7 +44,7 @@ class TaskModel extends CI_Model
     public function getGivenTasks($currentUserID)
     {
         $query = "
-            SELECT idTask, TaskName, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType
+            SELECT IdTask, TaskName, TaskDescription, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType
             FROM Task
             WHERE idUser = ?
         ";
@@ -74,16 +75,17 @@ class TaskModel extends CI_Model
             'TaskName' => $taskName,
             'TaskDescription' => $taskDescription,
             //'TimeCreated' => date("Y-m-d H:i:s"),
-            'TimeCreated' => 1,
-            'TimeToExecute' => $timeToExecute,
-            'ExecuteType' => $executeType
+            'TaskTimeCreated' => 1,
+            'TaskTimeToExecute' => $timeToExecute,
+            'TaskExecuteType' => $executeType
         );
 
-        $insertID = $this->db->insert('Task', $data)->insert_id();
+        $this->db->insert('Task', $data);
+        $insertID = $this->db->insert_id();
 
-        if ($insertID != null) {
+        //if ($insertID != null) {
 
-            if (!empty($assignedUser)) {
+            //if (!empty($assignedUser)) {
                 $taskUserData = array();
                 foreach ($assignedUser as $user) {
                     array_push($taskUserData, array(
@@ -94,12 +96,12 @@ class TaskModel extends CI_Model
                     ));
                 }
                 return $this->db->insert_batch('TaskUser', $taskUserData);
-            }
+            //}
 
             return true;
-        }
+        //}
 
-        return false;
+        //return false;
     }
 
 

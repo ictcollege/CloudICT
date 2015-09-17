@@ -14,8 +14,6 @@ class Tasks extends CI_Controller
     private $base_url;
     private $Groups;
 
-    private static $times_called;
-
     /**
      * Tasks constructor.
      */
@@ -33,8 +31,8 @@ class Tasks extends CI_Controller
 //        else redirect('/User');
 
 
-        $this->userID = 2;
-        $this->Username = "user";
+        $this->userID = 1;
+        $this->Username = "admin";
 
         $this->load->model('TaskModel');
         $this->load->model('UserModel');
@@ -42,7 +40,6 @@ class Tasks extends CI_Controller
         $this->base_url = base_url();
 
         $this->Groups = $this->UserModel->getAllUsersInGroups($this->userID);
-        Tasks::$times_called++;
     }
 
 
@@ -53,9 +50,17 @@ class Tasks extends CI_Controller
     {
         $tasks['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
         $tasks['given'] = $this->TaskModel->getGivenTasks($this->userID);
-        $task['base_url'] = $this->base_url;
+        $tasks['base_url'] = $this->base_url;
+        $tasks['title'] = "Tasks";
+        $tasks['count'] = 5;
+        $tasks['notifications'] = array();
         $tasks['base_url'] = base_url();
-        $this->load->view("Task/Show", $tasks);
+
+
+        $this->load->view("header", $tasks);
+        $this->load->view("menu", $tasks);
+        $this->load->view("Task/ShowAllTasks", $tasks);
+        $this->load->view("footer", $tasks);
 }
 
     /**
@@ -69,10 +74,15 @@ class Tasks extends CI_Controller
                 $adminGroups[$Group] = $users;
             }
         }
-
+        $data['title'] = "Tasks";
+        $data['count'] = 5;
         $data['Groups'] = $adminGroups;
         $data['base_url'] = base_url();
+        $this->load->view("header", $data);
+        $this->load->view("menu", $data);
         $this->load->view("Task/Create", $data);
+        $this->load->view("footer", $data);
+
     }
 
     /**
@@ -81,15 +91,15 @@ class Tasks extends CI_Controller
     public function store()
     {
         $this->load->helper('form');
-        $taskName = $this->input->post('taskName');
-        $taskDescription = $this->input->post('taskDescription');
-        $timeToExecute = $this->input->post('timeToExecute');
-        $executeType = $this->input->post('executeType');
-        $assignedUserIDs = array_unique($this->input->post('Users'));
+        $taskName = $this->input->post('TaskName');
+        $taskDescription = $this->input->post('TaskDescription');
+        $timeToExecute = 0;
+        $executeType = $this->input->post('isGroupTask');
+        $assignedUserIDs = array_unique(explode(",", $this->input->post('Users')));
 
         $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription,
             $timeToExecute, $executeType, $assignedUserIDs);
-        redirect('Task/Index');
+        redirect('Tasks/Index');
     }
 
     /**
@@ -126,11 +136,16 @@ class Tasks extends CI_Controller
     {
         if($this->UserCanEditTask($taskID)) {
             $this->TaskModel->removeTask($taskID);
-            redirect("Task/Show");
+            redirect("Tasks/Index");
         }
         else {
             $data['Error'] = "You do not have premission to delete this task";
+            $data['base_url'] = base_url();
+            $data['count'] = 5;
+            $this->load->view("header", $data);
+            $this->load->view("menu", $data);
             $this->load->view("Task/Error", $data);
+            $this->load->view("footer", $data);
         }
     }
 
@@ -152,8 +167,10 @@ class Tasks extends CI_Controller
 
     private function UserCanEditTask($IdTask)
     {
+        echo "Hello World";
         $task = $this->TaskModel->getTask($IdTask);
         if(!empty($task)) {
+            echo "Hello World";
             if ($task[0]['IdUser'] == $this->userID)
                 return true;
         }
