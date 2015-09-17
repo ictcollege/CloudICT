@@ -60,7 +60,6 @@ class Tasks extends CI_Controller
         $this->load->view("header", $tasks);
         $this->load->view("menu", $tasks);
         $this->load->view("Task/ShowAllTasks", $tasks);
-        $this->load->view("footer", $tasks);
 }
 
     /**
@@ -81,7 +80,6 @@ class Tasks extends CI_Controller
         $this->load->view("header", $data);
         $this->load->view("menu", $data);
         $this->load->view("Task/Create", $data);
-        $this->load->view("footer", $data);
 
     }
 
@@ -94,7 +92,7 @@ class Tasks extends CI_Controller
         $taskName = $this->input->post('TaskName');
         $taskDescription = $this->input->post('TaskDescription');
         $timeToExecute = 0;
-        $executeType = $this->input->post('isGroupTask');
+        $executeType = $this->input->post('isGroupTask') == null ? false : true;
         $assignedUserIDs = array_unique(explode(",", $this->input->post('Users')));
 
         $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription,
@@ -108,9 +106,22 @@ class Tasks extends CI_Controller
      */
     public function show($taskID)
     {
-        //$taskID = $this->input->post('taskID');
-        $task['task'] = $this->TaskModel->getTask($taskID);
-        $this->load->view("TaskInfo", $task);
+        if($this->UserCanSeeTask($taskID)){
+            $data['Task'] = $this->TaskModel->getTask($taskID);
+            $data['base_url'] = base_url();
+            $data['count'] = 5;
+            $this->load->view("header", $data);
+            $this->load->view("menu", $data);
+            $this->load->view("Task/Details", $data);
+        }
+        else{
+            $data["Error"] = "You do not have permision to see this Task";
+            $data['base_url'] = base_url();
+            $data['count'] = 5;
+            $this->load->view("header", $data);
+            $this->load->view("menu", $data);
+            $this->load->view("Task/Error", $data);
+        }
     }
 
     /**
@@ -145,7 +156,6 @@ class Tasks extends CI_Controller
             $this->load->view("header", $data);
             $this->load->view("menu", $data);
             $this->load->view("Task/Error", $data);
-            $this->load->view("footer", $data);
         }
     }
 
