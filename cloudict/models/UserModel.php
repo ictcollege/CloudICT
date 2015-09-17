@@ -1,8 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class UserModel extends CI_Model
-{
+class UserModel extends CI_Model {
 
     /**
      * Get All Users In Groups
@@ -23,18 +22,64 @@ class UserModel extends CI_Model
      *          )
      *      )
      *
-     * New Structure of returned Data:
-     *
-     *  Array (
-     *  [GroupName] => Array (
-     *      [Username] => Array ( [UserId] => value (int), [Status] => value (boolean) )
-     *      [UserName] => Array ( [UserId] => value (int), [Status] => value (boolean) )
-     *  )
-     *
      * @param int $IdUser
      * @return array
      */
-    public function getAllUsersInGroups($IdUser)
+//	public function getAllUsersInGroups($IdUser)
+//	{
+//		$query = "
+//			SELECT	`GroupName` AS `Group`,
+//				`UserName` AS `User`,
+//				`UserGroupStatusAdmin` AS `Admin`
+//
+//			FROM 	`User`
+//
+//			JOIN	`UserGroup`
+//			USING	(`IdUser`)
+//
+//			JOIN	`Group` AS `g`
+//			USING	(`IdGroup`)
+//
+//			WHERE	`g`.`IdGroup` IN (
+//							SELECT	`IdGroup`
+//							FROM	`UserGroup`
+//							WHERE	`IdUser` = ?
+//						 )
+//		";
+//
+//		$result = $this->db->query($query, [$IdUser])->result_array();
+//
+//		$data = array();
+//
+//		if(!empty($result)){
+//			foreach ($result as $row){
+//                    $data[$row['Group']][$row['User']] = $row['Admin'];
+//                        }
+//                }
+//
+//		$query2 = "
+//			SELECT	`GroupName` AS `Group`
+//
+//			FROM	`Group`
+//
+//			JOIN	`UserGroup`
+//			USING	(`IdGroup`)
+//
+//			WHERE	`IdUser` = ?
+//			AND	`UserGroupStatusAdmin` = 1
+//		";
+//
+//		$result2 = $this->db->query($query2, [$IdUser])->result_array();
+//
+//		$data['GroupAdmin'] = array();
+//
+//		if(!empty($result2))
+//			foreach ($result2 as $row) $data['GroupAdmin'][] = $row['Group'];
+//
+//		return $data;
+//	}
+
+    public function getAllUsersInGroupsWithId($IdUser)
     {
         $query = "
 			SELECT
@@ -63,7 +108,7 @@ class UserModel extends CI_Model
         $data = array();
 
         if (!empty($result)) {
-			//Data Restructuring
+            //Data Restructuring
             foreach ($result as $row) {
                 $data[$row['Group']] = array();
                 foreach ($result as $row2) {
@@ -77,29 +122,20 @@ class UserModel extends CI_Model
             }
 
         }
-
-
-//		$query2 = "
-//			SELECT	`GroupName` AS `Group`
-//
-//			FROM	`Group`
-//
-//			JOIN	`UserGroup`
-//			USING	(`IdGroup`)
-//
-//			WHERE	`IdUser` = ?
-//			AND	`UserGroupStatusAdmin` = 1
-//		";
-//
-//		$result2 = $this->db->query($query2, [$IdUser])->result_array();
-
-//		$data['GroupAdmin'] = array();
-//
-//		if(!empty($result2))
-//			foreach ($result2 as $row) $data['GroupAdmin'][] = $row['Group'];
-
-        return $data;
     }
+
+    public function getAllUsersInGroups($IdUser){
+        $query = "SELECT * FROM `usergroup` JOIN `group` ON usergroup.IdGroup = group.IdGroup WHERE usergroup.IdUser = ?";
+
+        $result = $this->db->query($query, [$IdUser]);
+        $query = "SELECT usergroup.IdUser,usergroup.IdGroup,usergroup.UserGroupStatusAdmin,user.UserName FROM usergroup JOIN user ON usergroup.IdUser = user.IdUser  WHERE usergroup.IdGroup = ?";
+        foreach($result->result() as $obj){
+            $obj->Users = $this->db->query($query, $obj->IdGroup)->result_array();
+        }
+        return $result->result();
+    }
+
+
 
     /**
      * Get User
@@ -109,14 +145,14 @@ class UserModel extends CI_Model
      * Structure of returned data:
      *      array (
      *          [User] => array (
-     *              [Id] => [UserId],
-     *               [User] => [UserName],
-     *               [Password] => [UserPassword],
-     *               [FullName] => [UserFullname],
-     *               [Email] => [UserEmail],
-     *               [DiskQuota] => [UserDiskQuota],
-     *               [DiskUsed] => [UserDiskUsed],
-     *               [Status] => [UserStatus],
+     *                          [Id] => [UserId],
+     *			   [User] => [UserName],
+     *			   [Password] => [UserPassword],
+     *			   [FullName] => [UserFullname],
+     *			   [Email] => [UserEmail],
+     *			   [DiskQuota] => [UserDiskQuota],
+     *			   [DiskUsed] => [UserDiskUsed],
+     *			   [Status] => [UserStatus],
      *          ),
      *          )
      *
@@ -128,6 +164,7 @@ class UserModel extends CI_Model
     {
         $query = "
 			SELECT	`IdUser` AS `Id`,
+                                `IdRole`,
 				`UserName` AS `User`,
 				`UserPassword` AS `Password`,
 				`UserFullname` AS `FullName`,
@@ -142,11 +179,11 @@ class UserModel extends CI_Model
 			AND `UserPassword` = ?
 		";
 
-        $result = $this->db->query($query, [$username, $password])->result_array();
+        $result = $this->db->query($query, [$username,$password])->result_array();
 
         $data['User'] = array();
 
-        if (!empty($result))
+        if(!empty($result))
             foreach ($result as $row) $data['User'] = $row;
         return $data;
     }
@@ -158,7 +195,7 @@ class UserModel extends CI_Model
      *
      * Structure of returned data:
      *      0: user doesnt exist
-     *       1: user exists
+     *	   1: user exists
      *
      * @param string $username
      * @return int
@@ -175,7 +212,7 @@ class UserModel extends CI_Model
 
         $result = $this->db->query($query, [$username])->result_array();
 
-        return !empty($result) ? 1 : 0;
+        return !empty($result)?1:0;
     }
 
     /**
@@ -185,7 +222,7 @@ class UserModel extends CI_Model
      *
      * Structure of returned data:
      *      0: user doesnt exist
-     *       1: user exists
+     *	   1: user exists
      *
      * @param string $email
      * @return int
@@ -202,7 +239,7 @@ class UserModel extends CI_Model
 
         $result = $this->db->query($query, [$email])->result_array();
 
-        return !empty($result) ? 1 : 0;
+        return !empty($result)?1:0;
     }
 
     /**
@@ -212,7 +249,7 @@ class UserModel extends CI_Model
      *
      * Structure of returned data:
      *      0: key expired
-     *       1: key is not expired
+     *	   1: key is not expired
      *
      * @param string $UserKey
      * @return int
@@ -230,10 +267,10 @@ class UserModel extends CI_Model
         $result = $this->db->query($query, [$UserKey])->result_array();
         $key = "";
 
-        if (!empty($result))
+        if(!empty($result))
             foreach ($result as $row) $key = $row["UserKeyExpires"];
 
-        return ($key > time()) ? 1 : 0;
+        return ($key > time())?1:0;
     }
 
     /**
@@ -255,7 +292,7 @@ class UserModel extends CI_Model
 			VALUES (?,?);
 		";
 
-        $result = $this->db->query($query, [$email, md5(time() + $email)]);
+        $result = $this->db->query($query, [$email,md5(time()+$email)]);
         $IdUser = $this->db->insert_id();
         $updateQuery = "
 			UPDATE `User` SET `UserName` = ?,
@@ -267,42 +304,8 @@ class UserModel extends CI_Model
 			WHERE IdUser = ?;
 		";
         $updateData = "user$IdUser";
-        $this->db->query($updateQuery, [$updateData, $updateData, $updateData, 5, time(), $IdUser]);
+        $this->db->query($updateQuery, [$updateData,$updateData,$updateData,5,time(),$IdUser]);
         return $IdUser;
-    }
-
-    /**
-     * Update User
-     *
-     * Returns int
-     *
-     * Structure of returned data:
-     *      0: user was not updated
-     *       1: user was updated
-     *
-     * @param int $IdUser
-     * @param array ($IdRole, $Username, $UserPassword, $UserFullname, $UserEmail, $UserStatus)
-     * @return int
-     */
-    public function updateUser($IdUser, $UserArray)
-    {
-        $IdRole = $UserArray[0];
-        $Username = $UserArray[1];
-        $UserPassword = $UserArray[2];
-        $UserFullname = $UserArray[3];
-        $UserEmail = $UserArray[4];
-        $UserStatus = $UserArray[5];
-        $updateQuery = "
-			UPDATE `User` SET `IdRole` = ?,
-				`UserName` = ?,
-				`UserPassword` = ?,
-				`UserFullname` = ?,
-				`UserEmail` = ?,
-				`UserStatus` = ?
-			WHERE IdUser = ?;
-		";
-        $result = $this->db->query($updateQuery, [$IdRole, $Username, $UserPassword, $UserFullname, $UserEmail, $UserStatus, $IdUser]);
-        return !empty($result) ? 1 : 0;
     }
 
     /**
@@ -312,7 +315,7 @@ class UserModel extends CI_Model
      *
      * Structure of returned data:
      *      0: UserDiskUsed was not updated
-     *       1: UserDiskUsed was updated
+     *	   1: UserDiskUsed was updated
      *
      * @param int $IdUser
      * @param int $UserDiskUsed
@@ -325,8 +328,226 @@ class UserModel extends CI_Model
 			
 			WHERE IdUser = ?;
 		";
-        $result = $this->db->query($updateQuery, [$UserDiskUsed, $IdUser]);
-        return !empty($result) ? 1 : 0;
+        $result = $this->db->query($updateQuery, [$UserDiskUsed,$IdUser]);
+        return !empty($result)?1:0;
+    }
+
+    public function getAllUsers()
+    {
+        $query = "
+                        SELECT * 
+                    
+                        FROM `User`
+                    ";
+
+        $result = $this->db->query($query)->result_array();
+
+        return $result;
+    }
+
+    public function getUserKey($idUser)
+    {
+        $query = "
+                    SELECT      `UserKey`
+                    
+                    FROM        `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+
+        $result = $this->db->query($query, [$idUser])->result_array();
+
+        $data = array();
+
+        if(!empty($result))
+        {
+            $i=0;
+            foreach($result as $row)
+            {
+                $data['Key'][$i++] = $row;
+            }
+        }
+
+        return $data;
+    }
+
+    public function initialPasswordChange($newPassword)
+    {
+        $query = "
+                    UPDATE      `User`      
+                    
+                    SET         `UserPassword` = '".$newPassword."'        
+                    
+                    WHERE `IdUser` = 1
+                    ";
+
+        $result = $this->db->query($query);
+    }
+
+    public function editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
+    {
+        $query = "
+                    UPDATE      `User`      
+                    
+                    SET         `UserName` = ?,
+                                `UserPassword` = ?,
+                                `UserFullname` = ?,
+                                `UserEmail` = ?,
+                                `UserDiskQuota` = ?,
+                                `UserDiskUsed` = ?,
+                                `UserStatus` = ?,
+                                `UserKey` = ?,
+                                `UserKeyExpires` = ?
+                                
+                    WHERE `IdUser` = ?
+                    ";
+
+        $result = $this->db->query($query, [$username, md5($password), $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires, $iduser]);
+    }
+
+    public function deleteUser($iduser)
+    {
+        $query = "
+                    DELETE 
+                    
+                    FROM `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+        $result = $this->db->query($query, [$iduser]);
+    }
+
+    public function getUserById($iduser)
+    {
+        $query = "
+                    SELECT * 
+                    
+                    FROM `User`
+                    
+                    WHERE `IdUser` = ?
+                    ";
+        $result = $this->db->query($query, [$iduser])->result_array();
+
+        return $result;
+    }
+
+    public function checkIfPasswordExists($password, $idUser)
+    {
+
+        $query = "
+                    SELECT * 
+                    
+                    FROM `User`
+                    
+                    WHERE `UserPassword` = '".$password."' AND `IdUser` = '".$idUser."'
+                    ";
+
+        $result = $this->db->query($query)->result_array();
+
+        if(!empty($result))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function changePassword($password, $idUser) {
+
+        $query = "
+                    UPDATE `User`
+                    
+                    SET `UserPassword` = '".$password."'
+                    
+                    WHERE `IdUser` = ?
+                    ";
+
+        $result = $this->db->query($query, [$idUser]);
+
+        return $result;
+    }
+
+    public function checkIfKeyExists($key)
+    {
+        $query = "
+			SELECT	* 				
+
+			FROM 	`User`
+
+			WHERE	`UserKey` = '".$key."' 
+                           
+                        AND `UserKeyExpires` != 0
+		";
+
+        $result = $this->db->query($query)->result_array();
+
+        if(!empty($result))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public function registerUser($username, $password, $key)
+    {
+
+        $query = "
+			UPDATE `User` 
+                        
+                        SET     `UserName` = ?,
+				`UserPassword` = ?,
+                                `UserKeyExpires` = 0
+                        
+                        WHERE `UserKey` = ?;
+		";
+        $result = $this->db->query($query, [$username,md5($password),$key]);
+
+
+    }
+
+    public function getUserByKey($key)
+    {
+        $query = "
+			SELECT	* 				
+
+			FROM 	`User`
+
+			WHERE	`UserKey` = '".$key."' 
+		";
+
+        $result = $this->db->query($query)->result_array();
+
+        $data = array();
+
+        if(!empty($result))
+        {
+            $i=0;
+            foreach($result as $row)
+            {
+                $data['User'][$i++] = $row;
+            }
+        }
+
+        return $data;
+    }
+
+    public function updateUser($username, $fullname, $email, $iduser)
+    {
+        $query = "
+			UPDATE  `User` 
+                        
+                        SET     
+				`UserName` = ?,
+				`UserFullname` = ?,
+				`UserEmail` = ?
+			WHERE IdUser = ?;
+		";
+        $result = $this->db->query($query, [$username, $fullname, $email, $iduser]);
     }
 }
 

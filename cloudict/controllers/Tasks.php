@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Tasks extends CI_Controller
+class Tasks extends Backend_Controller
 {
 
     /**
@@ -36,10 +36,11 @@ class Tasks extends CI_Controller
 
         $this->load->model('TaskModel');
         $this->load->model('UserModel');
+        $this->load->model('MenuModel');
 
         $this->base_url = base_url();
 
-        $this->Groups = $this->UserModel->getAllUsersInGroups($this->userID);
+        $this->Groups = $this->UserModel->getAllUsersInGroupsWithId($this->userID);
     }
 
 
@@ -48,18 +49,25 @@ class Tasks extends CI_Controller
      */
     public function index()
     {
-        $tasks['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
-        $tasks['given'] = $this->TaskModel->getGivenTasks($this->userID);
-        $tasks['base_url'] = $this->base_url;
-        $tasks['title'] = "Tasks";
-        $tasks['count'] = 5;
-        $tasks['notifications'] = array();
-        $tasks['base_url'] = base_url();
+        $data['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
+        $data['given'] = $this->TaskModel->getGivenTasks($this->userID);
+        $data['base_url'] = $this->base_url;
+        $data['title'] = "ICT Cloud | Admin | Tasks";
+
+        $menu = $this->MenuModel->getMenuOfApplication(5);
+
+        $data['menu'] = "";
+
+        foreach($menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
 
 
-        $this->load->view("header", $tasks);
-        $this->load->view("menu", $tasks);
-        $this->load->view("Task/ShowAllTasks", $tasks);
+
+        $this->load_view("Task/ShowAllTasks", $data);
 }
 
     /**
