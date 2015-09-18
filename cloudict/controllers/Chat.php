@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Chat extends CI_Controller {
+class Chat extends MY_Controller {
 
 
     public function __construct()
@@ -17,25 +17,44 @@ class Chat extends CI_Controller {
             redirect('/');
         }
 
-        $this->load->model('usermodel');
-        $this->load->model('userlogmodel');
+        // $this->load->model('usermodel');
+        // $this->load->model('userlogmodel');
         $this->load->helper('url');
     }
 
     public function index(){
 
-        $UsersIds=$this->userlogmodel->getUsersLoggedIn();
 
-        $Users = array();
-        foreach($UsersIds as $UserId)
-        {
-            $Users[]  = $this->usermodel->getUserById($UserId->IdUser);
+       $this->load->helper('url');
+        $this->load->helper('form');
+        
+        //variables
+        $base_url = base_url();
 
-        }
+         //model
+        $this->load->model('MenuModel');
+        $this->load->model("UserModel");
 
-        $data["Users"] = $Users;
+         $menu = $this->MenuModel->getMenuOfApplication(5);
 
-        $this->load->view('chat',$data);
+            $data['menu'] = "";
+
+            foreach($menu['Menu'] as $m)
+            {
+                $data['menu'] .= '<li>';
+                $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+                $data['menu'] .= '</li>';
+            }
+        
+        
+        $users = $this->UserModel->getAllUsers();
+        // var_dump($users);exit();
+        $data['base_url']=$base_url;
+        $data['count']="1";
+        $data['Users']=$users;
+        $data['CurrentUserId']=$this->session->userdata('userid');
+        
+        $this->load_view('chat',$data);
     }
 
     /**Get messages for logged in user and chat user
@@ -46,19 +65,16 @@ class Chat extends CI_Controller {
         //getting data for chat user
         if($IdUser==null)
         {
-            $UserName = $this->input->post('username');
-            $User=$this->usermodel->getUserByName($UserName);
-
-            $IdUser=$User->Id;
+            $IdUser = $this->input->post('IdUser');
         }
-//        var_dump($this->session->userdata('id'));exit;
 
         $this->load->model('chatmessagemodel');
         //getting all messages sent between logged user and chat user
-        $Messages = $this->chatmessagemodel->getMessages($this->session->userdata('id'),$IdUser);
-//
+        $Messages = $this->chatmessagemodel->getMessages($this->session->userdata('userid'),$IdUser);
+//      
         $data = array(
-            'Messages' => $Messages
+            'Messages' => $Messages,
+            'Session'=>$this->session->userdata()
         );
 
         $this->load->view('messages',$data);
@@ -71,15 +87,17 @@ class Chat extends CI_Controller {
     public function message(){
 
         $TextMessage = $this->input->post('text');
-        $ReceiverName  = $this->input->post('username');
+        $ReceiverId  = $this->input->post('IdUser');
 
-        $Sender     = $this->usermodel->getUserById($this->session->userdata('id'));
-        $Receiver   = $this->usermodel->getUserByName($ReceiverName);
+        $this->load->model("UserModel");
+
+        $Sender     = $this->UserModel->getUserById($this->session->userdata('userid'));
+        $Receiver   = $this->UserModel->getUserById($ReceiverId);
 
         $this->load->model('chatmessagemodel');
-        $this->chatmessagemodel->insertMessage($Sender->Id,$Receiver->Id,$TextMessage,$Sender->User,$Receiver->User);
+        $this->chatmessagemodel->insertMessage($Sender['0']['IdUser'],$Receiver['0']['IdUser'],$TextMessage,$Sender['0']['UserName'],$Sender['0']['UserName']);
 
-        $this->getMessages($Receiver->Id);
+        $this->getMessages($Receiver['0']['IdUser']);
 
     }
 
