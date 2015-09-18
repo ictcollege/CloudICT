@@ -1,0 +1,363 @@
+body{
+	font-family: 'Patua One', cursive;
+	font-weight: 100;
+}
+.route{
+	padding-top: 30px;
+	margin-bottom: 30px; 
+	height: 50px;
+	width: 100%;
+}
+
+.route .routebutton{
+  	position: relative;
+  	top: -5px;
+}
+.tablefiles tr td .fa{
+	cursor: pointer;
+}
+
+.filename{
+	width:50px; 
+	white-space: nowrap; 
+}
+
+.fileiconhide{
+	display: none;
+}
+
+.td-50{
+	width: 50px;
+}
+
+.content{
+	margin-top: 70px;
+}
+
+.row-padding-top{
+	padding-top: 65px;
+}
+
+.application-panel {
+    font-family: 'Patua One', cursive;
+}
+
+.user-panel {
+    margin-top: 65px;
+}
+
+.notification-panel-heading {
+    height: 100px !important;
+}
+
+.app{
+	margin: 10px; 
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+.app i {
+    color: #333;
+}
+
+.app1{
+	/* background-color: #213E38; */
+}
+
+.app2{
+	background-color: #CF8292;
+}
+
+.app3{
+	background-color: rgba(186, 76, 99, 1);
+}
+
+.app4{
+	background-color: rgba(29, 131, 193, 1);
+}
+
+.app5{
+	background-color: rgba(204, 178, 163, 1);
+}
+
+.app6{
+	background-color: rgba(239, 200, 74, 1);
+}
+
+.app h2{
+	padding: 50px 10px 50px 10px;
+}
+
+.app-panel{
+	  margin-top: 17%;
+}
+
+.app-name-none {
+    position: relative;
+    top: -56px;
+}
+
+.main-panel{
+	font-weight: 100;
+}
+
+.group-panel-footer{
+    height: 40px;
+}
+.app-name{
+  	color: white;
+  	margin: 0px auto;
+  	margin-top: -90px;
+	
+  	padding-bottom: 54px;
+}
+
+.app-name2{
+    color: white;
+    margin: 0px auto;
+    margin-top: -90px;
+    padding-bottom: 54px;
+}
+
+.fa-star{
+	color: rgb(244, 216, 128);
+}
+
+.white {
+	color: white;
+	border: 1px solid #000;
+}
+
+.rotate360 {
+	-webkit-transform: rotate(360deg);  
+	-moz-transform: rotate(360deg); 
+  	-ms-transform: rotate(360deg);  
+	-o-transform: rotate(360deg);  
+ 	transform: rotate(360deg);  
+}
+
+.transition_3 {
+  	-webkit-transition: all 0.3s ease-out;  
+ 	-moz-transition: all 0.3s ease-out;  
+   	-o-transition: all 0.3s ease-out;  
+  	transition: all 0.3s ease-out;  
+}
+
+textarea { 
+	resize:vertical; 
+	resize:horizontal;
+}
+
+.dropzone {
+    border: 2px dashed #0087F7 !important;
+    border-radius: 5px;
+    background: white !important;
+}
+
+.panel-heading { 
+    height: 50px;
+}
+
+.chat-wrapper {
+	padding-top: 50px !important;
+}
+
+.chat li {
+	border-bottom: none;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+}
+
+.user-image {
+	height: 35px;
+	margin-right: 15px;
+}
+
+.panel-people {
+	height: 400px;
+	overflow-y: scroll;
+}
+
+
+@media(max-width: 992px){
+	.people-panel {
+		display: none;
+	}	
+}
+
+.min-chat {
+	position: absolute;
+
+	height: 450px;
+	width: 400px;
+	border:1px solid #000;
+    top: 152px;
+    z-index: 100;
+    left: -400px;
+}
+
+.arrow {
+	position: absolute;
+
+	height: 50px;
+	width: 50px;
+	border-radius: 50%;
+	border:1px solid #000;
+
+}
+
+a {
+    text-decoration: none;
+}
+
+.logo {
+    height: 50px;
+    position: absolute;
+    top: 0px;
+}
+
+.cloud {
+    margin-left: 50px;
+}
+
+.btn-admin, .btn-user {
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+.btn-application{
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+.btn-no-hover {
+    cursor: initial;
+}
+
+.btn-application-edit{
+   position: relative;
+    top: -4px;
+    left: 9px; 
+}
+
+.btnDeleteUser {
+    margin-left: 5px;
+}
+
+.btnSaveChanges{
+    margin-top: 10px;
+}
+    
+.icon-remove-user {
+    color: #357ebd;
+}
+
+.icon-add-admin{
+    color: #357ebd;
+}
+
+.icon-add-newuser{
+    color: #357ebd;
+}
+
+.admins {
+    min-height: 50px;
+}
+
+.users {
+    min-height: 50px;
+}
+
+.tbSearchNewUser {
+    margin-bottom: 5px;
+}
+
+.btnChangeGroupName{
+    margin-top: 5px;
+}
+
+.btnChangePassword {
+    margin-top: -3px;
+}
+
+.btnUserProfileSaveChanges {
+    margin-top: 10px;
+}
+
+.user-exists {
+    color: red;
+}
+
+.chbAppGroup{
+    position: relative;
+    top: -18px;
+    left: 18px;
+}
+
+.login-error p{
+    color: red;
+    margin-top: 20px;
+    margin-left: 5px;
+}
+
+.options {
+    width: 100px;
+}
+
+.error-message {
+    color: red;
+    margin-top: 10px;
+}
+
+.error p{
+    color: red;
+}
+
+p.error {
+    color: red;
+}
+
+.pConfirmPassword {
+    margin-top: 0px;
+}
+
+.h3-success {
+    margin-bottom: 25px;
+}
+
+.green {
+    color: #5cb85c;
+}
+
+.jumbotron img {
+    max-height: 145px;
+    position: relative;
+    top: -45px;
+    left: 45px;
+}
+
+@media(max-width: 450px){
+	.jumbotron img {
+		max-height: 65px;
+                top: 5px;
+                left: 20px;
+	}	
+}
+
+.more {
+    font-size: 14px;
+    right: 0;
+    top: -145px;
+    margin-right: -44px;
+    margin-bottom: 0px;
+    position: relative;
+    width: 430px;
+}
+
+.more2 {
+    font-size: 14px;
+}
+
+.small {
+    font-size: 10px;
+}
