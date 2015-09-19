@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 18, 2015 at 09:14 PM
+-- Generation Time: Sep 19, 2015 at 10:46 PM
 -- Server version: 5.6.21
 -- PHP Version: 5.6.3
 
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS `file` (
   `FileSize` int(10) unsigned NOT NULL,
   `FileCreated` int(10) unsigned NOT NULL,
   `FileLastModified` int(10) unsigned NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=49 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `file`
@@ -292,7 +292,7 @@ INSERT INTO `filetype` (`IdFileType`, `FileTypeMime`) VALUES
 CREATE TABLE IF NOT EXISTS `group` (
 `IdGroup` int(10) unsigned NOT NULL,
   `GroupName` varchar(16) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `group`
@@ -331,25 +331,26 @@ INSERT INTO `groupapp` (`IdGroup`, `IdApp`) VALUES
 CREATE TABLE IF NOT EXISTS `notificationtype` (
 `IdNotificationType` int(10) unsigned NOT NULL,
   `NotificationTypeName` varchar(255) NOT NULL,
-  `NotificationTypeIcon` varchar(255) NOT NULL
+  `NotificationTypeIcon` varchar(255) NOT NULL,
+  `NotificationTypePanelStyle` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `notificationtype`
 --
 
-INSERT INTO `notificationtype` (`IdNotificationType`, `NotificationTypeName`, `NotificationTypeIcon`) VALUES
-(1, 'Information', 'fa fa-info'),
-(2, 'Warning', 'fa fa-warning (alias)'),
-(3, 'Message', 'fa fa-comment'),
-(4, 'Reminder', 'fa fa-calendar-o'),
-(9, 'New Task', 'fa fa-tasks'),
-(10, 'New Group', 'fa fa-group (alias)'),
-(11, 'Quota Exceeded', 'fa fa-exclamation-triangle'),
-(12, 'Task Executed', 'fa fa-check-square-o'),
-(13, 'Shared File', 'fa fa-share-alt'),
-(14, 'New Application', 'fa fa-cloud'),
-(15, 'Group Admin', 'fa fa-info');
+INSERT INTO `notificationtype` (`IdNotificationType`, `NotificationTypeName`, `NotificationTypeIcon`, `NotificationTypePanelStyle`) VALUES
+(1, 'Information', 'fa fa-info', NULL),
+(2, 'Warning', 'fa fa-warning (alias)', 'panel-danger'),
+(3, 'Message', 'fa fa-comment', NULL),
+(4, 'Reminder', 'fa fa-calendar-o', NULL),
+(9, 'New Task', 'fa fa-tasks', NULL),
+(10, 'New Group', 'fa fa-group (alias)', 'panel-primary'),
+(11, 'Quota Exceeded', 'fa fa-exclamation-triangle', NULL),
+(12, 'Task Executed', 'fa fa-check-square-o', NULL),
+(13, 'Shared File', 'fa fa-share-alt', NULL),
+(14, 'New Application', 'fa fa-cloud', NULL),
+(15, 'Group Admin', 'fa fa-info', NULL);
 
 -- --------------------------------------------------------
 
@@ -543,75 +544,20 @@ CREATE TABLE IF NOT EXISTS `usernotification` (
   `UserNotificationCreated` int(10) unsigned NOT NULL,
   `UserNotificationTimeExpires` int(10) unsigned DEFAULT '0' COMMENT 'se popunjava kada korisnik prvi put vidi notifikaciju',
   `UserNotificationStatus` tinyint(2) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `usernotification`
 --
 
 INSERT INTO `usernotification` (`IdUserNotification`, `IdUser`, `IdNotificationType`, `IdApp`, `IdEvent`, `UserFullname`, `UserNotificationDescription`, `UserNotificationCreated`, `UserNotificationTimeExpires`, `UserNotificationStatus`) VALUES
-(1, 1, 10, 4, 2, 'Admin', 'You have been added to new group', 1437129742, 1439721742, 1),
-(2, 1, 1, 1, 1, 'Admin', 'Generic Description', 1437129742, 1439721742, 1),
-(3, 1, 3, 1, 1, 'Admin', 'Generic Description', 1437129750, 1439721750, 1),
-(4, 1, 2, 1, 1, 'Admin', 'Generic Description', 1437129751, 1439721751, 1),
-(5, 66, 2, 1, 1, 'Admin', 'Generic Description', 1437136468, 1437156468, 1),
-(6, 66, 1, 1, 1, 'Admin', 'Generic Description', 1437136508, 1437156508, 1),
-(7, 66, 1, 1, 1, 'Admin', 'Generic Description', 1437136515, 1437156515, 1),
-(8, 66, 3, 1, 1, 'Admin', 'Generic Description', 1437136520, 1437156520, 1),
-(9, 66, 3, 1, 1, 'Admin', 'Generic Description', 1437136533, 1437156533, 1),
-(10, 66, 10, 4, 5, 'Admin', 'You have been added to new group', 1437136543, 1437156543, 1),
-(11, 66, 1, 1, 1, 'Admin', 'Generic Description', 1440601622, 1440621622, 1),
-(12, 66, 2, 1, 1, 'Admin', 'Generic Description', 1440603676, 1440623676, 1),
-(13, 66, 3, 1, 1, 'Admin', 'Generic Description', 1440603676, 1440623676, 1),
-(14, 66, 1, 1, 1, 'Admin', 'Generic Description', 1440603677, 1440623677, 1),
-(15, 66, 3, 1, 1, 'Admin', 'Generic Description', 1440603677, 1440623677, 1),
-(16, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441121511, 1441141511, 1),
-(17, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441121515, 1441141515, 1),
-(18, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441127371, 1441147371, 1),
-(19, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441127381, 1441147381, 1),
-(20, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441127381, 1441147381, 1),
-(21, 66, 10, 4, 10, 'Admin', 'You have been added to new group', 1441127388, 1441147388, 1),
-(22, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441127401, 1441147401, 1),
-(23, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128363, 1441148363, 1),
-(24, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128413, 1441148413, 1),
-(25, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441128424, 1441148424, 1),
-(26, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441128425, 1441148425, 1),
-(27, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441128425, 1441148425, 1),
-(28, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441128425, 1441148425, 1),
-(29, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128613, 1441148613, 1),
-(30, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128631, 1441148631, 1),
-(31, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128632, 1441148632, 1),
-(32, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441128807, 1441148807, 1),
-(33, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441129648, 1441149648, 1),
-(34, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441129764, 1441149764, 1),
-(35, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441129780, 1441149780, 1),
-(36, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441129781, 1441149781, 1),
-(37, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441129788, 1441149788, 1),
-(38, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441129789, 1441149789, 1),
-(39, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441130895, 1441150895, 1),
-(40, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441130913, 1441150913, 1),
-(41, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441131216, 1441151216, 1),
-(42, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441131217, 1441151217, 1),
-(43, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441131229, 1441151229, 1),
-(44, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441131231, 1441151231, 1),
-(45, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441131996, 1441151996, 1),
-(46, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441131998, 1441151998, 1),
-(47, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441132009, 1441152009, 1),
-(48, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441132073, 1441152073, 1),
-(49, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441132134, 1441152134, 1),
-(50, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441132326, 0, 1),
-(51, 66, 2, 1, 1, 'Admin', 'Generic Description', 1441132327, 0, 1),
-(52, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441132328, 0, 1),
-(53, 66, 1, 1, 1, 'Admin', 'Generic Description', 1441132328, 0, 1),
-(54, 66, 3, 1, 1, 'Admin', 'Generic Description', 1441132329, 0, 1),
-(55, 1, 1, 2, 2, 'admin', 'nova notifikacija', 123123123, 125715123, 1),
-(56, 1, 1, 2, 1, 'admin', 'nova', 123123123, 125715123, 1),
-(57, 1, 3, 2, 2, 'nikola', 'proba', 123123123, 125715123, 1),
-(58, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442250289, 1444842289, 1),
-(59, 1, 10, 3, 14, 'Admin', 'You have been added to group', 1442592901, 1445184901, 1),
-(60, 24, 10, 3, 14, 'Admin', 'You have been added to group', 1442592925, 0, 0),
-(61, 1, 10, 3, 14, 'Admin', 'You have been added to group', 1442592937, 1445184937, 1),
-(62, 24, 10, 3, 14, 'Admin', 'You have been added to group', 1442592942, 0, 0);
+(69, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442692578, 1445284578, 1),
+(70, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442693731, 1445285731, 1),
+(71, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442693767, 1445285767, 1),
+(72, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442693801, 1445285801, 1),
+(73, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442693891, 1445285891, 1),
+(74, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442694041, 1445286041, 1),
+(75, 1, 10, 3, 13, 'Admin', 'You have been added to group', 1442694515, 1445286515, 1);
 
 -- --------------------------------------------------------
 
@@ -759,7 +705,7 @@ MODIFY `IdChatMessage` int(10) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT for table `file`
 --
 ALTER TABLE `file`
-MODIFY `IdFile` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=49;
+MODIFY `IdFile` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=52;
 --
 -- AUTO_INCREMENT for table `filetype`
 --
@@ -769,7 +715,7 @@ MODIFY `IdFileType` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=16;
 -- AUTO_INCREMENT for table `group`
 --
 ALTER TABLE `group`
-MODIFY `IdGroup` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=16;
+MODIFY `IdGroup` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=14;
 --
 -- AUTO_INCREMENT for table `notificationtype`
 --
@@ -794,7 +740,7 @@ MODIFY `IdUserLog` int(10) unsigned NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT for table `usernotification`
 --
 ALTER TABLE `usernotification`
-MODIFY `IdUserNotification` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=63;
+MODIFY `IdUserNotification` int(10) unsigned NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=76;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
