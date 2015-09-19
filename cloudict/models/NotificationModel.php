@@ -32,7 +32,8 @@ class NotificationModel extends CI_Model {
 			JOIN `notificationtype`
 			USING(`IdNotificationType`)
 			
-			WHERE `IdUser`=? AND `UserNotificationTimeExpires` = 0
+			WHERE `IdUser`=? 
+			/*AND `UserNotificationTimeExpires` = 0*/
 			ORDER BY `UserNotificationCreated` DESC
 			LIMIT 6
 		";
@@ -72,7 +73,7 @@ class NotificationModel extends CI_Model {
 			JOIN `notificationtype`
 			USING(`IdNotificationType`)
 			
-			WHERE `UserNotificationStatus` = 0 AND `IdUser`=? AND `UserNotificationTimeExpires` = 0
+			WHERE `UserNotificationStatus` = 0 AND `IdUser`=? /*AND `UserNotificationTimeExpires` = 0*/
 		";
 		
 
@@ -100,8 +101,10 @@ class NotificationModel extends CI_Model {
 	public function getAllNotifications($IdUser){
 		$query = "
 			SELECT	`IdUserNotification`,
+								`IdNotificationType`,
                                 `NotificationTypeName`,
                                 `NotificationTypeIcon`,
+                                `NotificationTypePanelStyle`,
                                 `AppLink`,
                                 `AppIcon`,
                                 `IdEvent`,

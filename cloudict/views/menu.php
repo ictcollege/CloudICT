@@ -58,7 +58,7 @@
                             foreach($notifications as $red)
                             {
 				echo "<li>";
-				echo"<a href='".base_url()."user/allnotifications'>";
+				echo"<a href='".base_url().$red['AppLink']."HandleNotification/".$red['IdEvent']."'>";
 				echo"<span class='image' style='margin-right:35px'>";
 				echo"<i class='".$red['NotificationTypeIcon']."'></i>";
 				echo"</span>";
@@ -69,6 +69,11 @@
 				echo"</li>";
 				echo "<i class='divider'></i>";
                             }
+							echo "<li>";
+                            echo "<a href='".base_url()."user/allnotifications'>";
+                            echo "<span>See All Notifications</span>";
+                            echo"</a>";
+                            echo"</li>";
                         }
                         else 
                         {

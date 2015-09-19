@@ -370,14 +370,25 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         
         $data['base_url']=  base_url();
        
-		
+		/*
         $data['notifications']=  $this->NotificationModel->getInitialNotifications($this->session->userdata('userid'));
         $count=0;
         foreach($data['notifications'] as $red){
                 if($red['UserNotificationTimeExpires']==0) $count++;
         }
-        $data['count']=$count;
+        $data['count']=$count;*/
 	
+		$data['userid']=$this->session->userdata('userid');
+			$this->load->model('NotificationModel');
+			$data['notifications']=  $this->NotificationModel->getInitialNotifications($data['userid']);
+			$count=0;
+			foreach($data['notifications'] as $red){
+				if($red['UserNotificationTimeExpires']==0) $count++;
+			}
+			$data['count']=$count;
+			
+			$data['allnotifications']= $this->NotificationModel->getAllNotifications($data['userid']);
+		
         $this->load->view('header', $data);
         $this->load->view('menu', $data);
         $this->load->view('allnotifications',$data);        

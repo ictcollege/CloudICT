@@ -37,7 +37,7 @@
 			var month = months[date.getMonth()];
 			
 			
-            $("#menu1").prepend("<li><a href='"+base_url+json[i].AppLink+"HandleNotification/"+json[i].IdEvent+"'><span class='image' style='margin-right:10px'><i class='"+json[i].NotificationTypeIcon+"'></i></span><span><span>"+json[i].NotificationTypeName+"</span><span class='time'>"+day+"-"+month+" "+hour+":"+minute+"</span></span><br/><span>from "+json[i].UserFullname+"</span><span class='message'>"+json[i].UserNotificationDescription+"</span></a></li>");
+            $("#menu1").prepend("<li><a href='"+json[i].AppLink+"HandleNotification/"+json[i].IdEvent+"'><span class='image' style='margin-right:35px'><i class='"+json[i].NotificationTypeIcon+"'></i></span><span><span>"+json[i].NotificationTypeName+"</span></span><br/></a></li><i class='divider'></i>");
 			
 			$('#ntf_counter').text(parseInt($('#ntf_counter').text())+1);
 			}
@@ -45,7 +45,9 @@
 		
 		
 		
-		else alert("ne radi");
+		
+		
+		else alert("error loading notifications, network problem?");
        
     }
 	
@@ -65,6 +67,7 @@
                 );
             },
             error: function(XMLHttpRequest, textStatus, errorThrown){
+				alert('network problem?');
                 addNotification("error", textStatus + " (" + errorThrown + ")");
                 setTimeout(
                     waitForNotification,
