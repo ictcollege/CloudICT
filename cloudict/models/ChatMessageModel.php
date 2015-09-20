@@ -43,6 +43,35 @@ class ChatMessageModel extends CI_Model {
     }
 
 
+/**
+ * Get all messages for Group
+ * @param  int $IdGroup 
+ * @return array          group messages
+ */
+    public function getGroupMessages($IdGroup)
+    {
+        $query= "
+
+            SELECT  `IdChatMessage` AS `Id`,
+                `IdGroup`,
+                `IdSender`,
+                `IdReceiver`,
+                `ChatMessageText` AS `Message`,
+                `ChatMessageTime` AS `Time`,
+                `ChatMessageSenderName` AS `Sender`,
+                `ChatMessageReceiverName` AS `Reciever`
+
+            FROM    `Chatmessage`
+
+            WHERE   `IdGroup` = ? 
+
+        ";
+        $result = $this->db->query($query, [$IdGroup])->result_array();
+        return $result;
+
+    }
+
+
     /**insert new message
      *
      * @param $IdSender
@@ -51,16 +80,16 @@ class ChatMessageModel extends CI_Model {
      * @param $SenderName
      * @param $ReceiverName
      */
-    public function insertMessage($IdSender, $IdReceiver, $TextMessage, $SenderName,$ReceiverName)
+    public function insertMessage($IdGroup,$IdSender, $IdReceiver, $TextMessage, $SenderName,$ReceiverName)
     {
 
         $query = "
-			INSERT INTO `chatmessage`(`IdSender`,`IdReceiver`,`ChatMessageText`,`ChatMessageTime`,`ChatMessageSenderName`,`ChatMessageReceiverName`)
+			INSERT INTO `chatmessage`(`IdGroup`,`IdSender`,`IdReceiver`,`ChatMessageText`,`ChatMessageTime`,`ChatMessageSenderName`,`ChatMessageReceiverName`)
 
-			VALUES (?,?,?,?,?,?);
+			VALUES (?,?,?,?,?,?,?);
 		";
 
-        $result = $this->db->query($query, [$IdSender,$IdReceiver,$TextMessage,time(),$SenderName,$ReceiverName]);
+        $result = $this->db->query($query, [$IdGroup,$IdSender,$IdReceiver,$TextMessage,time(),$SenderName,$ReceiverName]);
 
 
     }
