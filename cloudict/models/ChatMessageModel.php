@@ -66,5 +66,4 @@ class ChatMessageModel extends CI_Model {
     }
 
 
-
 }

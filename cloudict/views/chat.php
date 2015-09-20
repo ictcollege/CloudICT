@@ -129,9 +129,6 @@
     setInterval(showMssages,10000);
 
 
-
-
-
 </script>
 </body>
 </html>
