@@ -36,7 +36,7 @@ class Chat extends MY_Controller {
 		$this->load->model("UserModel");
 
 		 $menu = $this->MenuModel->getMenuOfApplication(5);
-
+		if($menu!=null){
 			$data['menu'] = "";
 
 			foreach($menu['Menu'] as $m)
@@ -46,7 +46,7 @@ class Chat extends MY_Controller {
 				$data['menu'] .= '</li>';
 			}
 		
-		
+		}
 		$users = $this->UserModel->getAllUsers();
 		// var_dump($users);exit();
 		$data['base_url']=$base_url;
