@@ -38,6 +38,12 @@
 	</div>
 	<script type="text/javascript">
 
+	function scrollSmallChat(chat){
+		var $cont = $(chat);
+		$cont[0].scrollTop = $cont[0].scrollHeight;
+	}
+
+	scrollSmallChat(".small_chat<?php echo $Reciever; ?>");
 	/**
 	 *  close pop up chat
 	 */
@@ -63,6 +69,7 @@
 					success: function (response) { // on success..
 						$('.small_chat<?php echo $Reciever; ?>').html(response);
 						$('#TextMessageSmall<?php echo $Reciever; ?>').val("");
+						scrollSmallChat(".small_chat<?php echo $Reciever; ?>");
 					}
 				});
 		}
@@ -74,6 +81,7 @@
 				success: function (response) { // on success..
 					$('.small_chat<?php echo $Reciever; ?>').html(response);
 					$('#TextMessageSmall<?php echo $Reciever; ?>').val("");
+					scrollSmallChat(".small_chat<?php echo $Reciever; ?>");
 				}
 			});
 		}
@@ -96,6 +104,7 @@
 					success: function (response) { // on success..
 						$('.small_chat<?php echo $Reciever; ?>').html(response);
 						$('#TextMessageSmall<?php echo $Reciever; ?>').val("");
+						scrollSmallChat(".small_chat<?php echo $Reciever; ?>");
 					}
 				});
 			}
@@ -107,6 +116,7 @@
 					success: function (response) { // on success..
 						$('.small_chat<?php echo $Reciever; ?>').html(response);
 						$('#TextMessageSmall<?php echo $Reciever; ?>').val("");
+						scrollSmallChat(".small_chat<?php echo $Reciever; ?>");
 					}
 				});
 			}
