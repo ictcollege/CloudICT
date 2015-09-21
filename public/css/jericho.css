@@ -2,6 +2,24 @@ body{
 	font-family: 'Patua One', cursive;
 	font-weight: 100;
 }
+
+#chat{
+    max-height:400px; 
+    overflow-y:scroll;
+}
+#chat_box{
+    height: 300px;
+    position: absolute;
+    bottom: 0px
+}
+.small_chat{
+    height: 180px;
+    overflow-y:scroll; 
+}
+.small-form-input{
+    width: 70%;
+}
+
 .route{
 	padding-top: 30px;
 	margin-bottom: 30px; 
