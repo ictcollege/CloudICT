@@ -4,9 +4,11 @@
 			<div class="panel panel-default main-panel">
 				<div class="panel-heading">
 					<div class="pull-left">
-						<h4 ><i class="fa fa-user fa-fw"></i> <span class='chat_user'></span>   </h4>
+						<h4 ><i class="fa fa-user fa-fw"></i> <span class='chat_user'>  All Users</span> </h4>
 					</div>
 					<div class="pull-right">
+						<a href="#" id="pop_chat" style='float:right'  ><h4 ><i class="fa fa-commenting  fa-fw"></i></h4></a>
+						<a href="#" id="export_chat" style='float:right'  ><h4 ><i class="fa fa-file-text fa-fw"></i></h4></a>
 					</div>
 				</div>
 				<div class="panel-body" id="chat">
@@ -71,24 +73,20 @@
 			</div>
 
 		</div>
+
+
+		<div class="col-md-10" id="chat_box">
+			
+		</div>
+
+
+
 	</div>
 </div>
 
 	  
 
-
-
-
-
-
-
-
-
-
-
-
-
-<script>
+<script type="text/javascript">
 
 	/*
 	 function to show messages with ajax
@@ -96,30 +94,23 @@
 	function showMesages() {
 		var IdUser    = $('#receiver').val();
 		if(IdUser!=''){
-		$.ajax({ 
-			method: "POST",
-			url: "<?php echo base_url('/chat/getMessages');?>", 
-			data: { IdUser:IdUser },
-			success: function (response) {
-				$('#chat').html(response);
-			}
-		});
+			$.ajax({ 
+				method: "POST",
+					url: "<?php echo base_url('/chat/showMessage');?>", 
+					data: { IdUser:IdUser },
+					success: function (response) {
+						$('#chat').html(response);
+					}
+			});
 		}
-	}
-
-	/*
-	 function to show messages with ajax
-	 */
-	function showGroupMesages() {
-		var IdUser    = $('#receiver').val();
-		if(IdUser!=''){
-		$.ajax({ 
-			method: "POST",
-			url: "<?php echo base_url('/chat/showGroupMessages');?>", 
-			success: function (response) {
-				$('#chat').html(response);
-			}
-		});
+		else{
+			$.ajax({ 
+				method: "POST",
+				url: "<?php echo base_url('/chat/showGroupMessages');?>", 
+				success: function (response) {
+					$('#chat').html(response);
+				}
+			});
 		}
 	}
 
@@ -145,13 +136,75 @@
 	 */
 	$('.groupchat').click(function(e){
 		e.preventDefault();
-
+		$('#receiver').val("");
+		$('.chat_user').text('All Users');
 		$('#TextMessage').val("");
-		showGroupMesages();
+		showMesages();
+
+	});
+
+	/**
+	 * Export chat to .txt file 
+	 */
+	$('#export_chat').click(function(e){
+		e.preventDefault();
+		var IdUser = $('#receiver').val();
+		if(IdUser == ""){
+			$.ajax({ // create an AJAX call...
+					method: "POST",
+					url: "<?php echo base_url('/chat/exportGroupChat');?>", // the file to call
+					data: {  IdGroup:1 },
+					success: function (response) { // on success..
+						 window.open("<?php echo base_url('/chat/exportGroupChat');?>");
+					}
+				});
+		}
+		else{
+			$.ajax({ // create an AJAX call...
+					method: "POST",
+					url: "<?php echo base_url('/chat/exportChat');?>", // the file to call
+					data: { IdUser:IdUser },
+					success: function (response) { // on success..
+						 window.open("<?php echo base_url('/chat/exportChat');?>"+"/"+IdUser);
+					}
+				});
+		}
+		
+		
 
 	});
 
 
+	$('#pop_chat').click(function(e){
+		e.preventDefault();
+		var IdUser    = $('#receiver').val();
+		if(IdUser!=''){
+			$.ajax({ 
+				method: "POST",
+				url: "<?php echo base_url('/chat/showSmallMessage');?>", 
+				data: { IdUser:IdUser },
+				success: function (response) {
+					$('#chat_box').append(response);
+				}
+			});
+		}
+		else{
+			$.ajax({ 
+				method: "POST",
+				url: "<?php echo base_url('/chat/showSmallGroupMessages');?>", 
+				success: function (response) {
+					$('#chat_box').append(response);
+				}
+			});
+		}
+	});
+
+	
+
+
+	/*
+	 submit new message with ajax with Enter keypress
+	 */
 	$('#TextMessage').keypress(function(e) {
 		 if( e.which == 13 ) {
 			var text        = $('#TextMessage').val();
@@ -191,16 +244,15 @@
 		var IdUser    = $('#receiver').val();
 
 		if(IdUser == ""){
-			alert('test');
-			// $.ajax({ // create an AJAX call...
-			// 	method: "POST",
-			// 	url: "<?php echo base_url('/chat/message');?>", // the file to call
-			// 	data: { text: text, IdUser:IdUser },
-			// 	success: function (response) { // on success..
-			// 		$('#chat').html(response);
-			// 		$('#TextMessage').val("");
-			// 	}
-			// });
+			$.ajax({ // create an AJAX call...
+					method: "POST",
+					url: "<?php echo base_url('/chat/GroupMessage');?>", // the file to call
+					data: { text: text, IdUser:IdUser },
+					success: function (response) { // on success..
+						$('#chat').html(response);
+						$('#TextMessage').val("");
+					}
+				});
 		}
 		else{
 			$.ajax({ // create an AJAX call...
@@ -216,7 +268,7 @@
 	});
 
 
-	setInterval(showMssages,10000);
+	setInterval(showMesages,10000);
 
 
 </script>
