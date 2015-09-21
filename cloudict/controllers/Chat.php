@@ -61,23 +61,41 @@ class Chat extends MY_Controller {
 	 *
 	 * @param null $IdUser
 	 */
-	public function getMessages($IdUser=null){
-		//getting data for chat user
-		if($IdUser==null)
-		{
-			$IdUser = $this->input->post('IdUser');
-		}
-
+	public function getMessages($IdUser){
 		$this->load->model('chatmessagemodel');
+
 		//getting all messages sent between logged user and chat user
-		$Messages = $this->chatmessagemodel->getMessages($this->session->userdata('userid'),$IdUser);
-//      
-		$data = array(
-			'Messages' => $Messages
+		return $this->chatmessagemodel->getMessages($this->session->userdata('userid'),$IdUser);
+	}
+
+	public function showMessage($IdUser=null)
+	{
+		if($IdUser==null){
+			$IdUser= $this->input->post('IdUser');
+		}
+		$Messages 	=	$this->getMessages($IdUser);
+		$data 		= array(
+			'Messages' 	=>	 $Messages
 		);
 
 		$this->load->view('messages',$data);
+	}
 
+	public function showSmallMessage($IdUser=null)
+	{
+		if($IdUser==null){
+			$IdUser= $this->input->post('IdUser');
+		}
+		$this->load->model('UserModel');
+
+		$Reciever 		=	$this->UserModel->getUserById($IdUser);
+		$Messages 	=	$this->getMessages($IdUser);
+		$data 		= 	array(
+			'Messages' 	=>	$Messages,
+			'Reciever'	=>	$Reciever[0]['UserName'],
+			'IdReceiver'	=>	$IdUser
+		);
+		$this->load->view('small_chat',$data);
 	}
 
 	/**
@@ -94,10 +112,20 @@ class Chat extends MY_Controller {
 	public function showGroupMessages($IdGroup=null){
 		$Messages 	=	$this->getGroupMessages(1);
 		$data 		= array(
-			'Messages' 	=>	 $Messages
+			'Messages' 	=>	$Messages
 		);
 
 		$this->load->view('messages',$data);
+	}
+
+	public function showSmallGroupMessages($IdGroup=null){
+		$Messages 	=	$this->getGroupMessages(1);
+		$data 		= array(
+			'Messages' 	=>	$Messages,
+			'Reciever'	=>	"All"
+		);
+
+		$this->load->view('small_chat',$data);
 	}
 
 
@@ -119,7 +147,7 @@ class Chat extends MY_Controller {
 		$this->load->model('chatmessagemodel');
 		$this->chatmessagemodel->insertMessage(NULL,$Sender['0']['IdUser'],$Receiver['0']['IdUser'],$TextMessage,$Sender['0']['UserName'],$Receiver['0']['UserName']);
 
-		$this->getMessages($Receiver['0']['IdUser']);
+		$this->showMessage($Receiver['0']['IdUser']);
 
 	}
 	/**
@@ -137,6 +165,73 @@ class Chat extends MY_Controller {
 		$this->chatmessagemodel->insertMessage(1,$Sender['0']['IdUser'],$Sender['0']['IdUser'],$TextMessage,$Sender['0']['UserName'],$Sender['0']['UserName']);
 
 		$this->showGroupMessages(1);
+
+	}
+
+
+	public function exportGroupChat($IdGroup=null)
+	{
+		$GroupMessages = $this->getGroupMessages(1);
+
+		$path=$_SERVER['DOCUMENT_ROOT']."/All_users_chat.txt";
+		
+		 $fh = fopen($path, 'w');
+		 foreach ($GroupMessages as $GroupMessage) {
+		 	$text=$GroupMessage['Message'].PHP_EOL;
+		 	$text.=$GroupMessage['Sender']." | ".date('H:i d M Y',$GroupMessage['Time']).PHP_EOL.PHP_EOL;
+		 	  fwrite($fh, $text);     
+		 }
+		fclose($fh);
+
+
+		if (file_exists($path)) {
+		    header('Content-Description: File Transfer');
+		    header('Content-Type: application/octet-stream');
+		    header('Content-Disposition: attachment; filename="'.basename($path).'"');
+		    header('Expires: 0');
+		    header('Cache-Control: must-revalidate');
+		    header('Pragma: public');
+		    header('Content-Length: ' . filesize($path));
+		    readfile($path);
+		    exit;
+		}
+	}		
+
+	public function exportChat()
+	{
+		$IdUser  = $this->input->post('IdUser');
+		if($IdUser==null)
+		{
+			$IdUser=$this->uri->segment(3);
+		}
+		$UserMessages	 =$this->getMessages($IdUser);
+
+		$this->load->model('UserModel');
+
+		$Receiver 		=$this->UserModel->getUserById($IdUser);
+		$path=$_SERVER['DOCUMENT_ROOT']."/".$this->session->userdata('username')."-".$Receiver[0]['UserName'].".txt";
+
+		 $fh = fopen($path, 'w');
+		 foreach ($UserMessages as $UserMessage) {
+		 	$text=$UserMessage['Message'].PHP_EOL;
+		 	$text.=$UserMessage['Sender']." | ".date('H:i d M Y',$UserMessage['Time']).PHP_EOL.PHP_EOL;
+		 	  fwrite($fh, $text);     
+		 }
+		fclose($fh);
+
+		if (file_exists($path)) {
+		    header('Content-Description: File Transfer');
+		    header('Content-Type: application/octet-stream');
+		    header('Content-Disposition: attachment; filename="'.basename($path).'"');
+		    header('Expires: 0');
+		    header('Cache-Control: must-revalidate');
+		    header('Pragma: public');
+		    header('Content-Length: ' . filesize($path));
+		    readfile($path);
+		    exit;
+		}
+
+
 
 	}
 
