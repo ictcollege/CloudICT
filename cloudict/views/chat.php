@@ -4,7 +4,7 @@
 			<div class="panel panel-default main-panel">
 				<div class="panel-heading">
 					<div class="pull-left">
-						<h4 ><i class="fa fa-user fa-fw"></i> <span class='chat_user'>  All Users</span> </h4>
+						<h4 ><i class="fa fa-user fa-fw"></i> <span class='chat_user'>All Users</span> </h4>
 					</div>
 					<div class="pull-right">
 						<a href="#" id="pop_chat" style='float:right'  ><h4 ><i class="fa fa-commenting  fa-fw"></i></h4></a>
@@ -88,6 +88,11 @@
 
 <script type="text/javascript">
 
+	function scrollChat(chat){
+	var $cont = $(chat);
+	$cont[0].scrollTop = $cont[0].scrollHeight;
+	}
+	scrollChat("#chat");
 	/*
 	 function to show messages with ajax
 	 */
@@ -150,24 +155,26 @@
 		e.preventDefault();
 		var IdUser = $('#receiver').val();
 		if(IdUser == ""){
-			$.ajax({ // create an AJAX call...
-					method: "POST",
-					url: "<?php echo base_url('/chat/exportGroupChat');?>", // the file to call
-					data: {  IdGroup:1 },
-					success: function (response) { // on success..
-						 window.open("<?php echo base_url('/chat/exportGroupChat');?>");
-					}
-				});
+			 window.open("<?php echo base_url('/chat/exportGroupChat');?>");
+			// $.ajax({ // create an AJAX call...
+			// 		method: "POST",
+			// 		url: "<?php echo base_url('/chat/exportGroupChat');?>", // the file to call
+			// 		data: {  IdGroup:1 },
+			// 		success: function (response) { // on success..
+						
+			// 		}
+			// 	});
 		}
 		else{
-			$.ajax({ // create an AJAX call...
-					method: "POST",
-					url: "<?php echo base_url('/chat/exportChat');?>", // the file to call
-					data: { IdUser:IdUser },
-					success: function (response) { // on success..
-						 window.open("<?php echo base_url('/chat/exportChat');?>"+"/"+IdUser);
-					}
-				});
+			 window.open("<?php echo base_url('/chat/exportChat');?>"+"/"+IdUser);
+			// $.ajax({ // create an AJAX call...
+			// 		method: "POST",
+			// 		url: "<?php echo base_url('/chat/exportChat');?>", // the file to call
+			// 		data: { IdUser:IdUser },
+			// 		success: function (response) { // on success..
+						
+			// 		}
+			// 	});
 		}
 		
 		
@@ -178,24 +185,34 @@
 	$('#pop_chat').click(function(e){
 		e.preventDefault();
 		var IdUser    = $('#receiver').val();
-		if(IdUser!=''){
-			$.ajax({ 
-				method: "POST",
-				url: "<?php echo base_url('/chat/showSmallMessage');?>", 
-				data: { IdUser:IdUser },
-				success: function (response) {
-					$('#chat_box').append(response);
-				}
-			});
+		var username=  $('.chat_user').text();
+		
+		if(username=="All Users"){
+			username="All";
 		}
-		else{
-			$.ajax({ 
-				method: "POST",
-				url: "<?php echo base_url('/chat/showSmallGroupMessages');?>", 
-				success: function (response) {
-					$('#chat_box').append(response);
-				}
-			});
+		var checkIfExist=$("body").find("#main_"+username).length;
+
+		if(checkIfExist==0){
+
+			if(IdUser!=''){
+				$.ajax({ 
+					method: "POST",
+					url: "<?php echo base_url('/chat/showSmallMessage');?>", 
+					data: { IdUser:IdUser },
+					success: function (response) {
+						$('#chat_box').append(response);
+					}
+				});
+			}
+			else{
+				$.ajax({ 
+					method: "POST",
+					url: "<?php echo base_url('/chat/showSmallGroupMessages');?>", 
+					success: function (response) {
+						$('#chat_box').append(response);
+					}
+				});
+			}
 		}
 	});
 
@@ -219,6 +236,7 @@
 					success: function (response) { // on success..
 						$('#chat').html(response);
 						$('#TextMessage').val("");
+						scrollChat("#chat");
 					}
 				});
 			}
@@ -230,6 +248,7 @@
 					success: function (response) { // on success..
 						$('#chat').html(response);
 						$('#TextMessage').val("");
+						scrollChat("#chat");
 					}
 				});
 			}
@@ -251,6 +270,7 @@
 					success: function (response) { // on success..
 						$('#chat').html(response);
 						$('#TextMessage').val("");
+						scrollChat("#chat");
 					}
 				});
 		}
@@ -262,13 +282,14 @@
 				success: function (response) { // on success..
 					$('#chat').html(response);
 					$('#TextMessage').val("");
+					scrollChat("#chat");
 				}
 			});
 		}
 	});
 
 
-	setInterval(showMesages,10000);
+	setInterval(showMesages,2000);
 
 
 </script>
