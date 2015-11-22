@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://localhost/cloudict/';
+$config['base_url'] = 'http://localhost:8080/cloudict/';
 
 /*
 |--------------------------------------------------------------------------

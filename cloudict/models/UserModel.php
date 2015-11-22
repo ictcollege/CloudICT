@@ -25,60 +25,6 @@ class UserModel extends CI_Model {
      * @param int $IdUser
      * @return array
      */
-//	public function getAllUsersInGroups($IdUser)
-//	{
-//		$query = "
-//			SELECT	`GroupName` AS `Group`,
-//				`UserName` AS `User`,
-//				`UserGroupStatusAdmin` AS `Admin`
-//
-//			FROM 	`User`
-//
-//			JOIN	`UserGroup`
-//			USING	(`IdUser`)
-//
-//			JOIN	`Group` AS `g`
-//			USING	(`IdGroup`)
-//
-//			WHERE	`g`.`IdGroup` IN (
-//							SELECT	`IdGroup`
-//							FROM	`UserGroup`
-//							WHERE	`IdUser` = ?
-//						 )
-//		";
-//
-//		$result = $this->db->query($query, [$IdUser])->result_array();
-//
-//		$data = array();
-//
-//		if(!empty($result)){
-//			foreach ($result as $row){
-//                    $data[$row['Group']][$row['User']] = $row['Admin'];
-//                        }
-//                }
-//
-//		$query2 = "
-//			SELECT	`GroupName` AS `Group`
-//
-//			FROM	`Group`
-//
-//			JOIN	`UserGroup`
-//			USING	(`IdGroup`)
-//
-//			WHERE	`IdUser` = ?
-//			AND	`UserGroupStatusAdmin` = 1
-//		";
-//
-//		$result2 = $this->db->query($query2, [$IdUser])->result_array();
-//
-//		$data['GroupAdmin'] = array();
-//
-//		if(!empty($result2))
-//			foreach ($result2 as $row) $data['GroupAdmin'][] = $row['Group'];
-//
-//		return $data;
-//	}
-
     public function getAllUsersInGroupsWithId($IdUser)
     {
         $query = "
@@ -120,7 +66,7 @@ class UserModel extends CI_Model {
                     }
                 }
             }
-
+        return $data;
         }
     }
 

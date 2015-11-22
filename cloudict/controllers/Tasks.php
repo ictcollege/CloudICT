@@ -9,10 +9,11 @@ class Tasks extends Backend_Controller
      * git checkout tasks-feature
      */
 
-    private $userID;
+    private $userId;
     private $Username;
     private $base_url;
     private $Groups;
+    private $menu;
 
     /**
      * Tasks constructor.
@@ -24,23 +25,22 @@ class Tasks extends Backend_Controller
         $this->load->helper('url');
 
         //TODO:Implement proper redirect on not logged in
-        //TODO: Update Users Controller to include idUser in session
-//        if($_SESSION['LoggedIn'] == true){
-//            $this->userID = $this->session->userData("UserID");
-//        }
-//        else redirect('/User');
 
+        if($this->isLogged()){
+            $this->userId = $this->session->userid;
+            $this->Username = $this->session->username;
 
-        $this->userID = 1;
-        $this->Username = "admin";
+            $this->load->model('TaskModel');
+            $this->load->model('UserModel');
+            $this->load->model('MenuModel');
 
-        $this->load->model('TaskModel');
-        $this->load->model('UserModel');
-        $this->load->model('MenuModel');
+            $this->base_url = base_url();
 
-        $this->base_url = base_url();
-
-        $this->Groups = $this->UserModel->getAllUsersInGroupsWithId($this->userID);
+            $this->Groups = array();
+            $this->Groups = $this->UserModel->getAllUsersInGroupsWithId($this->userId);
+            $this->menu = $this->MenuModel->getMenuOfApplication(5);
+        }
+        else redirect(base_url());
     }
 
 
@@ -49,23 +49,19 @@ class Tasks extends Backend_Controller
      */
     public function index()
     {
-        $data['assigned'] = $this->TaskModel->getAssignedTaks($this->userID);
-        $data['given'] = $this->TaskModel->getGivenTasks($this->userID);
+        $data['assigned'] = $this->TaskModel->getAssignedTaks($this->userId);
+        $data['given'] = $this->TaskModel->getGivenTasks($this->userId);
         $data['base_url'] = $this->base_url;
         $data['title'] = "ICT Cloud | Admin | Tasks";
 
-        $menu = $this->MenuModel->getMenuOfApplication(5);
-
         $data['menu'] = "";
 
-        foreach($menu['Menu'] as $m)
+        foreach($this->menu['Menu'] as $m)
         {
             $data['menu'] .= '<li>';
             $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
             $data['menu'] .= '</li>';
         }
-
-
 
         $this->load_view("Task/ShowAllTasks", $data);
 }
@@ -75,19 +71,27 @@ class Tasks extends Backend_Controller
      */
     public function create()
     {
+        if(empty($this->Groups)) print_r($this->Groups);
         $adminGroups = array();
-        foreach($this->Groups as $Group => $users){
+        foreach($this->Groups as $group => $users){
             if($users[$this->Username]['Status'] == true){
-                $adminGroups[$Group] = $users;
+                $adminGroups[$group] = $users;
             }
         }
         $data['title'] = "Tasks";
-        $data['count'] = 5;
         $data['Groups'] = $adminGroups;
-        $data['base_url'] = base_url();
-        $this->load->view("header", $data);
-        $this->load->view("menu", $data);
-        $this->load->view("Task/Create", $data);
+        $data['base_url'] = $this->base_url;
+
+        $data['menu'] = "";
+
+        foreach($this->menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+
+        $this->load_view("Task/Create", $data);
 
     }
 
@@ -103,9 +107,9 @@ class Tasks extends Backend_Controller
         $executeType = $this->input->post('isGroupTask') == null ? false : true;
         $assignedUserIDs = array_unique(explode(",", $this->input->post('Users')));
 
-        $this->TaskModel->storeTask($this->userID, $taskName, $taskDescription,
+        $this->TaskModel->storeTask($this->userId, $taskName, $taskDescription,
             $timeToExecute, $executeType, $assignedUserIDs);
-        redirect('Tasks/Index');
+        redirect('Tasks/');
     }
 
     /**
@@ -114,12 +118,11 @@ class Tasks extends Backend_Controller
      */
     public function show($taskID)
     {
-        if($this->UserCanSeeTask($taskID)){
-            $data['Task'] = $this->TaskModel->getTask($taskID);
+        $task = $this->TaskModel->getTask($taskID);
+        if($this->UserCanSeeTask($taskID) && !empty($task)){
+            $data['Task'] = $task;
             $data['base_url'] = base_url();
             $data['count'] = 5;
-            $this->load->view("header", $data);
-            $this->load->view("menu", $data);
             $this->load->view("Task/Details", $data);
         }
         else{
@@ -170,13 +173,14 @@ class Tasks extends Backend_Controller
     private function UserCanSeeTask($IdTask)
     {
         $task = $this->TaskModel->getTask($IdTask);
+        if(empty($task)) redirect("Tasks/error");
         $assignedTasks = $this->TaskModel->getAssignedTaks($IdTask);
-        if($task[0]['IdUser'] == $this->userID){
+        if($task[0]['IdUser'] == $this->userId){
             return true;
         }
         else {
             foreach($assignedTasks as $task){
-                if($task[0]['AssignedUser'] == $this->userID)
+                if($task[0]['AssignedUser'] == $this->userId)
                     return true;
             }
         }
@@ -187,9 +191,10 @@ class Tasks extends Backend_Controller
     {
         echo "Hello World";
         $task = $this->TaskModel->getTask($IdTask);
+        if(empty($task)) redirect("Tasks/error");
         if(!empty($task)) {
             echo "Hello World";
-            if ($task[0]['IdUser'] == $this->userID)
+            if ($task[0]['IdUser'] == $this->userId)
                 return true;
         }
         return false;

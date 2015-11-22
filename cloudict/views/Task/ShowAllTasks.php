@@ -4,8 +4,6 @@
             <div class="route pull-left">
                 <i class="fa fa-home fa-2x homeicon"></i>
                 <i class="fa fa-angle-right fa-2x separatoricon"></i>
-                <a href="<?php echo site_url("Tasks/create") ?>" <button type="button" class="btn btn-default routebutton">Create Task</button></a>
-
             </div>
         </div>
     </div>
