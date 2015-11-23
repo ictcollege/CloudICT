@@ -2,6 +2,7 @@
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
+            <?php if(isset($msg)){ echo $msg;}?>
             <form id="fileupload" action="//jquery-file-upload.appspot.com/" method="POST" enctype="multipart/form-data">
                 <!-- Redirect browsers with JavaScript disabled to the origin page -->
                 <noscript><input type="hidden" name="redirect" value="https://blueimp.github.io/jQuery-File-Upload/"></noscript>
@@ -175,8 +176,7 @@
     <a class="play-pause"></a>
     <ol class="indicator"></ol>
 </div>
-
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>    
+    
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
@@ -346,6 +346,16 @@
             dropZone.removeClass('in hover');
         }, 100);
     });
+    function checkIsValidFile(filename){
+        if(filename==null||!filename.length>2){
+            return false;
+        }
+        if(/^[a-zA-Z0-9-_]{2,}[\.]{1}[a-zA-Z]{1,}$/.test(filename)){
+            return true;
+        }
+
+        return false;
+    }
     $(function () {
     'use strict';
 
@@ -415,6 +425,7 @@
         });
     }
     $(document).ready(function(){
+        
         //kreiranje novog file-a
         //new file
         $("#newFile").click(function (e){
@@ -422,7 +433,8 @@
             var IdFolder = $("#current_dir").val();
             var Mask = $("#current_path").val();
             var file = prompt("File name");
-            if(file.length>0){
+            
+            if(checkIsValidFile(file)){
                 $("#errorMsg").text('');
                 $.ajax({
 			url: "<?php echo base_url();?>CloudFiles/",
@@ -434,7 +446,7 @@
 		});
             }
             else{
-              $("#errorMsg").text("Please give file some name!");  
+              $("#errorMsg").text("Please give file some name and extension!");  
             }
         });
         
@@ -445,7 +457,7 @@
             var IdFolder = $("#current_dir").val();
             var Mask = $("#current_path").val();
             var folder_name = prompt("Folder name:");
-            if(folder_name.length>0){
+            if(folder_name!=null&&folder_name.length>0){
                 $("#errorMsg").text('');
                 $.ajax({
 			url: "<?php echo base_url();?>CloudFiles/",
@@ -500,51 +512,16 @@
             });
             
         });
-        
+  
 
-        $(document).ajaxComplete(function (){
-            //pencil click
-            $(".edit").click(function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-                var IdFolder = $("#current_dir").val();
-                var Mask = $("#current_path").val();
-            });
-            $(".rename").click(function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-                var newName = prompt("New name");
-                var tdHref=$(this).parents('tr').find('p.name').find('a');
-                if(newName!=null&&newName.length>0){
-                $("#errorMsg").text('');
-                $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/",
-                        data:{action:"renameFile",IdFile:IdFile,newName:newName},
-			success: function(data) {
-                           if(data){
-                               window.location.reload();
-                           }
-                           else{
-                               alert("Error!");
-                           }
-			}
 
-                    });
-                }
-                else{
-                  $("#errorMsg").text("Please give folder some name!");  
-                }
-            });
-            //click on move link
-            $(".move").click(function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-            });
-        });
     });
 
 });
-
+        $(document).ajaxComplete(function (){
+            _init();
+        });
+        
 function shareWithUser(control){
         var IdUser = $(control).val();
         var chb = $(control);
@@ -596,5 +573,52 @@ function openModal(control){
 
     });
  }
+ 
+function _init(){
+ //unbind all 
+ $(".rename").off();
+ $(".edit").off();
+ $(".move").off();
+ 
+ //bind
+ $(".rename").bind('click',function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                var newName = prompt("New name");
+                var tdHref=$(this).parents('tr').find('p.name').find('a');
+                if(newName!=null&&newName.length>0){
+                $("#errorMsg").text('');
+                $.ajax({
+			url: "<?php echo base_url();?>CloudFiles/",
+                        data:{action:"renameFile",IdFile:IdFile,newName:newName},
+			success: function(data) {
+                           if(data){
+                               window.location.reload();
+                           }
+                           else{
+                               alert("Error!");
+                           }
+			}
+
+                    });
+                }
+                else{
+                  $("#errorMsg").text("Please give folder some name!");  
+                }
+            });
+            //click on move link
+            $(".move").bind('click',function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+            });
+            $(".edit").bind('click',function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                var IdFolder = $("#current_dir").val();
+                var Mask = $("#current_path").val();
+                window.open("<?php echo base_url();?>Share/edit/"+IdFile,"","width=400","height=800");
+                
+        });  
+ };
 
 </script>

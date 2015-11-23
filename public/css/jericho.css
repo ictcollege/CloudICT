@@ -353,3 +353,12 @@ p.error {
 .more2 {
     font-size: 14px;
 }
+
+#editor { 
+        position: absolute;
+        top: 250px;
+        right: 100px;
+        bottom: 0;
+        left: 250px;
+        width: 100%;
+}

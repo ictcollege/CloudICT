@@ -70,7 +70,7 @@ class Files extends Frontend_Controller{
     }
     
     public function shared_by_link(){
-        var_dump("Sta ovde bogte?");
+        var_dump("Sta ovde ...?");
     }
 
 

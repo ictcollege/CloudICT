@@ -27,6 +27,9 @@ class Share extends Frontend_Controller{
                 case 'sharedWithOthers':
                     $this->sharedWithOthers();
                     break;
+                case 'saveFile':
+                    $this->saveFile($_GET['IdFile']);
+                    break;
             }
         }
         
@@ -294,6 +297,40 @@ class Share extends Frontend_Controller{
             case "3":
                 return "DELETE";
         }
+    }
+    
+    public function edit($IdFile){
+        $this->load->model("FileModel");
+        $file = $this->FileModel->getFileById($IdFile);
+        $data['title'] = $file->FileName;
+        
+        if(file_exists($file->FilePath)){
+            $content = file_get_contents($file->FilePath);
+            $data['content'] = $content;
+            $data['filePath'] = $file->FilePath;
+            $data['IdFile']=$IdFile;
+        }
+        else{
+            $data['error'] = "File not found!";
+        }
+        $this->load->view("editor",$data);
+    }
+    
+    public function saveFile(){
+        if(isset($_POST['json'])){
+            $json = json_decode($_POST['json']);
+            $this->load->model("FileModel");
+            $file = $this->FileModel->getFileById($json->IdFile);
+            if(file_exists($file->FilePath)){
+                file_put_contents($file->FilePath, $json->content , LOCK_EX);
+                
+                die(TRUE);
+            }
+            else{
+                die(FALSE);
+            }
+        }
+        
     }
     
 }

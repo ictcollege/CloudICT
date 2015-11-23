@@ -274,6 +274,11 @@ class FileModel extends CI_Model {
             return $result;
         }
         
+        
+           public function getFavorites($IdUser){
+        
+            }
+        
 
         
 	
