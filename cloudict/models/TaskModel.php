@@ -19,11 +19,23 @@ class TaskModel extends CI_Model
     {
         $query = "
             SELECT *
-            FROM ( Task t JOIN User u ON t.IdUser = u.IdUser ) JOIN TaskUser tu ON t.IdTask = tu.IdTask
-            WHERE t.IdTask = ?
+            FROM Task
+            WHERE IdTask = ?
         ";
 
-        $data = $this->db->query($query, [$IdTask])->result_array();
+        $data = $this->db->query($query, [$IdTask])->row_array();
+
+        $query2 = "
+            SELECT IdTask, IdUser, TaskUserFullName, TaskUserAssigned, TaskUserTimeExecuted
+            FROM TaskUser
+            WHERE IdTask = ?
+        ";
+
+        $data2 = $this->db->query($query2, [$IdTask])->result_array();
+
+        $data["users"] = $data2;
+
+
         return $data;
 
 //        $this->db->where("IdTask", $IdTask);

@@ -6,7 +6,6 @@
                 <i class="fa fa-angle-right fa-2x separatoricon"></i>
                 <button type="button" class="btn btn-default routebutton"><i class="fa fa-upload  fa-1x"></i></button>
                 <button type="button" class="btn btn-default routebutton">New</button>
-                <?php $task = $Task[0]; ?>
             </div>
         </div>
     </div>
@@ -40,7 +39,23 @@
                             <td style="width: 50px"></td>
                         </tr>
 
-                        <?php print_r($task) ?>
+                        <?php //print_r($task) ?>
+
+                        <tr>
+                            <td style="width: 50px"></td>
+                            <td style="width: 50px">Task Status: </td>
+                            <td style="width: 50px">
+                                <?php foreach($task['users'] as $user) { ?>
+                                    <div class="users">
+                                        <?php $status = $user['TaskUserTimeExecuted'] == ""? "Finished" : "Not Finished" ?>
+                                        <?php echo "Username: ".$user['TaskUserFullName']; ?>
+                                        <br />
+                                        <?php    echo "Status: ".$status; ?>
+                                    </div>
+                                <?php } ?>
+                            </td>
+                            <td style="width: 50px"></td>
+                        </tr>
 
 
                         </tbody>

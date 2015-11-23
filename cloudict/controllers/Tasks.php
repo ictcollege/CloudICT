@@ -155,7 +155,6 @@ class Tasks extends Backend_Controller
                     "FullName" => $user[0]["UserFullname"]
                 ));
             }
-            print_r($this->input->post('Users'));
             $this->TaskModel->storeTask($this->userId, $taskName, $taskDescription,
                 $timeToExecute, $executeType, $assignedUsers);
             redirect('Tasks/');
@@ -186,7 +185,7 @@ class Tasks extends Backend_Controller
     {
         $task = $this->TaskModel->getTask($taskID);
         if($this->UserCanSeeTask($taskID)){
-            $data['Task'] = $task;
+            $data['task'] = $task;
             $data['base_url'] = base_url();
             $data['count'] = 5;
 
@@ -224,7 +223,7 @@ class Tasks extends Backend_Controller
         $task = $this->TaskModel->getTask($taskId);
         if(empty($task)) return false;
         $assignedTasks = $this->TaskModel->getCreatedTasks($this->userId);
-        if($task[0]['IdUser'] == $this->userId){
+        if($task['IdUser'] == $this->userId){
             return true;
         }
         else {
@@ -238,12 +237,9 @@ class Tasks extends Backend_Controller
 
     private function UserCanEditTask($taskId)
     {
-        echo "Hello World";
         $task = $this->TaskModel->getTask($taskId);
-        if(empty($task)) return false;
         if(!empty($task)) {
-            echo "Hello World";
-            if ($task[0]['IdUser'] == $this->userId)
+            if ($task['IdUser'] == $this->userId)
                 return true;
         }
         return false;
