@@ -38,7 +38,16 @@ class Files extends Frontend_Controller{
         $this->load_view('filesView', $data);
     }
     public function favourites(){
-        var_dump("Mora se doda tabela u bazi!");
+        $data = array();
+        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
+        $data['mask'] = $mask;
+        $data['menu'] = $this->getMenu(1);
+        $user_group = $this->session->userdata('group');
+        $data['user_groups'] = $user_group;
+        if(!empty($this->msg)){
+            $data['msg']=  $this->msg;
+        }
+        $this->load_view('favouritesView', $data);
     }
     public function shared_with_you(){
         

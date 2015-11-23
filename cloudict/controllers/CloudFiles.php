@@ -45,6 +45,9 @@ class CloudFiles extends File_Controller{
                     $newFile = rawurlencode(preg_replace('/\s+/', '_', $clean));
                     $this->newFile($newFile,$_GET['Mask'],intval($_GET['IdFolder']));
                     break;
+                case "favourites":
+                    
+                    break;
             }
             
         }
@@ -391,6 +394,11 @@ class CloudFiles extends File_Controller{
         } else {
             return 'text/plain';
         }
+    }
+    //files marked favourites
+    
+    protected function favourites($IdUser) {
+        
     }
     
 

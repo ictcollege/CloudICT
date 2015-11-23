@@ -276,8 +276,26 @@ class FileModel extends CI_Model {
         
         
            public function getFavorites($IdUser){
-        
-            }
+               $query = "
+			SELECT	`IdFile`, 
+					`FileTypeMime`,
+					`FileExtension`,
+					`FileName`,
+                                        `FilePath`,
+					`FileSize`,
+					`FileLastModified`,
+					`FileCreated`
+				
+			FROM 	`file`
+
+			JOIN	`FileType`
+			USING	(`IdFileType`)
+
+			WHERE	`IdUser` = ? AND Favorites = 1";
+		$result = $this->db->query($query, [$IdUser])->result_array();
+                
+		return $result;
+           }
         
 
         

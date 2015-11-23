@@ -263,7 +263,10 @@ class Share extends Frontend_Controller{
         if($result->FileTypeMime == "DIR"){
             $this->createZip($result->FilePath);
         }
-        $this->download_file($result);
+        else{
+            $this->download_file($result);
+        }
+        
         
     }
     
