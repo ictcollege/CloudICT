@@ -40,6 +40,8 @@
                             <td style="width: 50px"></td>
                         </tr>
 
+                        <?php print_r($task) ?>
+
 
                         </tbody>
                     </table>

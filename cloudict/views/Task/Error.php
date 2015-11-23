@@ -14,7 +14,7 @@
     <div class="row">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h4><i class="fa fa-files-o fa-fw"></i>There was an error while performing the task</h4>
+                <h4><i class="fa fa-files-o fa-fw"></i>There was an error while processing your request!</h4>
             </div>
             <div class="panel-body">
                 <div class="col-lg-12 table-responsive">

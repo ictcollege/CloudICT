@@ -4,27 +4,18 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 class Tasks extends Backend_Controller
 {
 
-    /**
-     * THIS FILE SHOULD BE EDITED ONLY FROM tasks-feature BRANCH
-     * git checkout tasks-feature
-     */
-
     private $userId;
     private $Username;
     private $base_url;
     private $Groups;
     private $menu;
 
-    /**
-     * Tasks constructor.
-     */
+
     public function __construct()
     {
         parent::__construct();
 
         $this->load->helper('url');
-
-        //TODO:Implement proper redirect on not logged in
 
         if($this->isLogged()){
             $this->userId = $this->session->userid;
@@ -43,16 +34,15 @@ class Tasks extends Backend_Controller
         else redirect(base_url());
     }
 
-
-    /**
-     * Shows all Tasks for current user
-     */
     public function index()
     {
-        $data['assigned'] = $this->TaskModel->getAssignedTaks($this->userId);
-        $data['given'] = $this->TaskModel->getGivenTasks($this->userId);
+        $data['tasks'] = $this->TaskModel->getAssignedTasks($this->userId);
+        $data['taskTitle'] = "Tasks assigned to you";
         $data['base_url'] = $this->base_url;
         $data['title'] = "ICT Cloud | Admin | Tasks";
+
+        $data['finish'] = true;
+        $data['delete'] = false;
 
         $data['menu'] = "";
 
@@ -63,15 +53,62 @@ class Tasks extends Backend_Controller
             $data['menu'] .= '</li>';
         }
 
-        $this->load_view("Task/ShowAllTasks", $data);
-}
+        $this->load_view("Task/TaskList", $data);
+    }
 
-    /**
-     * shows view for creating new task
-     */
+    public function assigned()
+    {
+        $data['tasks'] = $this->TaskModel->getCreatedTasks($this->userId);
+        $data['taskTitle'] = "Tasks you Assigned";
+        $data['base_url'] = $this->base_url;
+        $data['title'] = "ICT Cloud | Admin | Tasks";
+
+        $data['finish'] = false;
+        $data['delete'] = true;
+
+        $data['menu'] = "";
+
+        foreach($this->menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+
+        $this->load_view("Task/TaskList", $data);
+    }
+
+    public function finished(){
+        $data['tasks'] = $this->TaskModel->getFinishedTasks($this->userId);
+        $data['taskTitle'] = "Finished Tasks";
+        $data['base_url'] = $this->base_url;
+        $data['title'] = "ICT Cloud | Admin | Tasks";
+
+        $data['finish'] = false;
+        $data['delete'] = false;
+
+        $data['menu'] = "";
+
+        foreach($this->menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+
+        $this->load_view("Task/TaskList", $data);
+    }
+
+    public function finish($taskId)
+    {
+        if($this->UserCanSeeTask($taskId)){
+            $this->TaskModel->finishTask($taskId);
+        }
+        redirect("Tasks/");
+    }
+
     public function create()
     {
-        if(empty($this->Groups)) print_r($this->Groups);
         $adminGroups = array();
         foreach($this->Groups as $group => $users){
             if($users[$this->Username]['Status'] == true){
@@ -81,6 +118,11 @@ class Tasks extends Backend_Controller
         $data['title'] = "Tasks";
         $data['Groups'] = $adminGroups;
         $data['base_url'] = $this->base_url;
+
+        $data["edate"] = array(
+            "type" => "date",
+            "name" => "edate"
+        );
 
         $data['menu'] = "";
 
@@ -95,86 +137,93 @@ class Tasks extends Backend_Controller
 
     }
 
-    /**
-     * Target for create method, stores created task in database
-     */
     public function store()
     {
-        $this->load->helper('form');
-        $taskName = $this->input->post('TaskName');
-        $taskDescription = $this->input->post('TaskDescription');
-        $timeToExecute = 0;
-        $executeType = $this->input->post('isGroupTask') == null ? false : true;
-        $assignedUserIDs = array_unique(explode(",", $this->input->post('Users')));
-
-        $this->TaskModel->storeTask($this->userId, $taskName, $taskDescription,
-            $timeToExecute, $executeType, $assignedUserIDs);
-        redirect('Tasks/');
+        $submitted = $this->input->post("submit");
+        if(isset($submitted)) {
+            $this->load->helper('form');
+            $taskName = $this->input->post('TaskName');
+            $taskDescription = $this->input->post('TaskDescription');
+            $timeToExecute = $this->input->post("edate");;
+            $executeType = $this->input->post('isGroupTask') == null ? false : true;
+            $assignedUserIDs = array_unique($this->input->post('Users'));
+            $assignedUsers = array();
+            foreach ($assignedUserIDs as $id) {
+                $user = $this->UserModel->getUserById($id);
+                array_push($assignedUsers, array(
+                    "id" => $id,
+                    "FullName" => $user[0]["UserFullname"]
+                ));
+            }
+            print_r($this->input->post('Users'));
+            $this->TaskModel->storeTask($this->userId, $taskName, $taskDescription,
+                $timeToExecute, $executeType, $assignedUsers);
+            redirect('Tasks/');
+        }
+        else{
+            $this->showError("There was an error while trying to create the task.");
+        }
     }
 
-    /**
-     * Shows current task, i.e no. of people who finished the selected task
-     * TODO: Find a way to limit the access to task to people who are on the task
-     */
+    public function showError($message)
+    {
+        $data['menu'] = "";
+
+        foreach($this->menu['Menu'] as $m)
+        {
+            $data['menu'] .= '<li>';
+            $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+            $data['menu'] .= '</li>';
+        }
+
+        $data['Error'] = $message;
+        $data['base_url'] = base_url();
+        $data['count'] = 5;
+        $this->load_view("Task/Error", $data);
+    }
+
     public function show($taskID)
     {
         $task = $this->TaskModel->getTask($taskID);
-        if($this->UserCanSeeTask($taskID) && !empty($task)){
+        if($this->UserCanSeeTask($taskID)){
             $data['Task'] = $task;
             $data['base_url'] = base_url();
             $data['count'] = 5;
-            $this->load->view("Task/Details", $data);
+
+            $data['menu'] = "";
+
+            foreach($this->menu['Menu'] as $m)
+            {
+                $data['menu'] .= '<li>';
+                $data['menu'] .= '<a href="'.$m['AppMenuLink'].'"><i class="fa '.$m['AppMenuIcon'].' fa-fw"></i> '.$m['AppMenuName'].'</a>';
+                $data['menu'] .= '</li>';
+            }
+
+            $this->load_view("Task/Details", $data);
         }
         else{
-            $data["Error"] = "You do not have permision to see this Task";
-            $data['base_url'] = base_url();
-            $data['count'] = 5;
-            $this->load->view("header", $data);
-            $this->load->view("menu", $data);
-            $this->load->view("Task/Error", $data);
+            if(!empty($task))$this->showError("You do not have permision to see this Task!");
+            else $this->showError("Task does not exist!");
+
         }
     }
 
-    /**
-     * Show view for editing selected task
-     */
-    public function edit()
+    public function destroy($taskId)
     {
-        $this->load->view('Task/Edit');
-    }
-
-    /**
-     * Method for updating selected task
-     */
-    public function update()
-    {
-
-    }
-
-    /**
-     * Method for deleting selected tasks
-     */
-    public function destroy($taskID)
-    {
-        if($this->UserCanEditTask($taskID)) {
-            $this->TaskModel->removeTask($taskID);
+        if($this->UserCanEditTask($taskId)) {
+            $this->TaskModel->removeTask($taskId);
             redirect("Tasks/Index");
         }
         else {
-            $data['Error'] = "You do not have premission to delete this task";
-            $data['base_url'] = base_url();
-            $data['count'] = 5;
-            $this->load->view("header", $data);
-            $this->load->view("menu", $data);
-            $this->load->view("Task/Error", $data);
+            $this->showError("You do not have premission to delete this task");
         }
     }
 
-    private function UserCanSeeTask($IdTask)
+    private function UserCanSeeTask($taskId)
     {
-        $task = $this->TaskModel->getTask($IdTask);
-        if(empty($task)) redirect("Tasks/error");
-        $assignedTasks = $this->TaskModel->getAssignedTaks($IdTask);
+        $task = $this->TaskModel->getTask($taskId);
+        if(empty($task)) return false;
+        $assignedTasks = $this->TaskModel->getCreatedTasks($this->userId);
         if($task[0]['IdUser'] == $this->userId){
             return true;
         }
@@ -187,11 +236,11 @@ class Tasks extends Backend_Controller
         return false;
     }
 
-    private function UserCanEditTask($IdTask)
+    private function UserCanEditTask($taskId)
     {
         echo "Hello World";
-        $task = $this->TaskModel->getTask($IdTask);
-        if(empty($task)) redirect("Tasks/error");
+        $task = $this->TaskModel->getTask($taskId);
+        if(empty($task)) return false;
         if(!empty($task)) {
             echo "Hello World";
             if ($task[0]['IdUser'] == $this->userId)

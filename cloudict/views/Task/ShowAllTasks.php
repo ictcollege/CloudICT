@@ -93,8 +93,8 @@
                                 <td style="width:25px"></td>
                                 <td style="width:50px" class="filename"><?php echo $task["TaskName"] ?></td>
                                 <td style="width:250px"><?php echo $task["TaskDescription"] ?></td>
-                                <td style="width:100px">15-04-2015</td>
-                                <td style="width:100px">20-04-2015</td>
+                                <td style="width:100px"><?php echo date("d/m/Y", $task["TaskTimeCreated"]); ?></td>
+                                <td style="width:100px"><?php echo date("d/m/Y", $task["TaskTimeToExecute"]); ?></td>
                                 <td style="width:25px"></td>
                                 <td style="width:50px">
                                     <a href="<?php echo site_url("Tasks/show/")."/".$task["IdTask"]; ?>">

@@ -10,6 +10,12 @@
         </div>
     </div>
 
+    <script type="javascript">
+
+        function
+
+    </script>
+
     <div class="row">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -42,6 +48,12 @@
                         </tr>
                         <tr>
                             <td style="width: 50px"></td>
+                            <td style="width: 50px">End Date: </td>
+                            <td style="width: 50px"><?php echo form_input($edate) ?></td>
+                            <td style="width: 50px"></td>
+                        </tr>
+                        <tr>
+                            <td style="width: 50px"></td>
                             <td style="width: 50px">Assign as group task:  </td>
                             <td style="width: 50px"><?php echo form_checkbox("isGroupTask") ?></td>
                             <td style="width: 50px"></td>
@@ -54,7 +66,7 @@
                                 if(empty($Groups)) echo "You do not have permision to assign tasks to anyone.";
                                 foreach($Groups as $Group => $Users){
                                     foreach($Users as $User => $UserData){
-                                        echo "Username: $User"."<input type='checkbox' name='Users' value='{$UserData['UserId']}' /> <br />";
+                                        echo "Username: $User"."<input type='checkbox' name='Users[]' value='{$UserData['UserId']}' /> <br />";
                                     }
                                     echo "<br />";
                                 }

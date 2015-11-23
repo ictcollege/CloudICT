@@ -5,28 +5,48 @@ class TaskModel extends CI_Model
 {
 
 
+    /**
+     * TaskModel constructor.
+     */
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->load->model("UserModel");
+    }
+
     public function getTask($IdTask)
     {
-        $this->db->where("IdTask", $IdTask);
-        return $this->db->get("Task")->result_array();
+        $query = "
+            SELECT *
+            FROM ( Task t JOIN User u ON t.IdUser = u.IdUser ) JOIN TaskUser tu ON t.IdTask = tu.IdTask
+            WHERE t.IdTask = ?
+        ";
+
+        $data = $this->db->query($query, [$IdTask])->result_array();
+        return $data;
+
+//        $this->db->where("IdTask", $IdTask);
+//        return $this->db->get("Task")->result_array();
     }
 
     /**
      * Get Tasks assigned to you
-     * @param $currentUserID
+     * @param $userId
      * @return mixed
      */
-    public function getAssignedTaks($currentUserID)
+    public function getAssignedTasks($userId)
     {
 
         $query = "
-            SELECT t.IdTask, TaskName, TaskDescription, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType, tu.IdUser AS AssignedUser
+            SELECT t.IdTask, TaskName, TaskDescription, TaskTimeCreated,
+                    TaskTimeToExecute, TaskExecuteType, tu.IdUser AS AssignedUser, TaskUserTimeExecuted as Finished
             FROM Task AS  t JOIN TaskUser AS tu ON t.IdTask = tu.IdTask
-            WHERE tu.idUser = ?
+            WHERE tu.idUser = ? AND TaskUserTimeExecuted IS NULL
         ";
 
 
-        $result = $this->db->query($query, [$currentUserID])->result_array();
+        $result = $this->db->query($query, [$userId])->result_array();
 
 
         $data = $result;
@@ -36,12 +56,64 @@ class TaskModel extends CI_Model
 
     }
 
+    public function getFinishedTasks($userId)
+    {
+        $query = "
+            SELECT t.IdTask, TaskName, TaskDescription, TaskTimeCreated,
+                        TaskTimeToExecute, TaskExecuteType, tu.IdUser AS AssignedUser, TaskUserTimeExecuted as Finished
+            FROM Task AS  t JOIN TaskUser AS tu ON t.IdTask = tu.IdTask
+            WHERE tu.idUser = ? AND TaskUserTimeExecuted IS NOT NULL
+        ";
+
+        $result = $this->db->query($query, [$userId])->result_array();
+        $data = $result;
+
+        return $data;
+    }
+
+    public function finishTask($taskId, $userId = 0)
+    {
+        $isGroupTask = $this->isGroupTask($taskId);
+
+        if(!$isGroupTask) {
+            $query = "
+                UPDATE TaskUser
+                SET TaskUserTimeExecuted = NOW()
+                WHERE IdTask = ?
+            ";
+            $result = $this->db->query($query, [$taskId]);
+        }
+        else {
+            $query = "
+                UPDATE TaskUser
+                SET TaskUserTimeExecuted = NOW()
+                WHERE IdTask = ? AND (IdUser = ?)
+            ";
+            $result = $this->db->query($query, [$taskId, $userId]);
+        }
+
+
+        return $result;
+    }
+
+    public function isGroupTask($taskId)
+    {
+        $query = "
+            SELECT TaskExecuteType
+            FROM Task
+            WHERE IdTask = ?
+        ";
+
+        $result = $this->db->query($query, [$taskId])->row_array();
+        return $result['TaskExecuteType'];
+    }
+
     /**
      * Get tasks that you assigned
      * @param $currentUserID (int)
      * @return mixed
      */
-    public function getGivenTasks($currentUserID)
+    public function getCreatedTasks($currentUserID)
     {
         $query = "
             SELECT IdTask, TaskName, TaskDescription, TaskTimeCreated, TaskTimeToExecute, TaskExecuteType
@@ -68,40 +140,38 @@ class TaskModel extends CI_Model
      * @param $assignedUser (array), Contains user data of users assigned to the Task
      * @return bool
      */
-    public function storeTask($userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUser)
+    public function storeTask($userID, $taskName, $taskDescription, $timeToExecute, $executeType, $assignedUsers)
     {
+        $sdate = strtotime(date("Y-m-d"));
+        $edate = strtotime($timeToExecute);
         $data = array(
             'IdUser' => $userID,
             'TaskName' => $taskName,
             'TaskDescription' => $taskDescription,
-            //'TimeCreated' => date("Y-m-d H:i:s"),
-            'TaskTimeCreated' => 1,
-            'TaskTimeToExecute' => $timeToExecute,
+            'TaskTimeCreated' => $sdate,
+            'TaskTimeToExecute' => $edate,
             'TaskExecuteType' => $executeType
         );
 
         $this->db->insert('Task', $data);
-        $insertID = $this->db->insert_id();
+        $insertId = $this->db->insert_id();
 
-        //if ($insertID != null) {
+        if (isset($insertId)) {
 
-            //if (!empty($assignedUser)) {
+            if (!empty($assignedUsers)) {
                 $taskUserData = array();
-                foreach ($assignedUser as $user) {
+                foreach ($assignedUsers as $user) {
                     array_push($taskUserData, array(
-                        'IdTask' => $insertID,
-                        'IdUser' => $user['idUser'],
-                        'TaskUserFullname' => $user['username'],
-                        'TaskUserAssigned' => date("Y-m-d H:i:s"),
+                        'IdTask' => $insertId,
+                        'IdUser' => $user['id'],
+                        'TaskUserFullname' => $user['FullName'],
+                        'TaskUserAssigned' => $sdate,
                     ));
                 }
-                return $this->db->insert_batch('TaskUser', $taskUserData);
-            //}
 
-            return true;
-        //}
-
-        //return false;
+                $this->db->insert_batch('TaskUser', $taskUserData);
+            }
+        }
     }
 
 
@@ -112,7 +182,13 @@ class TaskModel extends CI_Model
             WHERE Idtask = ?
         ";
 
-        $result = $this->db->query($query, [$IdTask]);
-        return $result;
+        $this->db->query($query, [$IdTask]);
+
+        $query2 = "
+            DELETE FROM TaskUser
+            WHERE IdTask = ?
+        ";
+
+        $this->db->query($query2, [$IdTask]);
     }
 }
