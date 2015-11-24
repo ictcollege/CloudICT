@@ -47,7 +47,7 @@
                             <td style="width: 50px">
                                 <?php foreach($task['users'] as $user) { ?>
                                     <div class="users">
-                                        <?php $status = $user['TaskUserTimeExecuted'] == ""? "Finished" : "Not Finished" ?>
+                                        <?php $status = isset($user['TaskUserTimeExecuted'])? "Finished" : "Not Finished" ?>
                                         <?php echo "Username: ".$user['TaskUserFullName']; ?>
                                         <br />
                                         <?php    echo "Status: ".$status; ?>
