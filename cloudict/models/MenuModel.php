@@ -25,7 +25,7 @@ class MenuModel extends CI_Model{
             
             $data = array();
             
-            if(!empty(($result)))
+            if(!empty($result))
             {
                 $i=0;
                 foreach($result as $row) 
