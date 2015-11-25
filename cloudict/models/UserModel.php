@@ -61,10 +61,10 @@ class UserModel extends CI_Model {
                     if ($row2['Group'] == $row['Group']) {
                         $group = $row['Group'];
                         $user = $row2['User'];
-                        $data[$group][$user] = [
+                        $data[$group][$user] = array(
                             "UserId" => $row2["Id"],
                             "Status" => $row2['Admin']
-                        ];
+                        );
                     }
                 }
             }
@@ -127,7 +127,7 @@ class UserModel extends CI_Model {
 			AND `UserPassword` = ?
 		";
 
-        $result = $this->db->query($query, [$username,$password])->result_array();
+        $result = $this->db->query($query, array($username,$password))->result_array();
 
         $data['User'] = array();
 
@@ -158,7 +158,7 @@ class UserModel extends CI_Model {
 			WHERE	`UserName` = ?
 		";
 
-        $result = $this->db->query($query, [$username])->result_array();
+        $result = $this->db->query($query, array($username))->result_array();
 
         return !empty($result)?1:0;
     }
@@ -185,7 +185,7 @@ class UserModel extends CI_Model {
 			WHERE	`UserEmail` = ?
 		";
 
-        $result = $this->db->query($query, [$email])->result_array();
+        $result = $this->db->query($query, array($email))->result_array();
 
         return !empty($result)?1:0;
     }
@@ -212,7 +212,7 @@ class UserModel extends CI_Model {
 			WHERE	`UserKey` = ?
 		";
 
-        $result = $this->db->query($query, [$UserKey])->result_array();
+        $result = $this->db->query($query, array($UserKey))->result_array();
         $key = "";
 
         if(!empty($result))
@@ -240,7 +240,7 @@ class UserModel extends CI_Model {
 			VALUES (?,?);
 		";
 
-        $result = $this->db->query($query, [$email,md5(time()+$email)]);
+        $result = $this->db->query($query, array($email,md5(time()+$email)));
         $IdUser = $this->db->insert_id();
         $updateQuery = "
 			UPDATE `User` SET `UserName` = ?,
@@ -252,7 +252,7 @@ class UserModel extends CI_Model {
 			WHERE IdUser = ?;
 		";
         $updateData = "user$IdUser";
-        $this->db->query($updateQuery, [$updateData,$updateData,$updateData,5,time(),$IdUser]);
+        $this->db->query($updateQuery, array($updateData,$updateData,$updateData,5,time(),$IdUser));
         return $IdUser;
     }
 
@@ -276,7 +276,7 @@ class UserModel extends CI_Model {
 			
 			WHERE IdUser = ?;
 		";
-        $result = $this->db->query($updateQuery, [$UserDiskUsed,$IdUser]);
+        $result = $this->db->query($updateQuery, array($UserDiskUsed,$IdUser));
         return !empty($result)?1:0;
     }
 
@@ -303,7 +303,7 @@ class UserModel extends CI_Model {
                     WHERE `IdUser` = ?
                     ";
 
-        $result = $this->db->query($query, [$idUser])->result_array();
+        $result = $this->db->query($query, array($idUser))->result_array();
 
         $data = array();
 
@@ -350,7 +350,7 @@ class UserModel extends CI_Model {
                     WHERE `IdUser` = ?
                     ";
 
-        $result = $this->db->query($query, [$username, md5($password), $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires, $iduser]);
+        $result = $this->db->query($query, array($username, md5($password), $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires, $iduser));
     }
 
     public function deleteUser($iduser)
@@ -362,7 +362,7 @@ class UserModel extends CI_Model {
                     
                     WHERE `IdUser` = ?
                     ";
-        $result = $this->db->query($query, [$iduser]);
+        $result = $this->db->query($query, array($iduser));
     }
 
     public function getUserById($iduser)
@@ -374,7 +374,7 @@ class UserModel extends CI_Model {
                     
                     WHERE `IdUser` = ?
                     ";
-        $result = $this->db->query($query, [$iduser])->result_array();
+        $result = $this->db->query($query, array($iduser))->result_array();
 
         return $result;
     }
@@ -412,7 +412,7 @@ class UserModel extends CI_Model {
                     WHERE `IdUser` = ?
                     ";
 
-        $result = $this->db->query($query, [$idUser]);
+        $result = $this->db->query($query, array($idUser));
 
         return $result;
     }
@@ -453,7 +453,7 @@ class UserModel extends CI_Model {
                         
                         WHERE `UserKey` = ?;
 		";
-        $result = $this->db->query($query, [$username,md5($password),$key]);
+        $result = $this->db->query($query, array($username,md5($password),$key));
 
 
     }
@@ -495,7 +495,7 @@ class UserModel extends CI_Model {
 				`UserEmail` = ?
 			WHERE IdUser = ?;
 		";
-        $result = $this->db->query($query, [$username, $fullname, $email, $iduser]);
+        $result = $this->db->query($query, array($username, $fullname, $email, $iduser));
     }
 }
 
