@@ -75,7 +75,7 @@ class UserModel extends CI_Model {
     public function getAllUsersInGroups($IdUser){
         $query = "SELECT * FROM `usergroup` JOIN `group` ON usergroup.IdGroup = group.IdGroup WHERE usergroup.IdUser = ?";
 
-        $result = $this->db->query($query, [$IdUser]);
+        $result = $this->db->query($query, array($IdUser));
         $query = "SELECT usergroup.IdUser,usergroup.IdGroup,usergroup.UserGroupStatusAdmin,user.UserName FROM usergroup JOIN user ON usergroup.IdUser = user.IdUser  WHERE usergroup.IdGroup = ?";
         foreach($result->result() as $obj){
             $obj->Users = $this->db->query($query, $obj->IdGroup)->result_array();

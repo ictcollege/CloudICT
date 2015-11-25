@@ -10,7 +10,7 @@
  * @author Darko
  */
 class Frontend_Controller extends MY_Controller{
-    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudICT/data/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
+    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/cloud_project/data/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
     public $class_name;
     public function __construct() {
         $this->class_name = get_class($this);
