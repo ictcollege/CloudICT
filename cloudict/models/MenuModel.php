@@ -21,7 +21,7 @@ class MenuModel extends CI_Model{
                     ORDER BY `AppMenuOrder`
             ";
             
-            $result = $this->db->query($query, [$idApplication])->result_array();
+            $result = $this->db->query($query, array($idApplication))->result_array();
             
             $data = array();
             

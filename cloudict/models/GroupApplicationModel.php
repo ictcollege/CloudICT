@@ -57,7 +57,7 @@ class GroupApplicationModel extends CI_Model{
             ";
             
         
-            $result = $this->db->query($query, [$idGroup, $idApp]);
+            $result = $this->db->query($query, array($idGroup, $idApp));
         }
         
         
@@ -70,7 +70,7 @@ class GroupApplicationModel extends CI_Model{
             ";
             
         
-            $result = $this->db->query($query, [$idGroup, $idApp]);
+            $result = $this->db->query($query, array($idGroup, $idApp));
         }
         
         public function getApplicationsMenu($idApp)
@@ -85,7 +85,7 @@ class GroupApplicationModel extends CI_Model{
             ";
             
         
-            $result = $this->db->query($query, [$idApp])->result_array();
+            $result = $this->db->query($query, array($idApp))->result_array();
             
             $data = array();
             

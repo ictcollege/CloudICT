@@ -10,7 +10,7 @@ class UserGroupModel extends CI_Model {
                 VALUES (?)
             ";
             
-        $this->db->query($query, [$groupName]);
+        $this->db->query($query, array($groupName));
         $IdGroup = $this->db->insert_id();
         
         return $IdGroup;
@@ -26,7 +26,7 @@ class UserGroupModel extends CI_Model {
                 WHERE `IdGroup` = ?
             ";
         
-        $this->db->query($query, [$idGroup]);
+        $this->db->query($query, array($idGroup));
         
         $query2 = "
                 DELETE 
@@ -36,7 +36,7 @@ class UserGroupModel extends CI_Model {
                 WHERE `IdGroup` = ?
             ";
         
-        $this->db->query($query2, [$idGroup]);
+        $this->db->query($query2, array($idGroup));
         
         $query3 = "
                 DELETE 
@@ -46,7 +46,7 @@ class UserGroupModel extends CI_Model {
                 WHERE `IdGroup` = ?
                 ";
         
-        $this->db->query($query3, [$idGroup]);
+        $this->db->query($query3, array($idGroup));
     }
     
     public function changeGroupName($idGroup, $newName)
@@ -57,7 +57,7 @@ class UserGroupModel extends CI_Model {
                 WHERE       `IdGroup` = ?
                 ";
         
-        $this->db->query($query, [$newName, $idGroup]);
+        $this->db->query($query, array($newName, $idGroup));
     }
     
     public function getGroups()
@@ -137,7 +137,7 @@ class UserGroupModel extends CI_Model {
                                                 )
             ";
             
-            $result = $this->db->query($query, [$idGroup])->result_array();
+            $result = $this->db->query($query, array($idGroup))->result_array();
             
             $data = array();
             
@@ -161,7 +161,7 @@ class UserGroupModel extends CI_Model {
                 AND         `IdUser` = ?
                 ";
         
-        $this->db->query($query, [$idGroup, $idUser]);
+        $this->db->query($query, array($idGroup, $idUser));
     }
     
     public function addAdmin($idUser, $idGroup) {
@@ -172,7 +172,7 @@ class UserGroupModel extends CI_Model {
                 AND         `IdUser` = ?
                 ";
         
-        $this->db->query($query, [$idGroup, $idUser]);
+        $this->db->query($query, array($idGroup, $idUser));
     }
     
     public function removeUserFromGroup($idUser, $idGroup) {
@@ -183,7 +183,7 @@ class UserGroupModel extends CI_Model {
                 AND         `IdUser` = ?
                 ";
         
-        $this->db->query($query, [$idGroup, $idUser]);
+        $this->db->query($query, array($idGroup, $idUser));
     }
     
     public function addNewUserToGroup($idUser, $idGroup)
@@ -194,7 +194,7 @@ class UserGroupModel extends CI_Model {
                 VALUES (?, ?, 0);
                 ";
         
-        $this->db->query($query, [$idUser, $idGroup]);
+        $this->db->query($query, array($idUser, $idGroup));
     }
     
     public function searchNewUser($username, $idGroup)
@@ -247,7 +247,7 @@ class UserGroupModel extends CI_Model {
                                                 )
             ";
             
-        $result = $this->db->query($query, [$idGroup])->result_array();
+        $result = $this->db->query($query, array($idGroup))->result_array();
 
         return $result;
     }

@@ -38,12 +38,12 @@ class NotificationModel extends CI_Model {
 		";
 		
 
-		$result = $this->db->query($query, [$IdUser])->result_array();
+		$result = $this->db->query($query, array($IdUser))->result_array();
 		
 		$query2 = "
 			call update_notification_status(?)
 		";
-		$result2 = $this->db->query($query2, [$IdUser]);
+		$result2 = $this->db->query($query2, array($IdUser));
 		
 		return $result;
 
@@ -76,12 +76,12 @@ class NotificationModel extends CI_Model {
 		";
 		
 
-		$result = $this->db->query($query, [$IdUser])->result_array();
+		$result = $this->db->query($query, array($IdUser))->result_array();
 		
 		$query2 = "
 			call update_notification_status(?)
 		";
-		$result2 = $this->db->query($query2, [$IdUser]);
+		$result2 = $this->db->query($query2, array($IdUser));
 		
 		return $result;
 		
@@ -92,7 +92,7 @@ class NotificationModel extends CI_Model {
 		$query2 = "
 			call update_notification_expire_time(?)
 		";
-		$result2 = $this->db->query($query2, [$IdUser]);
+		$result2 = $this->db->query($query2, array($IdUser));
 		
 		
 	}
@@ -124,7 +124,7 @@ class NotificationModel extends CI_Model {
 		";
 		
 
-		$result = $this->db->query($query, [$IdUser])->result_array();
+		$result = $this->db->query($query, array($IdUser))->result_array();
 		
 		return $result;
 		

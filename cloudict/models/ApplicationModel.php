@@ -55,7 +55,7 @@ class ApplicationModel extends CI_Model{
                     ORDER BY AppOrder
             ";
                     
-            $result = $this->db->query($query, [$status])->result_array();
+            $result = $this->db->query($query, array($status))->result_array();
             
             $data = array();
             
@@ -95,7 +95,7 @@ class ApplicationModel extends CI_Model{
                         WHERE `IdUser` = ?
                     ";
             
-            $result = $this->db->query($query, [$idUser])->result_array();
+            $result = $this->db->query($query, array($idUser))->result_array();
             
             if(!empty($result))
             {
@@ -134,7 +134,7 @@ class ApplicationModel extends CI_Model{
                         AND `IdApp` = ?
                     ";
             
-            $result = $this->db->query($query, [$idUser, $idApp])->result_array();
+            $result = $this->db->query($query, array($idUser, $idApp))->result_array();
             
             if(!empty($result))
             {
@@ -154,7 +154,7 @@ class ApplicationModel extends CI_Model{
                     VALUES (?,?,?,0,?)
             ";
                     
-            $result = $this->db->query($query, [$appName, $appLink, $appIcon, $appColor]);
+            $result = $this->db->query($query, array($appName, $appLink, $appIcon, $appColor));
         }
         
         public function editApplication($appName, $appLink, $appIcon, $appColor, $idApp)
@@ -185,7 +185,7 @@ class ApplicationModel extends CI_Model{
                     WHERE `IdApp` = ?
                     ";
             
-            $result = $this->db->query($query, [$idApp]);
+            $result = $this->db->query($query, array($idApp));
             
             $query2 = "
                     DELETE 
@@ -195,7 +195,7 @@ class ApplicationModel extends CI_Model{
                     WHERE `IdApp` = ?
                     ";
             
-            $result = $this->db->query($query2, [$idApp]);
+            $result = $this->db->query($query2, array($idApp));
         }
         
         public function deleteApplicationMenu($idAppMenu)
@@ -208,7 +208,7 @@ class ApplicationModel extends CI_Model{
                     WHERE `IdAppMenu` = ?
                     ";
             
-            $result = $this->db->query($query, [$idAppMenu]);
+            $result = $this->db->query($query, array($idAppMenu));
         }
         
         public function updateApplicationMenu($idAppMenu, $idApp, $appMenuName, $appMenuLink, $appMenuIcon) 
@@ -224,7 +224,7 @@ class ApplicationModel extends CI_Model{
                     AND         `IdApp` = ?
                     ";
             
-            $result = $this->db->query($query, [$appMenuName, $appMenuLink, $appMenuIcon, $idAppMenu, $idApp]);
+            $result = $this->db->query($query, array($appMenuName, $appMenuLink, $appMenuIcon, $idAppMenu, $idApp));
         }
         
         public function insertApplicationMenu($idApp, $appMenuName, $appMenuLink, $appMenuIcon)
@@ -234,7 +234,7 @@ class ApplicationModel extends CI_Model{
 
                     VALUES          (?,?,?,?)
                    ";
-            $result = $this->db->query($query, [$idApp, $appMenuName, $appMenuLink, $appMenuIcon]);
+            $result = $this->db->query($query, array($idApp, $appMenuName, $appMenuLink, $appMenuIcon));
             
             $insert_id = $this->db->insert_id();
 

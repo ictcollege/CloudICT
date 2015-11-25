@@ -23,7 +23,7 @@ class TaskModel extends CI_Model
             WHERE IdTask = ?
         ";
 
-        $data = $this->db->query($query, [$IdTask])->row_array();
+        $data = $this->db->query($query, array($IdTask))->row_array();
 
         $query2 = "
             SELECT IdTask, IdUser, TaskUserFullName, TaskUserAssigned, TaskUserTimeExecuted
@@ -31,7 +31,7 @@ class TaskModel extends CI_Model
             WHERE IdTask = ?
         ";
 
-        $data2 = $this->db->query($query2, [$IdTask])->result_array();
+        $data2 = $this->db->query($query2, array($IdTask))->result_array();
 
         $data["users"] = $data2;
 
@@ -58,7 +58,7 @@ class TaskModel extends CI_Model
         ";
 
 
-        $result = $this->db->query($query, [$userId])->result_array();
+        $result = $this->db->query($query, array($userId))->result_array();
 
 
         $data = $result;
@@ -77,7 +77,7 @@ class TaskModel extends CI_Model
             WHERE tu.idUser = ? AND TaskUserTimeExecuted IS NOT NULL
         ";
 
-        $result = $this->db->query($query, [$userId])->result_array();
+        $result = $this->db->query($query, array($userId))->result_array();
         $data = $result;
 
         return $data;
@@ -93,7 +93,7 @@ class TaskModel extends CI_Model
                 SET TaskUserTimeExecuted = NOW()
                 WHERE IdTask = ?
             ";
-            $result = $this->db->query($query, [$taskId]);
+            $result = $this->db->query($query, array($taskId));
         }
         else {
             $query = "
@@ -101,7 +101,7 @@ class TaskModel extends CI_Model
                 SET TaskUserTimeExecuted = NOW()
                 WHERE IdTask = ? AND (IdUser = ?)
             ";
-            $result = $this->db->query($query, [$taskId, $userId]);
+            $result = $this->db->query($query, array($taskId, $userId));
         }
 
 
@@ -116,7 +116,7 @@ class TaskModel extends CI_Model
             WHERE IdTask = ?
         ";
 
-        $result = $this->db->query($query, [$taskId])->row_array();
+        $result = $this->db->query($query, array($taskId))->row_array();
         return $result['TaskExecuteType'];
     }
 
@@ -134,7 +134,7 @@ class TaskModel extends CI_Model
         ";
 
 
-        $result = $this->db->query($query, [$currentUserID])->result_array();
+        $result = $this->db->query($query, array($currentUserID))->result_array();
 
 
         $data = $result;
@@ -194,13 +194,13 @@ class TaskModel extends CI_Model
             WHERE Idtask = ?
         ";
 
-        $this->db->query($query, [$IdTask]);
+        $this->db->query($query, array($IdTask));
 
         $query2 = "
             DELETE FROM TaskUser
             WHERE IdTask = ?
         ";
 
-        $this->db->query($query2, [$IdTask]);
+        $this->db->query($query2, array($IdTask));
     }
 }
