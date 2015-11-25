@@ -49,7 +49,7 @@ class UserModel extends CI_Model {
 						 )
 		";
 
-        $result = $this->db->query($query, [$IdUser])->result_array();
+        $result = $this->db->query($query, $IdUser)->result_array();
 
         $data = array();
 
@@ -59,7 +59,9 @@ class UserModel extends CI_Model {
                 $data[$row['Group']] = array();
                 foreach ($result as $row2) {
                     if ($row2['Group'] == $row['Group']) {
-                        $data[$row['Group']][$row2['User']] = [
+                        $group = $row['Group'];
+                        $user = $row2['User'];
+                        $data[$group][$user] = [
                             "UserId" => $row2["Id"],
                             "Status" => $row2['Admin']
                         ];
