@@ -217,6 +217,7 @@ function timeConverter(UNIX_timestamp){
                         }
                     );
                 }
+                myFunction();
             },
             // Callback for failed (abort or error) uploads:
             fail: function (e, data) {

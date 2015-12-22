@@ -45,7 +45,7 @@ class FileModel extends CI_Model {
                 $query.=(is_null($IdFolder))? "AND `IdFolder` IS ? ":"AND `IdFolder` = ? ";
                 //mozda neka funkcija za sortiranje npr(LastModified), folderi u svakom slucaju moraju prvi
                 $query.= "ORDER BY `IdFileType`";
-		$result = $this->db->query($query, [$IdUser, $IdFolder])->result_array();
+		$result = $this->db->query($query, array($IdUser, $IdFolder))->result_array();
                 
 		return $result;
 	}
@@ -84,7 +84,7 @@ class FileModel extends CI_Model {
 			VALUES 	(?,?,?,?,?,?,?,?,?)
 		";
 
-		$result = $this->db->query($query, [$IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified]);
+		$result = $this->db->query($query, array($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified));
 		$IdFile = $this->db->insert_id();
 		
 		return $IdFile;
@@ -110,7 +110,7 @@ class FileModel extends CI_Model {
 			
 			WHERE IdFile = ?
 		";
-		$result = $this->db->query($updateQuery, [$IdFolder,$IdFile]);
+		$result = $this->db->query($updateQuery, array($IdFolder,$IdFile));
 		return !empty($result)?1:0; 
 	}
 	
@@ -136,7 +136,7 @@ class FileModel extends CI_Model {
 			WHERE IdFile = ?
 		";
                 
-		$result = $this->db->query($updateQuery, [$FileName,$FilePath, $IdFile ]);
+		$result = $this->db->query($updateQuery, array($FileName,$FilePath, $IdFile ));
                 
 		return !empty($result)?1:0; 
 	}
@@ -156,14 +156,13 @@ class FileModel extends CI_Model {
 	*/
 	public function updateFileSize($IdFile, $FileSize)
 	{
-            //da li ovde treba FileLastModified ?
 		$FileLastModified = time();
 		$updateQuery = "
 			UPDATE `File` SET `FileSize` = ?, `FileLastModified` = ?
 			
 			WHERE IdFile = ?
 		";
-		$result = $this->db->query($updateQuery, [$IdFile, $FileSize, $FileLastModified]);
+		$result = $this->db->query($updateQuery, array($FileSize, $FileLastModified, $IdFile));
 		return !empty($result)?1:0; 
 	}
 	
@@ -189,7 +188,7 @@ class FileModel extends CI_Model {
                         LIMIT 1
 		";
 
-		$result = $this->db->query($query, [$FileTypeMime])->result_array();
+		$result = $this->db->query($query, array($FileTypeMime))->result_array();
 		
 		if(!empty($result)) return $result[0]['IdFileType'];
 		else{
@@ -198,7 +197,7 @@ class FileModel extends CI_Model {
 				)
 				
 			VALUES 	(?)";
-                    $result = $this->db->query($query, [$FileTypeMime]);
+                    $result = $this->db->query($query, array($FileTypeMime));
                     $IdFileType = $this->db->insert_id();
                     return $IdFileType;
                 }
@@ -226,7 +225,7 @@ class FileModel extends CI_Model {
 			
 			WHERE `IdFile` = ?
 		";
-		$result = $this->db->query($deleteeQuery, [$IdFile]);
+		$result = $this->db->query($deleteeQuery, array($IdFile));
 		return !empty($result)?1:0; 
 		// Okida se triger koji brise sve podfoldere i fajlove koji pripadaju tom folderu!
 	}
@@ -250,7 +249,7 @@ class FileModel extends CI_Model {
 			WHERE	`IdUser` = ? AND `FileName` = ? AND `FilePath` = ?";
             
                 $query.= " LIMIT 1";
-		$result = $this->db->query($query, [$IdUser, $FileName,$FilePath])->row();
+		$result = $this->db->query($query, array($IdUser, $FileName,$FilePath))->row();
                 
 		return $result;
         }
@@ -261,7 +260,7 @@ class FileModel extends CI_Model {
 
 			WHERE	`IdUser` = ? AND `FilePath` = ?";
                 $query.= " LIMIT 1";
-		$result = $this->db->query($query, [$IdUser,$FilePath])->row();
+		$result = $this->db->query($query, array($IdUser,$FilePath))->row();
 		return $result;
         }
         
@@ -270,7 +269,7 @@ class FileModel extends CI_Model {
                     . "JOIN `FileType` USING (`IdFileType`) "
                     . "WHERE `IdFile` = ? "
                     . "LIMIT 1";
-            $result = $this->db->query($query, [$IdFile])->row();
+            $result = $this->db->query($query, array($IdFile))->row();
             return $result;
         }
         
@@ -292,11 +291,21 @@ class FileModel extends CI_Model {
 			USING	(`IdFileType`)
 
 			WHERE	`IdUser` = ? AND Favorites = 1";
-		$result = $this->db->query($query, [$IdUser])->result_array();
+		$result = $this->db->query($query, array($IdUser))->result_array();
                 
 		return $result;
            }
         
+    public function getAllUserFiles($IdUser,$IdFolder=0){
+        $query = "SELECT * FROM file WHERE IdUser = ? AND IdFolder = ?";
+        $result = $this->db->query($query,array($IdUser,$IdFolder));
+        return $result->result();
+    }
+    
+    public function setFavourites($IdUser,$IdFile,$Unset){
+        $query = "UPDATE file SET Favourites = ? WHERE IdUser=? AND IdFile = ?";
+        $this->db->query($query,array($Unset,$IdUser,$IdFile));
+    }
 
         
 	

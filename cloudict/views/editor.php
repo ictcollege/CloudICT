@@ -67,7 +67,7 @@ $(document).ready(function (){
         NewContent.content = editor.getValue();
         var json = JSON.stringify(NewContent);
             $.ajax({
-                    url: "<?php echo base_url();?>Share/saveFile",
+                    url: "<?php echo base_url();?>ApiFiles/saveFile",
                     type: "POST",
                     dataType: "json",
                     data:{json:json},

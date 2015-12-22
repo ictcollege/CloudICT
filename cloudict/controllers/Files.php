@@ -39,8 +39,9 @@ class Files extends Frontend_Controller{
     }
     public function favourites(){
         $data = array();
-        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
-        $data['mask'] = $mask;
+//        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
+//        $data['mask'] = $mask;
+        
         $data['menu'] = $this->getMenu(1);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
@@ -49,11 +50,12 @@ class Files extends Frontend_Controller{
         }
         $this->load_view('favouritesView', $data);
     }
-    public function shared_with_you(){
+    public function shared_with_you($IdFolder=0){
         
         $data = array();
-        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
-        $data['mask'] = $mask;
+//        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
+//        $data['mask'] = $mask;
+        $data['current_dir']=$IdFolder;
         $data['menu'] = $this->getMenu(2);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
@@ -64,11 +66,12 @@ class Files extends Frontend_Controller{
         
     }
     
-    public function shared_with_others(){
+    public function shared_with_others($IdFolder=0){
         $this->load->model("ShareModel");
         $data = array();
-        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
-        $data['mask'] = $mask;
+//        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
+//        $data['mask'] = $mask;
+        $data['current_dir']=$IdFolder;
         $data['menu'] = $this->getMenu(3);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
@@ -91,11 +94,11 @@ class Files extends Frontend_Controller{
      * @return int
      */
     protected function get_current_dir($mask){
-        $this->load->model("FileModel");
+        $this->load->model("FolderModel");
         $filepath = substr(strtolower($this->get_upload_dir().$mask),0,-1);
-        $result = $this->FileModel->getFolder($this->get_user_id(),$filepath);
+        $result = $this->FolderModel->getFolder($this->get_user_id(),$filepath);
         if($result){
-            return $result->IdFile;
+            return $result->IdFolder;
         }
         else{
             return 0;
@@ -155,6 +158,23 @@ class Files extends Frontend_Controller{
     $tekst.= $msg;
     $tekst.= "</div>";
      return $tekst;  
+    }
+    
+    public function edit($IdFile){
+        $this->load->model("FileModel");
+        $file = $this->FileModel->getFileById($IdFile);
+        $data['title'] = $file->FileName;
+        
+        if(file_exists($file->FilePath)){
+            $content = file_get_contents($file->FilePath);
+            $data['content'] = $content;
+            $data['filePath'] = $file->FilePath;
+            $data['IdFile']=$IdFile;
+        }
+        else{
+            $data['error'] = "File not found!";
+        }
+        $this->load->view("editor",$data);
     }
 
 }

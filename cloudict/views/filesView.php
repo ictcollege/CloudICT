@@ -1,14 +1,262 @@
+<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript">
+    var table;
+    var IdFolder = $("#current_dir").val();
+    var Mask = $("#current_path").val();
+    function myFunction(){
+        IdFolder = $("#current_dir").val();
+        Mask = $("#current_path").val();
+        table.ajax.reload( 
+                function (){
+                    attachListeners();
+                }
+                ); // user paging is not reset on reload
+    }
+    $(document).ready(function (){
+        table = $("#myTable").DataTable({
+            "ajax": {
+                "url":"<?php echo base_url();?>ApiFiles/",
+                "dataSrc":"files",
+                "data": {
+                    "id_folder": $("#current_dir").val()
+                }
+              },
+            "fnInitComplete": function(oSettings){
+                attachListeners();
+            }
+        });
+        
+        $(".deleteAll").click(function (){
+            deleteFromCheckBox();
+        });
+        $("input:checkbox.chbUserGroup").click(function (){
+            var control = $(this);
+            $("input:checkbox.chbUserGroup").each(function () {
+               if($(this).val()==$(control).val()){
+                   if($(control).is(':checked')){
+                       this.checked = true;
+                   }
+                   else{
+                       this.checked = false;
+                   }
+               }
+            });
+        });
+        $("#btnShare").click(function (e){
+            var Share = new Object();
+            Share.users = [];
+            Share.Id = $("#inputIdToShare").val();
+            Share.Type = $("#inputTypeToShare").val();
+            Share.SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+            Share.unshare=[];
+            
+            $("input:checkbox.chbUserGroup").each(function () {
+               if(this.checked){
+                   Share.users.push($(this).val());
+               }
+               else{
+                   Share.unshare.push($(this).val());
+               }
+            });
+            var json = JSON.stringify(Share);
+            $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/shareFileFolders/",
+                type: "POST",
+                dataType: "json",
+                data:{json:json},
+                beforeSend: function (xhr) {
+                    $("#btnShare").append('<i class="fa fa-spinner fa-spin"></i>');
+                },
+                success: function(data) {
+                   if($(".fa-spin").length>0){
+                       $(".fa-spin").remove();
+                   }
+                }
+                        
 
+            });
+            
+        });
+        
+        
+    });
+    
+    function attachListeners(){
+        $(".download").bind("click",function (e){
+            
+        });
+        $(".deleteLink").bind("click",function (e){
+            e.preventDefault();
+            var id = $(this).data('id');
+            var type = $(this).data('type');
+            deleteFileFolder(id,type);
+        });
+        $(".edit").bind('click',function (e){
+                e.preventDefault();
+                var IdFile = $(this).data("idfile");
+                window.open("<?php echo base_url();?>Files/edit/"+IdFile,"","width=400","height=800");
+                
+        });
+        $(".rename").bind("click",function (e){
+            e.preventDefault();
+            var id = $(this).data("id");
+            var type = $(this).data("type");
+            if(type=="folder"){
+                renameFolder(id);
+            }
+            if(type=="file"){
+                renameFile(id);
+            }
+        });
+        
+        $(".setfav").bind("click",function (e){
+            e.preventDefault();
+            var id = $(this).data("id");
+            var type = $(this).data("type");
+            $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/setFavourites/"+id+"/"+type+"/"+1,
+                success:function(data){
+                    myFunction();
+                }
+            });
+        
+        });
+        $(".unsetfav").bind("click",function (e){
+            e.preventDefault();
+            var id = $(this).data("id");
+            var type = $(this).data("type");
+            $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/setFavourites/"+id+"/"+type+"/"+0,
+                success:function(data){
+                    myFunction();
+                }
+            });
+        });
+        
+        $(".share").bind("click",function (e){
+            var id = $(this).data('id');
+            var type = $(this).data('type');
+            $("#inputIdToShare").val(id);
+            $("#inputTypeToShare").val(type);
+            $.ajax({
+                url: "<?php echo base_url(); ?>ApiFiles/checkShared/",
+                type:"POST",
+                data:{id:id,type:type},
+                success: function(data) {
+                    $.each(data,function(index,val){
+                        $("input:checkbox.chbUserGroup").each(function () {
+                           if($(this).val()==val.IdUser){
+                               $(this).prop('checked',true);
+                           }
+                        });
+                    });
+
+                }
+
+            });
+        });
+        
+        
+        
+    }
+    function deleteFileFolder(id,type){
+                $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/?"+$.param({"Id":id,"Type":type}),
+                type: "DELETE",
+                beforeSend: function (xhr) {
+                    
+                },
+                success: function(data) {
+                   if(data=="1"){
+                       myFunction();
+                   }
+                   else{
+                     alert(data);  
+                    }
+                }
+                        
+
+            });
+    }
+    
+    function deleteFromCheckBox(){
+       $("input:checkbox.chbDelete").each(function () {
+               if(this.checked){
+                   var id = $(this).val();
+                   var type = $(this).data('type');
+                   deleteFileFolder(id,type);
+               }
+            });
+    }
+    
+    function renameFolder(IdFolder){
+        var Folder = new Object();
+        Folder.IdFolder = IdFolder;
+        Folder.Name = prompt("New name:");
+        var json = JSON.stringify(Folder);
+        if(Folder.Name!=null&&Folder.Name.length>0){
+            $("#errorMsg").text('');
+            $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/renameFolder/",
+                type: "POST",
+                dataType: "json",
+                data:{json:json},
+                success: function(data) {
+                   if(data=="1"){
+                       myFunction();
+                   }
+                   else{
+                       alert("Error!"+data);
+                   }
+                }
+
+            });
+        }
+        else{
+          $("#errorMsg").text("Please give folder some name!");  
+        }
+    }
+    
+    function renameFile(IdFile){
+        var File = new Object();
+        File.IdFile = IdFile;
+        File.Name = prompt("New name:");
+        var json = JSON.stringify(File);
+        if(checkIsValidFile(File.Name)){
+            $("#errorMsg").text('');
+            $.ajax({
+                url: "<?php echo base_url();?>ApiFiles/renameFile/",
+                type: "POST",
+                dataType: "json",
+                data:{json:json},
+                success: function(data) {
+                   if(data=="1"){
+                       myFunction();
+                   }
+                   else{
+                       alert("Error!"+data);
+                   }
+                }
+
+            });
+        }
+        else{
+          $("#errorMsg").text("Please give file some name and extension!");  
+        }
+    }
+    
+    
+    
+</script>
 <div id="page-wrapper">
+    <form id="fileupload" action="" method="POST" enctype="multipart/form-data">
     <div class="row">
         <div class="col-lg-12">
-            <?php if(isset($msg)){ echo $msg;}?>
-            <form id="fileupload" action="//jquery-file-upload.appspot.com/" method="POST" enctype="multipart/form-data">
-                <!-- Redirect browsers with JavaScript disabled to the origin page -->
-                <noscript><input type="hidden" name="redirect" value="https://blueimp.github.io/jQuery-File-Upload/"></noscript>
+        
+                <noscript><input type="hidden" name="redirect" value=""></noscript>
                 <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
                     <div class="row fileupload-buttonbar">
-
                         <div class="col-lg-7">
                         <ol class="breadcrumb">
                           <li><a href="<?php echo base_url();?>Files/"><i class="fa fa-home fa-2x homeicon"></i><i class="fa fa-angle-right fa-2x separatoricon"></i> </a></li>
@@ -47,7 +295,7 @@
                                 <i class="glyphicon glyphicon-ban-circle"></i>
                                 <span>Cancel upload</span>
                             </button>
-                            <button type="button" class="btn btn-danger delete routebutton">
+                            <button type="button" class="btn btn-danger deleteAll routebutton">
                                 <i class="glyphicon glyphicon-trash"></i>
                                 <span>Delete</span>
                             </button>
@@ -76,107 +324,96 @@
                             <div class="progress-extended">&nbsp;</div>
                         </div>
                     </div>
-                    
-                        <!-- The table listing the files available for upload/download -->
-                        <table id="dropzone" role="presentation" class="table table-striped">
-                            <thead>
-                                <th>Preview</th>
-                                <th></th>
-                                <th>Name</th>
-                                <th>Manage</th>
-                                <th>Size</th>
-                                <th>Modified</th>
-                                
-                            </thead>
-                            <tbody class="files"></tbody>
-                        </table>
-                        
-                        <input type="hidden" id="current_dir" name="current_dir" value="<?php echo $current_dir;?>"/>
-                        <input type="hidden" id="current_path" name="current_path" value="<?php echo $current_path;?>"/>
-                </form>
-                    
-            </div>
         </div>
+        <div class="clearfix"></div>
+        <div class="col-lg-12">
+            <table class="table table-striped table-hover" id="myTable">
+                <thead>
+                    <th>Preview</th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>Manage</th>
+                    <th>Size</th>
+                    <th>Modified</th>
+                </thead>
+                <tbody class="files">
 
-
+                </tbody>
+            </table>
+            <input type="hidden" id="current_dir" name="current_dir" value="<?php echo $current_dir;?>"/>
+            <input type="hidden" id="current_path" name="current_path" value="<?php echo $current_path;?>"/>
+        </div>                                  
+    </div>
+    </form>
 <!-- Modal -->
 <div class="modal fade in" id="ShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        <h4 class="modal-title" id="myModalLabel">Share</h4>
-                        
-                    </div>
-                    <div class="modal-body">
-                        <div class="btn-group" data-toggle="buttons">
-                            <label class="btn active">
-                                <input type="radio" value="1" name="SharePrivilege"  autocomplete="off" checked> Can read
-                            </label>
-                            <label class="btn">
-                                <input type="radio" value="2" name="SharePrivilege"  autocomplete="off"> Can edit
-                            </label>
-                            <label class="btn">
-                                <input type="radio" value="3" name="SharePrivilege"  autocomplete="off"> Can Delete
-                            </label>
-                          </div>
-                        <div class="panel-group" id="accordion">
-                            <input type="hidden" id='inputIdFileShare' />
-                            <input type='hidden' id='inputFileTypeMimeShare' />
-                            <?php
-                            $i = 0;
-                            foreach($user_groups as $group){ ?>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading">
-                                        <h4 class="panel-title">
-                                            <?php if($group->UserGroupStatusAdmin==1){?>
-                                            <input type="checkbox" class="chbGroupShare" data-no='<?= $i;?>' value="<?php echo $group->IdGroup ?>">
-                                            <?php }?>
-                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$i;?>" aria-expanded="false" class="collapsed"><?php echo $group->GroupName ;?></a>
-                                            
-                                        </h4>
-                                    </div>
-                                    <div id="collapse<?=$i;?>" class="panel-collapse collapse" aria-expanded="false" style="display: block; height: 0px;">
-                                        <div class="panel-body">
-                                            <ul class="list-inline">
-                                                <?php 
-                                                foreach ($group->Users as $members){
-                                                    if($this->session->userdata('userid')!=$members['IdUser']){
-                                                ?>
-                                                <li><input type="checkbox" class="chbUserGroup" name="input_chb_<?= $i; ?>[]" value="<?php echo $members['IdUser'];?>" onclick=""><?php echo $members["UserName"];?> </li>
-                                                <?php 
-                                                    }
-                                                }?>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div> 
-                            <?php 
-                            $i++;
-                            }
-                            ?>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="myModalLabel">Share</h4>
 
+            </div>
+            <div class="modal-body">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn active">
+                        <input type="radio" value="1" name="SharePrivilege"  autocomplete="off" checked> Can read
+                    </label>
+                    <label class="btn">
+                        <input type="radio" value="2" name="SharePrivilege"  autocomplete="off"> Can edit
+                    </label>
+                    <label class="btn">
+                        <input type="radio" value="3" name="SharePrivilege"  autocomplete="off"> Can Delete
+                    </label>
+                </div>
+                <div class="panel-group" id="accordion">
+                    <input type="hidden" id='inputIdToShare' />
+                    <input type='hidden' id='inputTypeToShare' />
+                    <?php
+                    $i = 0;
+                    foreach ($user_groups as $group) {
+                        ?>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <?php if ($group->UserGroupStatusAdmin == 1) { ?>
+                                        <input type="checkbox" class="chbGroupShare" data-no='<?= $i; ?>' value="<?php echo $group->IdGroup ?>">
+    <?php } ?>
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapse<?= $i; ?>" aria-expanded="false" class="collapsed"><?php echo $group->GroupName; ?></a>
+
+                                </h4>
                             </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="btnShareFile">Share</button>                    </div>
+                            <div id="collapse<?= $i; ?>" class="panel-collapse collapse" aria-expanded="false" style="display: block; height: 0px;">
+                                <div class="panel-body">
+                                    <ul class="list-inline">
+                                        <?php
+                                        foreach ($group->Users as $members) {
+                                            if ($this->session->userdata('userid') != $members['IdUser']) {
+                                                ?>
+                                                <li><input type="checkbox" class="chbUserGroup" name="input_chb_<?= $i; ?>[]" value="<?php echo $members['IdUser']; ?>" onclick=""><?php echo $members["UserName"]; ?> </li>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> 
+                        <?php
+                        $i++;
+                    }
+                    ?>
+
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="btnShare">Share</button>                                </div>
         </div>
+    </div>
+</div>   
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
-    <!-- The blueimp Gallery widget -->
-<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
-    <div class="slides"></div>
-    <h3 class="title"></h3>
-    <a class="prev">‹</a>
-    <a class="next">›</a>
-    <a class="close">×</a>
-    <a class="play-pause"></a>
-    <ol class="indicator"></ol>
-</div>
-    
 <!-- The template to display files available for upload -->
 <script id="template-upload" type="text/x-tmpl">
 {% for (var i=0, file; file=o.files[i]; i++) { %}
@@ -275,7 +512,7 @@
            {% } %}
         </td>
         <td>
-            <p class="FileLastModified">{%=timeConverter(file.FileLastModified)||''%}</p>
+            <p class="FileLastModified">{%=file.FileLastModified%}</p>
 
         </td>
         
@@ -283,8 +520,17 @@
     </tr>
 {% } %}
 </script>
-<!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>-->
-<!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+<div class="clearfix"></div>
+<!-- The blueimp Gallery widget -->
+<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
+    <div class="slides"></div>
+    <h3 class="title"></h3>
+    <a class="prev">‹</a>
+    <a class="next">›</a>
+    <a class="close">×</a>
+    <a class="play-pause"></a>
+    <ol class="indicator"></ol>
+</div>
 <script src="<?php echo base_url();?>public/js/vendor/jquery.ui.widget.js"></script>
 <!-- The Templates plugin is included to render the upload/download listings -->
 <script src="<?php echo base_url();?>public/js/tmpl.min.js"></script>
@@ -318,9 +564,9 @@
 <!--[if (gte IE 8)&(lt IE 10)]>
 <script src="<?php echo base_url();?>public/js/cors/jquery.xdr-transport.js"></script>
 <![endif]-->
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
     $(document).bind('dragover', function (e) {
-        var dropZone = $('#dropzone'),
+        var dropZone = $('#myTable'),
             timeout = window.dropZoneTimeout;
         if (!timeout) {
             dropZone.addClass('in');
@@ -363,13 +609,15 @@
     $('#fileupload').fileupload({
         // Uncomment the following to send cross-domain cookies:
         //xhrFields: {withCredentials: true},
-        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
+//        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
+        url: '<?php echo base_url();?>ApiFiles/',
         maxChunkSize: 4000000, // 4 MB,
-        dropZone : $("#dropzone"),
+        dropZone : $("#myTable"),
         formData: {IdFolder: $("#current_dir").val(),Mask:$("#current_path").val()}
     });
     $('#fileupload').fileupload({
-        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
+//        url: '<?php echo base_url();?>CloudFiles/index/'+$("#current_path").val(),
+        url: '<?php echo base_url();?>ApiFiles/',
         maxChunkSize: 4000000 // 4 MB
     }).on('fileuploadsubmit', function (e, data) {
         data.formData = data.context.find(':input').serializeArray();
@@ -431,16 +679,20 @@
         $("#newFile").click(function (e){
             e.preventDefault();
             var IdFolder = $("#current_dir").val();
-            var Mask = $("#current_path").val();
             var file = prompt("File name");
             
             if(checkIsValidFile(file)){
                 $("#errorMsg").text('');
                 $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/",
-                        data:{action:"newFile",Mask:Mask,File:file,IdFolder : IdFolder},
+			url: "<?php echo base_url();?>ApiFiles/createFile/"+IdFolder+"/"+file,
 			success: function(data) {
-                           window.location.reload();
+                           if(data == "1"){
+                               myFunction();
+                            }
+                            else{
+                               alert("Error:"+data); 
+                            }
+                           
 			}
 			
 		});
@@ -454,16 +706,25 @@
         //new folder 
         $("#newFolder").click(function (e){
             e.preventDefault();
-            var IdFolder = $("#current_dir").val();
-            var Mask = $("#current_path").val();
-            var folder_name = prompt("Folder name:");
-            if(folder_name!=null&&folder_name.length>0){
+            var Folder = new Object();
+            Folder.IdFolder = $("#current_dir").val();
+            Folder.Mask = $("#current_path").val();
+            Folder.FolderName = prompt("Folder name:");
+            var json = JSON.stringify(Folder);
+            if(Folder.FolderName!=null&&Folder.FolderName.length>0){
                 $("#errorMsg").text('');
                 $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/",
-                        data:{action:"newFolder",Mask:Mask,folderName:folder_name,IdFolder : IdFolder},
+			url: "<?php echo base_url();?>ApiFiles/newFolder/",
+                        type: "POST",
+                        dataType: "json",
+                        data:{json:json},
 			success: function(data) {
-                           window.location.reload();
+                           if(data=="1"){
+                               myFunction();
+                           }
+                           else{
+                               alert("Error:"+data);
+                           }
 			}
 			
 		});
@@ -479,146 +740,130 @@
                 checkBoxes.prop("checked", !checkBoxes.prop("checked"));
         });                 
         
-        $("#btnShareFile").click(function (e){
-            var Share = new Object();
-            Share.users = [];
-            Share.IdFile = $("#inputIdFileShare").val();
-            Share.SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
-            Share.unshare=[];
-            $("input:checkbox.chbUserGroup").each(function () {
-               if(this.checked){
-                   Share.users.push($(this).val());
-               }
-               else{
-                   Share.unshare.push($(this).val());
-               }
-            });
-            var json = JSON.stringify(Share);
-            $.ajax({
-                url: "<?php echo base_url();?>Share/shareFile",
-                type: "POST",
-                dataType: "json",
-                data:{json:json},
-                beforeSend: function (xhr) {
-                    $("#btnShareFile").append('<i class="fa fa-spinner fa-spin"></i>');
-                },
-                success: function(data) {
-                   if($(".fa-spin").length>0){
-                       $(".fa-spin").remove();
-                   }
-                }
-                        
-
-            });
-            
-        });
+//        $("#btnShareFile").click(function (e){
+//            var Share = new Object();
+//            Share.users = [];
+//            Share.Id = $("#inputIdFileShare").val();
+//            Share.SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+//            Share.unshare=[];
+//            $("input:checkbox.chbUserGroup").each(function () {
+//               if(this.checked){
+//                   Share.users.push($(this).val());
+//               }
+//               else{
+//                   Share.unshare.push($(this).val());
+//               }
+//            });
+//            var json = JSON.stringify(Share);
+//            $.ajax({
+//                url: "<?php echo base_url();?>ApiFiles/shareFileFolders/",
+//                type: "POST",
+//                dataType: "json",
+//                data:{json:json},
+//                beforeSend: function (xhr) {
+//                    $("#btnShareFile").append('<i class="fa fa-spinner fa-spin"></i>');
+//                },
+//                success: function(data) {
+//                   if($(".fa-spin").length>0){
+//                       $(".fa-spin").remove();
+//                   }
+//                }
+//                        
+//
+//            });
+//            
+//        });
   
 
 
     });
 
 });
-        $(document).ajaxComplete(function (){
-            _init();
-        });
-        
-function shareWithUser(control){
-        var IdUser = $(control).val();
-        var chb = $(control);
-        var IdFile = $("#inputIdFileShare").val();
-        var SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
-        if(chb.checked){
-            share = 1;
-        }
-        else{
-            share = 0;
-        }
-        $.ajax({
-        url: "<?php echo base_url();?>Share/shareFile",
-        type: "POST",
-        data:{IdFile:IdFile,IdUser:IdUser,Share:share,SharePrivilege:SharePrivilege},
-        beforeSend: function (xhr) {
-            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
-        },
-        error: function (){alert("Error...")},
-        success: function(data) {
-           if($(".fa-spin").length>0){
-               $(".fa-spin").remove();
-           }
-        }
+//        $(document).ajaxComplete(function (){
+//            _init();
+//        });
+//        
+//function shareWithUser(control){
+//        var IdUser = $(control).val();
+//        var chb = $(control);
+//        var IdFile = $("#inputIdFileShare").val();
+//        var SharePrivilege = $("input[type='radio'][name='SharePrivilege']:checked").val();
+//        if(chb.checked){
+//            share = 1;
+//        }
+//        else{
+//            share = 0;
+//        }
+//        $.ajax({
+//        url: "<?php echo base_url();?>Share/shareFile",
+//        type: "POST",
+//        data:{IdFile:IdFile,IdUser:IdUser,Share:share,SharePrivilege:SharePrivilege},
+//        beforeSend: function (xhr) {
+//            $(chb).next().append('<i class="fa fa-spinner fa-spin"></i>');
+//        },
+//        error: function (){alert("Error...")},
+//        success: function(data) {
+//           if($(".fa-spin").length>0){
+//               $(".fa-spin").remove();
+//           }
+//        }
+//
+//
+//    });
+//}
 
+//function openModal(control){
+//    var IdFile = $(control).data("idfile");
+//    var FileTypeMime = $(control).data("filetypemime");
+//    $("#inputIdFileShare").val(IdFile);
+//    $("#inputFileTypeMimeShare").val(FileTypeMime);
 
-    });
-}
-
-function openModal(control){
-    var IdFile = $(control).data("idfile");
-    var FileTypeMime = $(control).data("filetypemime");
-    $("#inputIdFileShare").val(IdFile);
-    $("#inputFileTypeMimeShare").val(FileTypeMime);
-     $.ajax({
-            url: "<?php echo base_url(); ?>Share/",
-            data:{action:"checkFileShare",IdFile:IdFile},
-            success: function(data) {
-                $.each(data,function(index,val){
-
-                    $("input:checkbox.chbUserGroup").each(function () {
-                       if($(this).val()==val.IdUser){
-                           $(this).prop('checked',true);
-                       }
-                    });
-                });
-
-            }
-
-    });
- }
+// }
  
-function _init(){
- //unbind all 
- $(".rename").off();
- $(".edit").off();
- $(".move").off();
- 
- //bind
- $(".rename").bind('click',function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-                var newName = prompt("New name");
-                var tdHref=$(this).parents('tr').find('p.name').find('a');
-                if(newName!=null&&newName.length>0){
-                $("#errorMsg").text('');
-                $.ajax({
-			url: "<?php echo base_url();?>CloudFiles/",
-                        data:{action:"renameFile",IdFile:IdFile,newName:newName},
-			success: function(data) {
-                           if(data){
-                               window.location.reload();
-                           }
-                           else{
-                               alert("Error!");
-                           }
-			}
-
-                    });
-                }
-                else{
-                  $("#errorMsg").text("Please give folder some name!");  
-                }
-            });
-            //click on move link
-            $(".move").bind('click',function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-            });
-            $(".edit").bind('click',function (e){
-                e.preventDefault();
-                var IdFile = $(this).data("idfile");
-                var IdFolder = $("#current_dir").val();
-                var Mask = $("#current_path").val();
-                window.open("<?php echo base_url();?>Share/edit/"+IdFile,"","width=400","height=800");
-                
-        });  
- };
-
+//function _init(){
+// //unbind all 
+// $(".rename").off();
+// $(".edit").off();
+// $(".move").off();
+// 
+// //bind
+// $(".rename").bind('click',function (e){
+//                e.preventDefault();
+//                var IdFile = $(this).data("idfile");
+//                var newName = prompt("New name");
+//                var tdHref=$(this).parents('tr').find('p.name').find('a');
+//                if(newName!=null&&newName.length>0){
+//                $("#errorMsg").text('');
+//                $.ajax({
+//			url: "<?php echo base_url();?>CloudFiles/",
+//                        data:{action:"renameFile",IdFile:IdFile,newName:newName},
+//			success: function(data) {
+//                           if(data){
+//                               window.location.reload();
+//                           }
+//                           else{
+//                               alert("Error!");
+//                           }
+//			}
+//
+//                    });
+//                }
+//                else{
+//                  $("#errorMsg").text("Please give folder some name!");  
+//                }
+//            });
+//            //click on move link
+//            $(".move").bind('click',function (e){
+//                e.preventDefault();
+//                var IdFile = $(this).data("idfile");
+//            });
+//            $(".edit").bind('click',function (e){
+//                e.preventDefault();
+//                var IdFile = $(this).data("idfile");
+//                var IdFolder = $("#current_dir").val();
+//                var Mask = $("#current_path").val();
+//                window.open("<?php echo base_url();?>Share/edit/"+IdFile,"","width=400","height=800");
+//                
+//        });  
+// };
 </script>

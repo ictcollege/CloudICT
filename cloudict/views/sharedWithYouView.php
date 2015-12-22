@@ -1,30 +1,40 @@
 <script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
 <script type="text/javascript">
+    var table;
+    var IdFolder = $("#current_dir").val();
+    function myFunction(){
+        IdFolder = $("#current_dir").val();
+        table.ajax.reload( 
+                function (){
+                    attachListeners();
+                }
+                ); // user paging is not reset on reload
+    }
     $(document).ready(function (){
-        $("#myTable").DataTable({
-            "ajax":"<?php echo base_url();?>share/?action=sharedWithYou"
+        table=$("#myTable").DataTable({
+            "ajax": {
+                "url":"<?php echo base_url();?>ApiFiles/sharedWithYou/",
+                "data": {
+                    "id_folder": $("#current_dir").val()
+                }
+              },
+            "fnInitComplete": function(oSettings){
+                attachListeners();
+            }
         });
-        
-        $(document).ajaxComplete(function (){
-            $('.viewFolder').click(function (e){
-                e.preventDefault();
-                var idfile = $(this).data('idfile');
-                alert(idfile);
-            });
-            $('.unshare').click(function (e){
-                e.preventDefault();
-                var control = $(this);
-                var tr = $(this).parent('td').parent('tr');
-                var Share = new Object();
-                Share.users = [];
-                Share.IdFile = $(this).data('idfile');
-                Share.unshare=[];
-
-                Share.unshare.push("<?php echo $this->session->userdata('userid');?>");
-                var json = JSON.stringify(Share);
-                $.ajax({
-                    url: "<?php echo base_url();?>Share/shareFile",
+    });
+    function attachListeners(){
+        $('.unshare').bind('click',function (e){
+            e.preventDefault();
+            var Unshare=new Object();
+            Unshare.id=$(this).data('id');
+            Unshare.type=$(this).data('type');
+            Unshare.IdShared = $(this).data('shareduser');
+            var json = JSON.stringify(Unshare);
+            var control = $(this);
+            $.ajax({
+                    url: "<?php echo base_url();?>ApiFiles/unshareFilesFolders",
                     type: "POST",
                     dataType: "json",
                     data:{json:json},
@@ -35,15 +45,12 @@
                        if($(".fa-spin").length>0){
                            $(".fa-spin").remove();
                        }
-                       tr.remove();
+                       myFunction();
+
                     }
-
-
                 });
-            });
-            
         });
-    });
+    }
 </script>
 <div id="page-wrapper">
     
@@ -81,7 +88,7 @@
                         </div>
                     </div>
                         
-                    
+                    <input type="hidden" id="current_dir" value="<?php echo $current_dir;?>"/>
             </div>
        
 </div><!-- /#page-wrapper -->
