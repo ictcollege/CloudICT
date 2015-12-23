@@ -15,6 +15,11 @@ class TaskModel extends CI_Model
         $this->load->model("UserModel");
     }
 
+    /**
+     * Returns the task with Id $IdTask from the database
+     * @param $IdTask
+     * @return mixed
+     */
     public function getTask($IdTask)
     {
         $query = "
@@ -32,15 +37,12 @@ class TaskModel extends CI_Model
         ";
 
         $data2 = $this->db->query($query2, array($IdTask))->result_array();
-
         $data["users"] = $data2;
 
 
         return $data;
-
-//        $this->db->where("IdTask", $IdTask);
-//        return $this->db->get("Task")->result_array();
     }
+
 
     /**
      * Get Tasks assigned to you
@@ -68,6 +70,11 @@ class TaskModel extends CI_Model
 
     }
 
+    /**
+     * Returns all finished tasks that belong to user $userId
+     * @param $userId
+     * @return mixed
+     */
     public function getFinishedTasks($userId)
     {
         $query = "
@@ -83,11 +90,11 @@ class TaskModel extends CI_Model
         return $data;
     }
 
-    public function finishTask($taskId, $userId = 0)
+    public function finishTask($taskId, $userId)
     {
         $isGroupTask = $this->isGroupTask($taskId);
 
-        if(!$isGroupTask) {
+        if($isGroupTask == "1") {
             $query = "
                 UPDATE TaskUser
                 SET TaskUserTimeExecuted = NOW()
@@ -99,7 +106,7 @@ class TaskModel extends CI_Model
             $query = "
                 UPDATE TaskUser
                 SET TaskUserTimeExecuted = NOW()
-                WHERE IdTask = ? AND (IdUser = ?)
+                WHERE IdTask = ? AND IdUser = ?
             ";
             $result = $this->db->query($query, array($taskId, $userId));
         }
@@ -117,7 +124,8 @@ class TaskModel extends CI_Model
         ";
 
         $result = $this->db->query($query, array($taskId))->row_array();
-        return $result['TaskExecuteType'];
+        $data = $result['TaskExecuteType'];
+        return $data;
     }
 
     /**

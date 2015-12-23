@@ -45,14 +45,21 @@
                             <td style="width: 50px"></td>
                             <td style="width: 50px">Task Status: </td>
                             <td style="width: 50px">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>User Full Name</th>
+                                            <th>Task Status</th>
+                                        </tr>
+                                    </thead>
                                 <?php foreach($task['users'] as $user) { ?>
-                                    <div class="users">
                                         <?php $status = isset($user['TaskUserTimeExecuted'])? "Finished" : "Not Finished" ?>
-                                        <?php echo "Username: ".$user['TaskUserFullName']; ?>
-                                        <br />
-                                        <?php    echo "Status: ".$status; ?>
-                                    </div>
+                                        <tr>
+                                            <td><?php echo $user['TaskUserFullName']; ?></td>
+                                            <td><?php echo $status; ?></td>
+                                        </tr>
                                 <?php } ?>
+                                </table>
                             </td>
                             <td style="width: 50px"></td>
                         </tr>

@@ -747,18 +747,18 @@ class Admin extends Backend_Controller {
     {
         $key = $this->input->post('Key');
         $email = $this->input->post('Email');
-        
+
         $this->load->library('email');
         $this->load->helper('url');
-        
-        $this->email->from('filip.radojkovic.26.12@ict.edu.rs', 'Filip Radojkovic');
-        $this->email->to($email); 
+
+        $this->email->from('cloud_project_auth@ict.edu.rs', 'Cloud Admin');
+        $this->email->to($email);
 
         $this->email->subject('ICT Cloud Registration Key');
-        $this->email->message(base_url()."user/register/".$key);	
+        $this->email->message(base_url()."user/register/".$key);
 
         $this->email->send();
-        
+
         echo $this->email->print_debugger();
     }
     

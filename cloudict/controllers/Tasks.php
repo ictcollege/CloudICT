@@ -11,13 +11,17 @@ class Tasks extends Backend_Controller
     private $menu;
 
 
+    /**
+     * Tasks constructor
+     * Initializes all global Models and Libraries
+     */
     public function __construct()
     {
         parent::__construct();
 
         $this->load->helper('url');
 
-        if($this->isLogged()){
+        //if($this->isLogged()){
             $this->userId = $this->session->userid;
             $this->Username = $this->session->username;
 
@@ -30,10 +34,16 @@ class Tasks extends Backend_Controller
             $this->Groups = array();
             $this->Groups = $this->UserModel->getAllUsersInGroupsWithId($this->userId);
             $this->menu = $this->MenuModel->getMenuOfApplication(5);
-        }
-        else redirect(base_url());
+        //}
+       // else redirect(base_url());
     }
 
+
+
+
+    /**
+     * Displays all tasks assigned to you
+     */
     public function index()
     {
         $data['tasks'] = $this->TaskModel->getAssignedTasks($this->userId);
@@ -56,6 +66,13 @@ class Tasks extends Backend_Controller
         $this->load_view("Task/TaskList", $data);
     }
 
+
+
+
+    /**
+     * Displays all tasks you created
+     *
+     */
     public function assigned()
     {
         $data['tasks'] = $this->TaskModel->getCreatedTasks($this->userId);
@@ -78,6 +95,10 @@ class Tasks extends Backend_Controller
         $this->load_view("Task/TaskList", $data);
     }
 
+
+    /**
+     * Displays all finished tasks
+     */
     public function finished(){
         $data['tasks'] = $this->TaskModel->getFinishedTasks($this->userId);
         $data['taskTitle'] = "Finished Tasks";
@@ -99,14 +120,24 @@ class Tasks extends Backend_Controller
         $this->load_view("Task/TaskList", $data);
     }
 
+
+
+    /**
+     * Method that finishes tasks with $taskId
+     * @param $taskId
+     */
     public function finish($taskId)
     {
         if($this->UserCanSeeTask($taskId)){
-            $this->TaskModel->finishTask($taskId);
+            $this->TaskModel->finishTask($taskId, $this->userId);
         }
         redirect("Tasks/");
     }
 
+
+    /**
+     * Method that displays the form for creating tasks
+     */
     public function create()
     {
         $adminGroups = array();
@@ -137,17 +168,26 @@ class Tasks extends Backend_Controller
 
     }
 
+    /**
+     * Method that stores created task into the database
+     */
     public function store()
     {
         $submitted = $this->input->post("submit");
         if(isset($submitted)) {
+
             $this->load->helper('form');
+
             $taskName = $this->input->post('TaskName');
             $taskDescription = $this->input->post('TaskDescription');
             $timeToExecute = $this->input->post("edate");;
-            $executeType = $this->input->post('isGroupTask') == null ? false : true;
+            $executeType = $this->input->post('isGroupTask') == 1 ? true : false;
             $assignedUserIDs = array_unique($this->input->post('Users'));
             $assignedUsers = array();
+
+            print ($executeType);
+
+
             foreach ($assignedUserIDs as $id) {
                 $user = $this->UserModel->getUserById($id);
                 array_push($assignedUsers, array(
@@ -155,6 +195,7 @@ class Tasks extends Backend_Controller
                     "FullName" => $user[0]["UserFullname"]
                 ));
             }
+
             $this->TaskModel->storeTask($this->userId, $taskName, $taskDescription,
                 $timeToExecute, $executeType, $assignedUsers);
             redirect('Tasks/');
@@ -164,6 +205,10 @@ class Tasks extends Backend_Controller
         }
     }
 
+    /**
+     * Helper method that displays an error message within $message parameter
+     * @param $message
+     */
     public function showError($message)
     {
         $data['menu'] = "";
@@ -181,10 +226,14 @@ class Tasks extends Backend_Controller
         $this->load_view("Task/Error", $data);
     }
 
-    public function show($taskID)
+    /**
+     * Mehod that displays the Task with id $taskID
+     * @param $taskId
+     */
+    public function show($taskId)
     {
-        $task = $this->TaskModel->getTask($taskID);
-        if($this->UserCanSeeTask($taskID)){
+        $task = $this->TaskModel->getTask($taskId);
+        if($this->UserCanSeeTask($taskId)){
             $data['task'] = $task;
             $data['base_url'] = base_url();
             $data['count'] = 5;
@@ -207,6 +256,11 @@ class Tasks extends Backend_Controller
         }
     }
 
+
+    /**
+     * Method that deletes the task with id $taskId
+     * @param $taskId
+     */
     public function destroy($taskId)
     {
         if($this->UserCanEditTask($taskId)) {
@@ -218,6 +272,12 @@ class Tasks extends Backend_Controller
         }
     }
 
+
+    /**
+     * Method that returns whether the current user can access the task with id $taskId
+     * @param $taskId
+     * @return bool
+     */
     private function UserCanSeeTask($taskId)
     {
         $task = $this->TaskModel->getTask($taskId);
@@ -235,10 +295,17 @@ class Tasks extends Backend_Controller
         return false;
     }
 
+
+    /**
+     * Method that returns whether the current user can edit the task with id $taskId
+     * @param $taskId
+     * @return bool
+     */
     private function UserCanEditTask($taskId)
     {
         $task = $this->TaskModel->getTask($taskId);
-        if(!empty($task)) {
+        print_r($task);
+        if(!empty($task['users'])) {
             if ($task['IdUser'] == $this->userId)
                 return true;
         }

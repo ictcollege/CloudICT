@@ -3,9 +3,6 @@
         <div class="col-lg-12">
             <div class="route pull-left">
                 <i class="fa fa-home fa-2x homeicon"></i>
-                <i class="fa fa-angle-right fa-2x separatoricon"></i>
-                <a href="<?php echo site_url("Tasks/index") ?>" <button type="button" class="btn btn-default routebutton">Show All Tasks</button></a>
-
             </div>
         </div>
     </div>
@@ -49,7 +46,7 @@
                         <tr>
                             <td style="width: 50px"></td>
                             <td style="width: 50px">Assign as group task:  </td>
-                            <td style="width: 50px"><?php echo form_checkbox("isGroupTask") ?></td>
+                            <td style="width: 50px"><input type="checkbox" name="isGroupTask" value="1" /> </td>
                             <td style="width: 50px"></td>
                         </tr>
                         <tr>
@@ -59,9 +56,24 @@
                                 <?php
                                 if(empty($Groups)) echo "You do not have permision to assign tasks to anyone.";
                                 foreach($Groups as $Group => $Users){
+                                    echo "<table class='table table-condensed'>";
+
+                                    echo "<tr style='background-color: #061317; color: white'>
+                                            <th>Group Name: </th><td>$Group</td>
+                                          </tr>";
+
+                                    echo "<tr>";
+                                    echo "<td>Username: </td>";
+                                    echo "<td>Assign: </td>";
+                                    echo "</tr>";
+
                                     foreach($Users as $User => $UserData){
-                                        echo "Username: $User"."<input type='checkbox' name='Users[]' value='{$UserData['UserId']}' /> <br />";
+                                        echo "<tr>";
+                                        echo "<td>$User</td>";
+                                        echo "<td><input type='checkbox' name='Users[]' value='{$UserData['UserId']}' /></td>";
+                                        echo "</tr>";
                                     }
+                                    echo "</table>";
                                     echo "<br />";
                                 }
                                 ?>

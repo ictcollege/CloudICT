@@ -47,17 +47,6 @@
                                     <td style="width:50px"></td>
                                 </tr>
                             <?php } ?>
-<!--                        <tr>-->
-<!--                            <td style="width:25px"></td>-->
-<!--                            <td style="width:50px" class="filename">Finish Homework</td>-->
-<!--                            <td style="width:250px">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, </td>-->
-<!--                            <td style="width:100px">15-04-2015</td>-->
-<!--                            <td style="width:100px">20-04-2015</td>-->
-<!--                            <td style="width:25px"></td>-->
-<!--                            <td style="width:50px"><button class="btn btn-default">Details</button></td>-->
-<!--                            <td style="width:50px"><button class="btn btn-default">Edit</button></td>-->
-<!--                            <td style="width:50px"><button class="btn btn-default">Finish</button></td>-->
-<!--                        </tr>-->
                         </tbody>
                     </table>
                 </div>
