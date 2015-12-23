@@ -36,7 +36,7 @@
     
     <!-- Font -->
     <link href='public/css/PatuaOne.css' rel='stylesheet' type='text/css'>
-    <link href='PoiretOne.css' rel='stylesheet' type='text/css'>
+    <link href='public/css/PoiretOne.css' rel='stylesheet' type='text/css'>
 <!--    <link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>-->
 <!--    <link href='http://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>-->
     
