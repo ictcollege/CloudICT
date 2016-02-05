@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Tasks extends Backend_Controller
+class Tasks extends Frontend_Controller
 {
 
     private $userId;
