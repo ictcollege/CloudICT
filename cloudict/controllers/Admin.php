@@ -27,20 +27,22 @@ class Admin extends Backend_Controller {
         
         //model
         $this->load->model('ApplicationModel');
-        
+
+
         $applications = $this->ApplicationModel->getApplicationsFromPrivileges($this->session->userdata('userid'));
+
         
         $data['applications'] = "";
-        $data['applications'] .= ' <div class="row">';  
+        $data['applications'] .= ' <div class="row">';
         $i= 0;
-        
+
         if(isset($applications['Applications']))
         {
             foreach($applications['Applications'] as $a)
             {
                 if($i%3==0)
                 {
-                   $data['applications'] .= ' <div class="row">';  
+                   $data['applications'] .= ' <div class="row">';
                 }
                 $data['applications'] .= '<div class="col-sm-4 text-center">';
                 $data['applications'] .= '<a href="'.base_url().$a['AppLink'].'"><div class="app app'.($i+1).'" style="background-color: '.$a['AppColor'].'">';
@@ -51,12 +53,12 @@ class Admin extends Backend_Controller {
                 $i++;
                 if($i%3==0)
                 {
-                    $data['applications'] .= '</div>'; 
+                    $data['applications'] .= '</div>';
                 }
             }
-        } 
+        }
         else {
-            $data['applications'] .= ' <div class="row">';  
+            $data['applications'] .= ' <div class="row">';
             $data['applications'] .= '<div class="col-sm-12 text-center">';
             $data['applications'] .= '<a><div class="app">';
             $data['applications'] .= '<h2></h2>';
@@ -65,14 +67,14 @@ class Admin extends Backend_Controller {
             $data['applications'] .= ' </div>';
             $data['applications'] .= '</div>';
         }
-        
+
         //data to view
         $data['base_url']= $base_url;
         $data['title'] = "ICT Cloud | Admin | Applications";
         $data['admin'] = true;
             //data for form
-            
-        
+
+
         //views
         $this->load_view('applications', $data);
     }
