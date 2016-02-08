@@ -10,10 +10,11 @@
  * @author Darko
  */
 class Frontend_Controller extends MY_Controller{
-    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudICT/data/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/CloudFiles/
+    //const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudICT/data/'; //main upload_dir exp /srv/uploads/ or C:/xampp/htdocs/cloud_project/data/
+    const USERS_UPLOAD_DIR = 'C:/xampp/htdocs/CloudICT/data/';
     public $class_name;
     public function __construct() {
-        $this->class_name = get_class($this);
+        $this->class_name = get_class($this);    
         parent::__construct();
         if(!$this->isLogged()){
             header('location:'.base_url());
@@ -62,6 +63,8 @@ class Frontend_Controller extends MY_Controller{
         }
         return $upload_path;
     }
+    
+    
     
 
     

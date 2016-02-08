@@ -71,12 +71,20 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
             $username = $user["User"]["User"];
             $userId = $user["User"]["Id"]; 
             $groups = $this->UserModel->getAllUsersInGroups($user["User"]["Id"]);
-            
+            $userDiskQuota = $user["User"]["DiskQuota"];
+            $userDiskUsed = $user["User"]["DiskUsed"];
+            if($userDiskUsed<0){
+                $userDiskUsed = 0;
+                //reset disk
+                $this->UserModel->updateUsedSpaceByUser($userId,0);
+            }
             $session= array(
                 'userid' =>$userId,
                 'username' => $username,
                 'role' => $idrole,
-                'group' => $groups
+                'group' => $groups,
+                'diskquota'=>$userDiskQuota,
+                'diskused'=>$userDiskUsed
             );
             
             $this->session->set_userdata($session);
@@ -209,12 +217,15 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                 
                 $data['usereditform'] .= '<div class="form-group">';
                 $data['usereditform'] .= '<label>Disk Quota</label>';
-                $data['usereditform'] .= '<input class="form-control tbUserDiskQuota" placeholder="'.$u['UserDiskQuota'].'" disabled/>';
+                $data['usereditform'] .= '<input class="form-control tbUserDiskQuota" placeholder="'.  $this->formatBytes($u['UserDiskQuota']).'" disabled/>';
                 $data['usereditform'] .= '</div>';
                 
                 $data['usereditform'] .= '<div class="form-group">';
                 $data['usereditform'] .= '<label>Disk Used %</label>';
-                $data['usereditform'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$u['UserDiskUsed'].'" disabled/>';
+                $diskquota = $this->session->userdata('diskquota');
+                $diskused = $this->session->userdata('diskused');
+                $percentage = $perc = round(($diskused/$diskquota) * 100);
+                $data['usereditform'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$percentage.'" disabled/>';
                 $data['usereditform'] .= '<button type="button" class="btn btn-primary pull-right btnUserProfileSaveChanges" id="'.$u['IdUser'].'">Save Changes</button>';
                 $data['usereditform'] .= '</div>';
                 $data['usereditform'] .= '<div class="update-success">';

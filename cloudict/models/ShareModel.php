@@ -6,7 +6,12 @@
 
 /**
  * Description of ShareModel
- *
+ * Share model se koristi za sve radnje vezane sa share-om. 
+ * Sadrzi funkcije za serovan i unshareovanje fajlova i foldera.
+ * Tabela u bazi za koriscenje [shares], tabela ima vezane strane kljuceve, on delete cascade, on update cascade, kako bi se automatski brisao taj fajl ili folder iz share-a ako vise ne postoji
+ * 
+ * [eng] Share model contains functions and methods for share and ushare files and folders
+ * Table in use [shares] , table have forigen keys to delete automaticly files or folders on delete, or update on delete.
  * @author Darko
  */
 class ShareModel extends CI_Model{
@@ -18,190 +23,14 @@ class ShareModel extends CI_Model{
         parent::__construct();
     }
     
-//    public function getAllSharedFiles($IdUser){
-//        $query = "SELECT * FROM `share` WHERE `IdUser` = ?";
-//        $result = $this->db->query($query,[$IdUser]);
-//        return $result->result_array();
-//    }
-//    
-//    public function shareFile($IdFile,$IdUser,$ShareFullName,$FilePath,$SharePrivilege){
-//            $query = "INSERT INTO `share` (
-//                                    `IdFile`,
-//                                    `IdUser`,
-//                                    `ShareCreated`,
-//                                    `ShareFullName`,
-//                                    `Path`,
-//                                    `SharePrivilege`
-//                                    ) VALUES (?,?,?,?,?,?)
-//                                    ";
-//            $result = $this->db->query($query,array($IdFile,$IdUser,time(),$ShareFullName,$FilePath,$SharePrivilege));
-//            var_dump($result);
-//        
-//    }
-//    
-//    public function removeShare($IdUser,$IdFile=null,$IdFolder=null){
-//        if(!is_null($IdFile)){
-//           $query = "DELETE FROM `share` WHERE `IdFile` = ? AND `IdUser` = ?";
-//           $this->db->query($query,array($IdFile,$IdUser)); 
-//        }
-//        if(!is_null($IdFolder)){
-//            $query = "DELETE FROM `share` WHERE `IdFolder` = ? AND `IdUser` = ?";
-//            $this->db->query($query,array($IdFolder,$IdUser));
-//        }
-//        else{
-//            $query = "DELETE FROM `share` WHERE `IdUser` = ?";
-//            $this->db->query($query,array($IdUser));
-//        }
-//        
-//
-//    }
-//    
-//   public function shareWithGroup($IdGroup,$IdFile,$Share,$SharePrivilege=self::READ){
-//       $this->load->model("UserGroupModel");
-//       $UsersInGroup = $this->UserGroupModel->getUsersThatAreInTheGroup($IdGroup);
-//       //if true than share with group
-//       if($Share){
-//            $this->load->model("FileModel");
-//            $File = $this->FileModel->getFileById($IdFile);
-//           foreach($UsersInGroup as $User){
-//               $this->shareFile($File->IdFile, $User["IdUser"], $File->FileName, $File->FilePath, $SharePrivilege);
-//           }
-//       }
-//       else{ //than unshare with group
-//           foreach($UsersInGroup as $User){
-//               $this->removeShare($IdFile, $User["IdUser"]);
-//           }
-//       }
-//       
-//   }
-//   public function shareFileWithUser($IdUser,$IdFile,$Share,$SharePrivilege=self::READ){
-//       //if true than share file
-//       if($Share){
-//        $checkQuery = "SELECT `IdUser`,`IdFile` FROM share WHERE `IdUser` = ? AND  `IdFile` = ? LIMIT 1";
-//        $checkResult = $this->db->query($checkQuery,array($IdUser,$IdFile))->result();
-//        if(!$checkResult){
-//            $this->load->model("FileModel");
-//            $File = $this->FileModel->getFileById($IdFile);
-//            $this->shareFile($File->IdFile, $IdUser, $File->FileName, $File->FilePath, $SharePrivilege);
-//        }
-//       }
-//       else{ //than unshare file
-//           $this->removeShare($IdUser,$IdFile,null);
-//       }
-//       
-//   }
-//   
-//   public function shareFolderWithUser($IdUser,$IdFolder,$Share,$SharePrivilege = self::READ){
-//       if($Share){
-//            $this->load->model("FolderModel");
-//            $Folder = $this->FolderModel->getFolderById($IdFolder);
-//            $this->shareFolder($Folder->IdFolder, $IdUser, $Folder->FolderName, $Folder->FolderPath, $SharePrivilege);
-//           
-//       }
-//       else{
-//            $this->removeShare($IdUser, null, $IdFolder);
-//        }
-//   }
-//   
-//   public function shareFolder($IdFolder,$IdUser,$FolderName,$Path,$SharePrivilege){
-//        $checkQuery = "SELECT `IdUser`,`IdFolder` FROM share WHERE `IdUser` = ? AND  `IdFolder` = ? LIMIT 1";
-//        $checkResult = $this->db->query($checkQuery,array($IdUser,$IdFolder))->result();
-//        if(empty($checkResult)){
-//            $query = "INSERT INTO `share` (
-//                                    `IdFolder`,
-//                                    `IdUser`,
-//                                    `ShareCreated`,
-//                                    `ShareFullName`,
-//                                    `Path`,
-//                                    `SharePrivilege`
-//                                    ) VALUES (?,?,?,?,?,?)
-//                                    ";
-//            $result = $this->db->query($query,array($IdFolder,$IdUser,time(),$FolderName,$Path,$SharePrivilege));  
-//        }
-//        
-//   }
-//   
-//   public function getAllSharedUsersForFile($IdFile){
-//       $query = "SELECT IdUser FROM share WHERE IdFile = ?";
-//       return array_values($this->db->query($query,[$IdFile])->result_array());
-//   }
-//   
-//   public function getAllSharedUsersForFolder($IdFolder){
-//       $query = "SELECT IdUser FROM share WHERE IdFolder = ?";
-//       return array_values($this->db->query($query,array($IdFolder))->result_array());
-//   }
-//   
-//   
-//   
-//   /**
-//    * files shared with user 
-//    * @param type $IdUser
-//    * @return  array
-//    */
-//   public function sharedFilesWithUser($IdUser,$IdFolder=0){
-//       $query = "SELECT 
-//            share.IdUser,
-//            share.IdFile,
-//            share.IdFolder,
-//            share.ShareCreated,
-//            share.ShareFullName,
-//            share.SharePrivilege,
-//            user.UserName as Owner,
-//            file.IdUser as OwnerId,
-//            file.FilePath,
-//            file.IdFolder,
-//            file.FileExtension,
-//            file.FileSize,
-//            file.FileLastModified, 
-//			file.IdFileType,
-//			filetype.FileTypeMime 
-//            FROM `share` 
-//            INNER JOIN file ON share.IdFile = file.IdFile 
-//            JOIN user ON file.IdUser = user.IdUser 
-//			JOIN filetype ON file.IdFileType = filetype.IdFileType 
-//            WHERE share.IdUser=? AND share.IdFolder = ?";
-//       $result = $this->db->query($query,array($IdUser,$IdFolder))->result_array();
-//       return $result;
-//   }
-//   
-//   public function sharedFoldersWithUser($IdUser,$IdFolder=0){
-//       
-//   }
-//   /**
-//    * Files shared by user
-//    * @param type $IdUser
-//    * @return array
-//    */
-//   public function sharedByUser($IdUser){
-//       $query = "SELECT 
-//            file.IdUser,
-//            share.IdFile, 
-//            share.IdUser as SharedUser, 
-//            user.UserName as SharedUsername, 
-//            share.ShareCreated,
-//            share.ShareFullName,
-//            share.SharePrivilege,
-//            file.FilePath,
-//            file.IdFolder,
-//            file.FileExtension,
-//            file.FileSize,
-//            file.FileLastModified, 
-//            filetype.FileTypeMime 
-//            FROM file 
-//            JOIN share ON file.IdFile = share.IdFile 
-//            JOIN user ON share.IdUser = user.IdUser 
-//            JOIN filetype ON file.IdFileType = filetype.IdFileType 
-//            WHERE file.IdFile IN 
-//            (SELECT IdFile FROM share WHERE share.IdFile=file.IdFile) AND file.IdUser = ?";
-//       $result = $this->db->query($query,[$IdUser])->result_array();
-//       return $result;
-//   }
    /**
-    * This method is much faster than if we use some in_array() function to check if user can download
-    * file or not.
-    * @param type $IdUser
-    * @param type $IdFile
-    * @return boolean
+    * Upit za definisanje dal neko nesto moze da downloaduje
+    * [eng]Query to check if someone can download file or folder
+    * 
+    * @param type Idshared int Which user
+    * @param type $IdFile int || null if null we will check folder
+    * @param type $IdFolder int || null if null we will check file
+    * @return boolean true/false
     */
    public function canDownload($IdShared,$IdFile=NULL,$IdFolder=NULL) {
        if(!is_null($IdFile)){
@@ -213,21 +42,29 @@ class ShareModel extends CI_Model{
            $result = $this->db->query($query,array($IdShared,$IdFolder));
        }
        
-       if(!empty($result->row())){
+       if(!empty($result)){
            return TRUE;
        }
        return FALSE;
    }
+   /**
+    * Metod za proveru dal neko moze obrisati fajl ili folder
+    * [eng] Method will check if user can delete shared file or folder 
+    * @param type $IdShared int IdUser who want's to delete
+    * @param type $IdFile int || null if null that's folder
+    * @param type $IdFolder int || nulll if null that's file
+    * @return boolean
+    */
    public function canExecute($IdShared,$IdFile=NULL,$IdFolder=NULL){
        if(!is_null($IdFile)){
            $query = "SELECT IdShared,IdFile FROM shares WHERE IdShared = ? AND IdFile = ? AND SharePrivilege = 3 LIMIT 1";
            $result = $this->db->query($query,array($IdShared,$IdFile));
        }
        else{
-           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdUser = ? AND IdFolder = ? AND SharePrivilege = 3 AND IdFile=0 LIMIT 1";
+           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdShared = ? AND IdFolder = ? AND SharePrivilege = 3 AND IdFile=0 LIMIT 1";
            $result = $this->db->query($query,array($IdShared,$IdFolder));
        }
-       if(!empty($result->row())){
+       if(!empty($result)){
            return TRUE;
        }
        return FALSE;
@@ -235,78 +72,68 @@ class ShareModel extends CI_Model{
    }
    public function canEdit($IdShared,$IdFile=NULL,$IdFolder=NULL){
        if(!is_null($IdFile)){
-           $query = "SELECT IdShared,IdFile FROM shares WHERE IdShared = ? AND IdFile = ? AND SharePrivilege = 2 LIMIT 1";
-           $result = $this->db->query($query,array($IdShared,$IdFile));
+           $query = "SELECT IdShared,IdFile FROM shares WHERE IdShared = ? AND IdFile = ? AND SharePrivilege <> 1 LIMIT 1";
+           $result = $this->db->query($query,array($IdShared,$IdFile))->result_array();
        }
        else{
-           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdUser = ? AND IdFolder = ? AND SharePrivilege = 2 AND IdFile=0 LIMIT 1";
-           $result = $this->db->query($query,array($IdShared,$IdFolder));
+           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdUser = ? AND IdFolder = ? AND SharePrivilege <> 1 AND IdFile=0 LIMIT 1";
+           $result = $this->db->query($query,array($IdShared,$IdFolder))->result_array();
        }
-       if(!empty($result->row())){
+       if(!empty($result)){
            return TRUE;
        }
        return FALSE;
    }
    
-    public function shareFile($IdOwner,$IdShared,$IdFile,$Name,$Path,$SharePrivilege=  self::READ,$IdFolder=0){
-        //we need to check if file is already shared
-        $checkQuery = "SELECT `IdOwner`,`IdShared` FROM `shares` WHERE `IdFile` = ?";
-        $checkResult = $this->db->query($checkQuery,array($IdFile))->result_array();
-        //if not than share
-        if(empty($checkResult)){
-            $ShareCreated = time();
-            $query = "INSERT INTO `shares` (
-                                    `IdOwner`,
-                                    `IdShared`,
-                                    `IdFile`,
-                                    `IdFolder`,
-                                    `ShareCreated`,
-                                    `Name`,
-                                    `FullPath`,
-                                    `SharePrivilege`
-                                    ) VALUES (?,?,?,?,?,?,?,?)
-                                    ";
-            $result=$this->db->query($query,array($IdOwner,$IdShared,$IdFile,$IdFolder,$ShareCreated,$Name,$Path,$SharePrivilege));
-        }
-        
-    }
-    
-    public function shareFolder($IdOwner,$IdShared,$IdFolder,$Name,$Path,$SharePrivilege=  self::READ){
-        //we need to check if folder is already shared
-        $checkQuery = "SELECT `IdOwner`,`IdShared` FROM `shares` WHERE `IdFolder` = ? AND `IdFile` = ?";
-        $checkResult = $this->db->query($checkQuery,array($IdFolder,0))->result_array();
-        //if not than share
-        if(empty($checkResult)){
-            $ShareCreated = time();
-            $query = "INSERT INTO `shares` (
-                                    `IdOwner`,
-                                    `IdShared`,
-                                    `IdFile`,
-                                    `IdFolder`,
-                                    `ShareCreated`,
-                                    `Name`,
-                                    `FullPath`,
-                                    `SharePrivilege`
-                                    ) VALUES (?,?,?,?,?,?,?,?)
-                                    ";
-            //triger do all share on files in folders and folders
-            $result = $this->db->query($query,array($IdOwner,$IdShared,0,$IdFolder,$ShareCreated,$Name,$Path,$SharePrivilege));
-        }
-        
-    }
+    /**
+     * Method za unshareovanje foldera sa shareovanim userom
+     * Method to unshare folder with user
+     * @param type $IdOwner - int IdUser who created that file
+     * @param type $IdShared - int IdUser with who is shared
+     * @param type $IdFolder - int IdFolder in share
+     */
     
     public function unshareFolder($IdOwner,$IdShared,$IdFolder){
-        $query = "DELETE FROM `shares` WHERE `IdOwner` = ? AND `IdShared` = ? AND `IdFolder`= ?";
-        $this->db->query($query,array($IdOwner,$IdShared,$IdFolder));
+        $this->db->trans_start();
+        //unshare that folder
+        $this->db->query('DELETE FROM shares WHERE IdOwner = ? AND IdShared = ? AND IdFolder= ?',array($IdOwner,$IdShared,$IdFolder));
+        //ushare all files in it
+        $this->db->query('DELETE FROM shares WHERE IdFolder=? AND IdShared=?',array($IdFolder,$IdShared));
+        //list child folders
+        $res=$this->db->query('SELECT folders.IdFolder FROM folders WHERE folders.IdParent = ?',array($IdFolder));
+        $this->db->trans_complete();
+        //if some child folders, callback 
+        if(!empty($res->result_array())){
+            $childs = $res->result_array();
+            foreach ($childs as $row){
+                $this->unshareFolder($IdOwner, $IdShared, $row['IdFolder']);
+            }
+        }
     }
-    
+    /**
+     * Method za unshareovanje fajla sa korisnikom
+     * Method to unshre file with shared user
+     * 
+     * @param type $IdOwner - int IdUser, owner of file
+     * @param type $IdShared - int IdUser , with who to unshare
+     * @param type $IdFile - int IdFile , which file 
+     * @param type $IdFolder - int IdFolder, if 0 that folder have no parent folde, else have.
+     */
     public function unshareFile($IdOwner,$IdShared,$IdFile,$IdFolder=0){
         $query = "DELETE FROM `shares` WHERE `IdOwner` = ? AND `IdShared` = ? AND `IdFile` = ? AND `IdFolder` = ?";
         $result = $this->db->query($query,array($IdOwner,$IdShared,$IdFile,$IdFolder));
     }
     
-    public function getAllSharedFiles($IdShared,$IdFolder=0){
+    /**
+     * Metod za dobijanje svih share-ovanih fajlova
+     * Method to get all shared files
+     * @param type $IdShared int IdUser who have share
+     * @param type $IdFolder int IdFolder
+     * @return type array
+     */
+    public function getAllSharedFiles($IdShared,$IdFolder=null){
         $query = "SELECT 
+                shares.IdShare,
                 shares.IdOwner,
                 shares.IdShared,
                 shares.IdFile,
@@ -322,13 +149,24 @@ class ShareModel extends CI_Model{
         FROM shares
         JOIN user ON shares.IdOwner = user.IdUser
         JOIN file ON shares.IdFile = file.IdFile
-        WHERE shares.IdShared = ? AND shares.IdFolder = ?";
-        $result = $this->db->query($query,array($IdShared,$IdFolder));
+        WHERE shares.IdShared = ?";
+        if(!is_null($IdFolder)){
+            $query.=" AND shares.IdFolder =".$IdFolder;
+        }
+        $result = $this->db->query($query,array($IdShared));
         return $result->result_array();
     }
     
-    public function getAllSharedFolders($IdShared,$IdFolder=0){
+    /**
+     * Metod za dobijanje svih share-ovanih folder
+     * Method to get all shared files
+     * @param type $IdShared int IdUser who have share
+     * @param type $IdFolder int IdFolder
+     * @return type array
+     */
+    public function getAllSharedFolders($IdShared,$IdFolder=null){
         $query = "SELECT 
+        shares.IdShare,
 	shares.IdOwner,
 	shares.IdShared,
 	shares.IdFolder,
@@ -343,8 +181,8 @@ FROM shares
 JOIN user ON shares.IdOwner = user.IdUser
 JOIN folders ON shares.IdFolder = folders.IdFolder
 ";
-        if($IdFolder==0){
-            $query.=" WHERE shares.IdFile = 0 AND shares.IdShared=?";
+        if(is_null($IdFolder)){
+            $query.=" WHERE shares.IdFile IS NULL AND shares.IdShared=?";
             $result = $this->db->query($query,array($IdShared));
         }
         else{
@@ -353,9 +191,17 @@ JOIN folders ON shares.IdFolder = folders.IdFolder
         }
         return $result->result_array();
     }
-    
-    public function getAllSharedFilesWithOthers($IdOwner,$IdFolder=0){
-        $query = "SELECT 
+    /**
+     * Metod za dobijanje svih share-ovanih fajlova , ako je korisnik u nekom folderu izbacice za tog korisnika child elemente tog foldera
+     * Metod to get all shared child files if IdFolder != 0 else root files
+     * @param type $IdOwner - int IdUser, owner of files
+     * @param type $IdFolder - int IdFolder if 0 , root
+     * @param type $IdShared - int IdShared if user go into some folder this will show just his child items
+     * @return type array 
+     */
+    public function getAllSharedFilesWithOthers($IdOwner,$IdFolder=NULL,$IdShared=""){
+        $query = "SELECT
+        shares.IdShare,
 	shares.IdOwner,
 	shares.IdShared,
 	shares.IdFile,
@@ -371,13 +217,26 @@ JOIN folders ON shares.IdFolder = folders.IdFolder
 FROM shares
 JOIN user ON shares.IdShared = user.IdUser
 JOIN file ON shares.IdFile = file.IdFile
-WHERE shares.IdOwner = ? AND shares.IdFolder = ?";
-        $result = $this->db->query($query,array($IdOwner,$IdFolder));
+WHERE shares.IdOwner = ?";
+        $query.=(is_null($IdFolder))? "" : " AND shares.IdFolder=".$IdFolder;
+        if(!empty($IdShared)){
+           $query.=" AND shares.IdShared=".$IdShared;
+            
+        }
+        $result = $this->db->query($query,array($IdOwner));
         return $result->result_array();
     }
-    
-    public function getAllSharedFoldersWithOthers($IdOwner,$IdFolder=0){
+    /**
+     * Metod za dobijanje svih share-ovanih folder , ako je korisnik u nekom folderu izbacice za tog korisnika child elemente tog foldera
+     * Metod to get all shared child folders if IdFolder != 0 else root files
+     * @param type $IdOwner - int IdUser, owner of files
+     * @param type $IdFolder - int IdFolder if 0 , root
+     * @param type $IdShared - int IdShared if user go into some folder this will show just his child items
+     * @return type array 
+     */
+    public function getAllSharedFoldersWithOthers($IdOwner,$IdFolder=null,$IdShared=""){
         $query = "SELECT 
+        shares.IdShare,
 	shares.IdOwner,
 	shares.IdShared,
 	shares.IdFolder,
@@ -391,27 +250,254 @@ WHERE shares.IdOwner = ? AND shares.IdFolder = ?";
 FROM shares
 JOIN user ON shares.IdShared = user.IdUser
 JOIN folders ON shares.IdFolder = folders.IdFolder";
-        if($IdFolder==0){
-            $query.=" WHERE shares.IdFile = 0 AND shares.IdOwner=?";
+        if(is_null($IdFolder)){
+            $query.=" WHERE folders.IdParent IS NULL AND shares.IdOwner=? AND shares.IdFile IS NULL";
             $result = $this->db->query($query,array($IdOwner));
         }
         else{
-            $query.= " WHERE folders.IdParent = ? AND shares.IdOwner= ?";
-            $result = $this->db->query($query,array($IdFolder,$IdOwner));
+            $query.= " WHERE folders.IdParent = ? AND shares.IdOwner= ? AND shares.IdShared=? AND shares.IdFile IS NULL";
+            $result = $this->db->query($query,array($IdFolder,$IdOwner,$IdShared));
         }
         return $result->result_array();
     }
     
-    public function getAllFavFolders($IdUser){
-        $query = "SELECT * FROM folders WHERE IdUser = ? AND Favourites = 1";
-        $result = $this->db->query($query,array($IdUser));
+
+    /**
+     * depricated function 
+     * Metod za dobijanje share-ovanog fajla. Koristi se najcesce za direktno share-ovan file
+     * Ovaj metod je zastareo i nije u korscenju
+     * [eng] Method to get shared file, deprcited , not in use
+     * @param type $IdOwner - int IdUser, owner of file
+     * @param type $IdFile - int IdFile
+     * @return type object file
+     */
+    public function getSharedFile($IdOwner,$IdFile){
+        $query = "SELECT * FROM shares WHERE IdOwner = ? AND IdFile = ? LIMIT 1";
+        $result = $this->db->query($query,array($IdOwner,$IdFile));
+        return $result->row();
+    }
+    /**
+     * depricated , not in use 
+     * Metod zastareo , nije u korscenju, mozda zatreba
+     * vraca share-ovan folder
+     * @param type $IdOwner
+     * @param type $IdFolder
+     * @return type
+     */
+    public function getSharedFolder($IdOwner,$IdFolder){
+        $query = "SELECT * FROM shares WHERE IdOwner = ? AND IdFolder = ? LIMIT 1";
+        $result = $this->db->query($query,array($IdOwner,$IdFolder));
+        return $result->row();
+    }
+    /**
+     * Method za serovanje direktno folder, procedura share-uje folder i vraca putanju koja se dalje koristi za generisanje direktnog linka
+     * Method to share direct folder so someone can download , procedure returns folder path which we later use to generate direct link.
+     * [procedure]
+     * CREATE DEFINER=`root`@`localhost` PROCEDURE `new_direct_share_folder`(IN `idowner` INT UNSIGNED, IN `idfolder` INT UNSIGNED, IN `privilege` INT)
+    NO SQL
+BEGIN
+DECLARE path VARCHAR(511) DEFAULT NULL;
+DECLARE name VARCHAR(100);
+SELECT folders.FolderPath,folders.FolderName INTO path,name FROM folders WHERE folders.IdFolder = idfolder;
+
+
+INSERT INTO shares (
+    shares.IdOwner,
+    shares.IdFolder,
+    shares.Name,
+    shares.ShareCreated,
+    shares.FullPath,
+    shares.SharePrivilege,
+    shares.SharedByLink
+    ) 
+VALUES (
+    idowner,
+    idfolder,
+    name,
+    UNIX_TIMESTAMP(),
+    path,
+    privilege,
+    1
+    );
+	SELECT path AS path;
+END
+     * @param type $IdFolder - int IdFolder to share
+     * @param type $IdOwner - int IdUser owner of folder
+     * @param type $SharePrivilege - constant read, write, execute, for later use, if we wont to create view to iterate throgh folder
+     * @return type string - folder path
+     */
+    public function shareDirectFolder($IdFolder,$IdOwner,$SharePrivilege=  self::READ){
+        $query = "call new_direct_share_folder(?,?,?)";
+        $result = $this->db->query($query,array($IdOwner,$IdFolder,$SharePrivilege));
+        $path = (empty($result))? null : $result->row()->path;
+        return $path;
+    }
+    /**
+     * Method za serovanje direktno fajla, procedura share-uje fajl i vraca putanju koja se dalje koristi za generisanje direktnog linka
+     * Method to share direct file so someone can download , procedure returns file path which we later use to generate direct link.
+     * [procedure]
+     * CREATE DEFINER=`root`@`localhost` PROCEDURE `new_direct_share_file`(IN `idowner` INT UNSIGNED, IN `idfile` INT UNSIGNED, IN `privilege` INT)
+    NO SQL
+BEGIN
+DECLARE path VARCHAR(511) DEFAULT NULL;
+DECLARE name VARCHAR(255);
+
+SELECT file.FilePath,file.FileName INTO path,name FROM file WHERE file.IdFile = idfile;
+
+
+INSERT INTO shares (
+    shares.IdOwner,
+    shares.IdFile,
+    shares.Name,
+    shares.ShareCreated,
+    shares.FullPath,
+    shares.SharePrivilege,
+    shares.SharedByLink
+    ) 
+VALUES (
+    idowner,
+    idfile,
+    name,
+    UNIX_TIMESTAMP(),
+    path,
+    privilege,
+    1
+    );
+	SELECT path AS path;
+END
+     * @param type $IdFile - int IdFile to share
+     * @param type $IdOwner - int IdUser, owner of file
+     * @param type $SharePrivilege - int Permission (constants)
+     * @return type string , file path
+     */
+    public function shareDirectFile($IdFile,$IdOwner,$SharePrivilege = self::READ){
+        $query = "call new_direct_share_file(?,?,?)";
+        $result = $this->db->query($query,array($IdOwner,$IdFile,$SharePrivilege));
+        $path = (empty($result))? null : $result->row()->path;
+        return $path;
+    }
+    /**
+     * Metod za brisanje direktno sharevanog foldera
+     * Method to delete direct shared folder
+     * 
+     * @param type $IdFolder - int IdFolder
+     * @param type $IdOwner - int IdUser , (owner) 
+     */
+    public function unshareDirectFolder($IdFolder,$IdOwner){
+        $query = "DELETE FROM shares WHERE IdFolder = ? AND IdOwner = ? AND SharedByLink = 1";
+        $this->db->query($query,array($IdFolder,$IdOwner));
+    }
+    /**
+     * Metod za brisanje direktno shareovanog fajla
+     * Method to delete direct shared file
+     * @param type $IdFile - int IdFile to delete
+     * @param type $IdOwner - int IdUser , owner of file
+     */
+    public function unshareDirectFile($IdFile,$IdOwner){
+        $query = "DELETE FROM shares WHERE IdFile = ? AND IdOwner = ? AND SharedByLink = 1";
+        $this->db->query($query,array($IdFile,$IdOwner));
+    }
+    
+    /**
+     * Method to check if user can download direct shared file or folder
+     * Metod koji proverava dal user sme da downloaduje direktno shareovan fajl ili folder
+     * @param type $filepath - path of file
+     * @return boolean 
+     */
+
+    public function canDirectDownload($filepath){
+        $query = "SELECT * FROM shares WHERE FullPath = ? AND SharedByLink = 1 LIMIT 1";
+        $result = $this->db->query($query,array($filepath))->result_array();
+        if(!empty($result)){
+            return TRUE;
+        }
+        return FALSE;
+    }
+    /**
+     * Metod za dobijanje svih direktno share-ovanih fajlova i foldera
+     * Method to get all owner direct shared files or folders
+     * @param type $IdOwner - owner of shared files
+     * @return type array (associative)
+     */
+    public function getDirectShares($IdOwner){
+        $query = "SELECT * FROM shares WHERE IdOwner = ? AND SharedByLink = 1";
+        $result = $this->db->query($query,array($IdOwner));
         return $result->result_array();
     }
     
-    public function getAllFavFiles($IdUser){
-        $query = "SELECT * FROM file WHERE IdUser = ? AND Favourites = 1";
-        $result = $this->db->query($query,array($IdUser));
-        return $result->result_array();
-    }
 
+    /**
+     * Method to share folders and all his child items
+     * [callback]This method call it's self if child items in folder
+     * Metod za share-ovanje foldera i svih njegovih unutrasnjih fajlova i foldera
+     * Ovaj metod zove sam sebe da bih share-ovao child iteme dok god ima svoje unutrasnje fajlove
+     * @param type $IdOwner - int IdUser, owner of folder
+     * @param type $IdShared - int IdUser , with who to share
+     * @param type $IdFolder - int IdFolder 
+     * @param type $SharePrivilege - constant - permission
+     */
+    public function shareFolder($IdOwner,$IdShared,$IdFolder,$SharePrivilege){
+        $this->db->trans_start();
+        //share that folder
+        $this->db->query('INSERT INTO shares (shares.IdOwner,shares.IdShared,shares.IdFolder,shares.ShareCreated,shares.Name,shares.FullPath,shares.SharePrivilege)
+SELECT DISTINCT ?,?,?,UNIX_TIMESTAMP(),folders.FolderName,folders.FolderPath,? FROM folders WHERE folders.IdFolder = ?',array($IdOwner,$IdShared,$IdFolder,$SharePrivilege,$IdFolder));
+        //notification
+        $id = $this->db->insert_id();
+        $user = $this->db->query("SELECT UserFullname FROM user WHERE user.IdUser=?",$IdOwner)->row();
+        $this->db->query('call create_notification(?,?,?,?,?,?)',array($IdShared,1,2,$id,$user->UserFullname,"Shared folder with child items!"));
+        //share all files in it
+        $this->db->query('INSERT INTO shares(shares.IdOwner,shares.IdShared,shares.IdFile,shares.IdFolder,shares.ShareCreated,shares.Name,shares.FullPath,shares.SharePrivilege)
+SELECT DISTINCT ?,?,file.IdFile,file.IdFolder,UNIX_TIMESTAMP(),file.FileName,file.FilePath,? FROM file WHERE file.IdFolder = ?;',array($IdOwner,$IdShared,$SharePrivilege,$IdFolder));
+        //list child folders
+        $res=$this->db->query('SELECT folders.IdFolder FROM folders WHERE folders.IdParent = ?',array($IdFolder));
+        $this->db->trans_complete();
+//        if some child folders, callback 
+        if(!empty($res->result_array())){
+            $childs = $res->result_array();
+            foreach ($childs as $row){
+                $this->shareFolder($IdOwner, $IdShared, $row['IdFolder'], $SharePrivilege);
+            }
+        }
+        
+    }
+    
+    /**
+     * Metod za shareovanje fajla sa korisnikom
+     * Method to share file with some user
+     * @param type $IdOwner - int IdUser, owner of file
+     * @param type $IdShared - int IdUser , with who to share
+     * @param type $IdFile - int IdFile
+     * @param type $SharePrivilege - constant privilege/ permission
+     */
+    public function shareFile($IdOwner,$IdShared,$IdFile,$SharePrivilege){
+        $query = 'INSERT INTO shares(
+            shares.IdOwner,
+            shares.IdShared,
+            shares.IdFile,
+            shares.IdFolder,
+            shares.ShareCreated,
+            shares.Name,
+            shares.FullPath,
+            shares.SharePrivilege
+            )
+            SELECT DISTINCT ?,?,file.IdFile,file.IdFolder,UNIX_TIMESTAMP(),file.FileName,file.FilePath,? FROM file WHERE file.IdFile = ?';
+        $this->db->trans_start();
+        $this->db->query($query,array($IdOwner,$IdShared,$SharePrivilege,$IdFile));
+        $id = $this->db->insert_id();
+        $user = $this->db->query("SELECT UserFullname FROM user WHERE user.IdUser=?",$IdOwner)->row();
+        //notification
+        $this->db->query('call create_notification(?,?,?,?,?,?)',array($IdShared,1,2,$id,$user->UserFullname,"Shared new file with you!"));
+        $this->db->trans_complete();
+    }
+    /**
+     * Metod za brisanje specificnog id-a , sta god to bilo , fajl folder, svaki share ima svoj primarni kljuc
+     * Method to delete from shares by primary key.
+     * @param type $Id - int IdShare
+     */
+    public function deleteShareById($Id){
+        $query = "DELETE FROM shares WHERE IdShare = ?";
+        $this->db->query($query,array($Id));
+    }
+    
+    
 }

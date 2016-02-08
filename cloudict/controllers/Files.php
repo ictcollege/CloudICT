@@ -27,7 +27,7 @@ class Files extends Frontend_Controller{
         $data = array();
         $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
         $data['current_path'] = $mask;
-        $data['current_dir'] = (empty($mask)) ? 0 : $this->get_current_dir($mask);
+        $data['current_dir'] = (empty($mask)) ? NULL : $this->get_current_dir($mask);
         $data['breadcrumbs'] = $this->breadcrumbs($mask);
         $data['menu'] = $this->getMenu(0);
         $user_group = $this->session->userdata('group');
@@ -35,6 +35,14 @@ class Files extends Frontend_Controller{
         if(!empty($this->msg)){
             $data['msg']=  $this->msg;
         }
+        $diskquota = $this->session->userdata('diskquota');
+        $diskused = $this->session->userdata('diskused');
+        $diskremain = $diskquota - $diskused;
+        $percentage = round(($diskused/$diskquota) * 100);
+        $data['diskused'] = $this->formatBytes($diskused);
+        $data['diskremain'] = $this->formatBytes($diskremain);
+        $data['diskquota'] = $this->formatBytes($diskquota);
+        $data['percentage'] = ($percentage>100) ? 100 : $percentage;
         $this->load_view('filesView', $data);
     }
     public function favourites(){
@@ -66,12 +74,10 @@ class Files extends Frontend_Controller{
         
     }
     
-    public function shared_with_others($IdFolder=0){
-        $this->load->model("ShareModel");
+    public function shared_with_others($IdFolder=0,$IdShared=""){
         $data = array();
-//        $mask = $this->get_mask($this->class_name,  $this->uri->uri_string());
-//        $data['mask'] = $mask;
         $data['current_dir']=$IdFolder;
+        $data['id_shared']=$IdShared;
         $data['menu'] = $this->getMenu(3);
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;
@@ -82,7 +88,11 @@ class Files extends Frontend_Controller{
     }
     
     public function shared_by_link(){
-        var_dump("Sta ovde ...?");
+        $data = array();
+        $data['menu'] = $this->getMenu(4);
+        $user_group = $this->session->userdata('group');
+        $data['user_groups'] = $user_group;
+        $this->load_view('sharedByLinkView', $data);
     }
 
 
@@ -97,6 +107,7 @@ class Files extends Frontend_Controller{
         $this->load->model("FolderModel");
         $filepath = substr(strtolower($this->get_upload_dir().$mask),0,-1);
         $result = $this->FolderModel->getFolder($this->get_user_id(),$filepath);
+        
         if($result){
             return $result->IdFolder;
         }
@@ -164,7 +175,25 @@ class Files extends Frontend_Controller{
         $this->load->model("FileModel");
         $file = $this->FileModel->getFileById($IdFile);
         $data['title'] = $file->FileName;
-        
+        if($file->IdUser==$this->get_user_id()){
+            //user is owner of file
+            $data['can_edit'] = true;
+            
+        }
+        else{
+            //check if file is shared with user
+            $this->load->model("ShareModel");
+            $permission=$this->ShareModel->canEdit($this->get_user_id(),$file->IdFile);
+            if($permission==false){
+                die("YOU DON'T HAVE PERMISSION TO EDIT THIS FILE!");
+                exit();
+            }
+        }
+        require 'ApiFiles.php';
+        if(!in_array($file->FileExtension, ApiFiles::$editableFileTypes)){
+            $data['can_edit']=false;
+            $data['error'] = "File can't be edit, uneditable file type!";
+        }
         if(file_exists($file->FilePath)){
             $content = file_get_contents($file->FilePath);
             $data['content'] = $content;
@@ -175,6 +204,11 @@ class Files extends Frontend_Controller{
             $data['error'] = "File not found!";
         }
         $this->load->view("editor",$data);
+    }
+    
+    public function HandleNotification($IdNotification){
+        echo "NOT DONE YET>>>> </br>";
+        echo "<a href='".base_url()."Files/shared_with_you'>View all shared files with you<a>";
     }
 
 }

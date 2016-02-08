@@ -16,7 +16,8 @@
             "ajax": {
                 "url":"<?php echo base_url();?>ApiFiles/sharedWithOthers/",
                 "data": {
-                    "id_folder": $("#current_dir").val()
+                    "id_folder": $("#current_dir").val(),
+                    "id_shared": $("#id_shared").val()
                 }
               },
             "fnInitComplete": function(oSettings){
@@ -24,52 +25,16 @@
             }
         });
         
-//        $(document).ajaxComplete(function (){
-//            $('.viewFolder').click(function (e){
-//                e.preventDefault();
-//                var idfile = $(this).data('idfile');
-//                alert(idfile);
-//            });
-//            $('.unshare').click(function (e){
-//                e.preventDefault();
-//                var control = $(this);
-//                var tr = $(this).parent('td').parent('tr');
-//                var shareduser = $(this).data('shareduser');
-//                var Share = new Object();
-//                Share.users = [];
-//                Share.IdFile = $(this).data('idfile');
-//                Share.unshare=[];
-//
-//                Share.unshare.push(shareduser);
-//                var json = JSON.stringify(Share);
-//                $.ajax({
-//                    url: "<?php echo base_url();?>Share/shareFile",
-//                    type: "POST",
-//                    dataType: "json",
-//                    data:{json:json},
-//                    beforeSend: function (xhr) {
-//                        $(control).append('<i class="fa fa-spinner fa-spin"></i>');
-//                    },
-//                    success: function(data) {
-//                       if($(".fa-spin").length>0){
-//                           $(".fa-spin").remove();
-//                       }
-//                       tr.remove();
-//                    }
-//
-//
-//                });
-//            });
-//            
-//        });
+
     });
     function attachListeners(){
         $('.unshare').bind('click',function (e){
             e.preventDefault();
             var Unshare=new Object();
-            Unshare.id=$(this).data('id');
-            Unshare.type=$(this).data('type');
-            Unshare.IdShared = $(this).data('shareduser');
+            Unshare.Id=$(this).data('id'); //id file folder
+            Unshare.Type=$(this).data('type'); //type folder or file
+            Unshare.IdShared = $(this).data('idshared'); //shareduser
+            Unshare.IdShare = $(this).data('idshare'); // id share
             var json = JSON.stringify(Unshare);
             var control = $(this);
             $.ajax({
@@ -126,7 +91,7 @@
                         </div>
                     </div>
         <input type="hidden" id="current_dir" value="<?php echo $current_dir;?>"/>    
-                    
+        <input type="hidden" id="id_shared" value="<?php echo $id_shared;?>"/>          
             </div>
        
 </div><!-- /#page-wrapper -->

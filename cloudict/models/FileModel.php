@@ -1,13 +1,24 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+/*
+ *  @author Darko Lesendric <dlesendric at https://github.com/ @Darko_Lesendric at https://twitter.com/>
+ */
+
 /**
- * fali neka funkcija za kvotu , da znam dal je prekoracio limit na upload-u
+ * Description of FileModel
+ * File model se koristi za sve radnje vezane sa fajlovima
+ * Sadrzi funkcije za fajlove i sve radnje sa njima
+ * Tabela u bazi za koriscenje [file], tabela ima vezane strane kljuceve, on delete cascade, on update cascade, kako bi se automatski brisao taj fajl ili folder iz file tabele ako vise ne postoji njegov folder
  * 
- * 
+ * [eng] File model contains functions and methods for files
+ * Table in use [file] , table have forigen keys to delete automaticly files if parent folder delete on delete cascade, or update on cascade.
+ * @author Darko
  */
 class FileModel extends CI_Model {
 
 	/**
+        * depricated
+        * zastarelo ne koristi se (korisceno u v1)
 	* Get All Files In Folder
 	* 
 	* Returns all files for $IdUser to which given $IdFolder belongs
@@ -28,7 +39,7 @@ class FileModel extends CI_Model {
 	{
 		$query = "
 			SELECT	`IdFile`, 
-					`FileTypeMime`,
+					`FileType`,
 					`FileExtension`,
 					`FileName`,
                                         `FilePath`,
@@ -38,8 +49,6 @@ class FileModel extends CI_Model {
 				
 			FROM 	`file`
 
-			JOIN	`FileType`
-			USING	(`IdFileType`)
 
 			WHERE	`IdUser` = ? ";
                 $query.=(is_null($IdFolder))? "AND `IdFolder` IS ? ":"AND `IdFolder` = ? ";
@@ -50,28 +59,25 @@ class FileModel extends CI_Model {
 		return $result;
 	}
 	
-	/**
-	* Insert File
-	* 
-	* Returns $IdFile of file inserted
-	* 
-	*      
-	* 
-	* @param int $IdUser
-	* @param int $IdFileType
-	* @param int $IdFolder
-	* @param string $FileName
-	* @param int $FileSize
-	* @return int
-	*/
-	public function insertUserFile($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize)
+        /**
+         * Metod za kreiranja fajla u bazi nakon uploada ili kreiranja
+         * Method for inserting  in db  file after upload or create
+         * @param type $IdUser - int IdUser owner of file
+         * @param type $FileType - string mime type
+         * @param type $IdFolder - int parent folder can be null 
+         * @param type $FileExtension - string extension (.txt, .php)
+         * @param type $FileName - string File Name
+         * @param type $FilePath - string File Path
+         * @param type $FileSize - int size 
+         * @return type int - inserted id
+         */
+	public function insertUserFile($IdUser, $FileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize)
 	{
 		$FileCreated = time();
 		$FileModified = time();
-		$query = "
-			INSERT INTO `File` (
+		$query = "INSERT INTO `File` (
 					`IdUser`,
-					`IdFileType`,
+					`FileType`,
 					`IdFolder`,
 					`FileExtension`,
 					`FileName`,
@@ -84,7 +90,7 @@ class FileModel extends CI_Model {
 			VALUES 	(?,?,?,?,?,?,?,?,?)
 		";
 
-		$result = $this->db->query($query, array($IdUser, $IdFileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified));
+		$result = $this->db->query($query, array($IdUser, $FileType, $IdFolder, $FileExtension, $FileName,$FilePath, $FileSize, $FileCreated, $FileModified));
 		$IdFile = $this->db->insert_id();
 		
 		return $IdFile;
@@ -176,33 +182,33 @@ class FileModel extends CI_Model {
 	* @param string $FileTypeMime
 	* @return int
 	*/
-	public function getFileType($FileTypeMime)
-	{
-		$query = "
-			SELECT `IdFileType`
-			
-			FROM `FileType`
-			
-			WHERE `FileTypeMime` = ? 
-                        
-                        LIMIT 1
-		";
-
-		$result = $this->db->query($query, array($FileTypeMime))->result_array();
-		
-		if(!empty($result)) return $result[0]['IdFileType'];
-		else{
-                    $query= "INSERT INTO `filetype` (
-					`FileTypeMime`
-				)
-				
-			VALUES 	(?)";
-                    $result = $this->db->query($query, array($FileTypeMime));
-                    $IdFileType = $this->db->insert_id();
-                    return $IdFileType;
-                }
-		return 0;
-	}
+//	public function getFileType($FileTypeMime)
+//	{
+//		$query = "
+//			SELECT `IdFileType`
+//			
+//			FROM `FileType`
+//			
+//			WHERE `FileTypeMime` = ? 
+//                        
+//                        LIMIT 1
+//		";
+//
+//		$result = $this->db->query($query, array($FileTypeMime))->result_array();
+//		
+//		if(!empty($result)) return $result[0]['IdFileType'];
+//		else{
+//                    $query= "INSERT INTO `filetype` (
+//					`FileTypeMime`
+//				)
+//				
+//			VALUES 	(?)";
+//                    $result = $this->db->query($query, array($FileTypeMime));
+//                    $IdFileType = $this->db->insert_id();
+//                    return $IdFileType;
+//                }
+//		return 0;
+//	}
 	
 	
 	/**
@@ -233,7 +239,7 @@ class FileModel extends CI_Model {
         public function getFile($IdUser,$FileName,$FilePath){
             $query = "
 			SELECT	`IdFile`, 
-					`FileTypeMime`,
+					`FileType`,
 					`FileExtension`,
 					`FileName`,
                                         `FilePath`,
@@ -243,8 +249,6 @@ class FileModel extends CI_Model {
 				
 			FROM 	`file`
 
-			JOIN	`FileType`
-			USING	(`IdFileType`)
 
 			WHERE	`IdUser` = ? AND `FileName` = ? AND `FilePath` = ?";
             
@@ -266,7 +270,6 @@ class FileModel extends CI_Model {
         
         public function getFileById($IdFile){
             $query = "SELECT * FROM `file` "
-                    . "JOIN `FileType` USING (`IdFileType`) "
                     . "WHERE `IdFile` = ? "
                     . "LIMIT 1";
             $result = $this->db->query($query, array($IdFile))->row();
@@ -277,7 +280,7 @@ class FileModel extends CI_Model {
            public function getFavorites($IdUser){
                $query = "
 			SELECT	`IdFile`, 
-					`FileTypeMime`,
+					`FileType`,
 					`FileExtension`,
 					`FileName`,
                                         `FilePath`,
@@ -287,8 +290,6 @@ class FileModel extends CI_Model {
 				
 			FROM 	`file`
 
-			JOIN	`FileType`
-			USING	(`IdFileType`)
 
 			WHERE	`IdUser` = ? AND Favorites = 1";
 		$result = $this->db->query($query, array($IdUser))->result_array();
@@ -296,9 +297,17 @@ class FileModel extends CI_Model {
 		return $result;
            }
         
-    public function getAllUserFiles($IdUser,$IdFolder=0){
-        $query = "SELECT * FROM file WHERE IdUser = ? AND IdFolder = ?";
-        $result = $this->db->query($query,array($IdUser,$IdFolder));
+    public function getAllUserFiles($IdUser,$IdFolder=null){
+        if(!is_null($IdFolder)){
+            $query = "SELECT * FROM file WHERE IdUser = ? AND IdFolder = ?";
+            $result = $this->db->query($query,array($IdUser,$IdFolder));
+        }
+        else{
+            $query = "SELECT * FROM file WHERE IdUser = ? AND IdFolder IS NULL";
+            $result = $this->db->query($query,array($IdUser));
+        }
+        
+        
         return $result->result();
     }
     
@@ -306,7 +315,33 @@ class FileModel extends CI_Model {
         $query = "UPDATE file SET Favourites = ? WHERE IdUser=? AND IdFile = ?";
         $this->db->query($query,array($Unset,$IdUser,$IdFile));
     }
+    
+    public function moveFile($destination_or_IdFolder,$IdFile,$IdUser,$root=false){
+        if($root){
+            $this->db->trans_start();
+            $query = "UPDATE file SET FilePath = ?,IdFolder=NULL WHERE IdUser = ? AND IdFile = ?";
+            $this->db->query($query,array($destination_or_IdFolder,$IdUser,$IdFile));
+            $this->db->query("UPDATE shares SET shares.FullPath = ?,shares.IdFolder=NULL WHERE IdFile=?",array($destination_or_IdFolder,$IdFile));
+            $this->db->trans_complete();
+        }
+        else{
+            $query = "call change_file_folder(?,?,?)";
+            $this->db->query($query,array($destination_or_IdFolder,$IdFile,$IdUser));
+        }
+    }
 
+    
+    public function getAllFavFiles($IdUser){
+        $query = "SELECT * FROM file WHERE IdUser = ? AND Favourites = 1";
+        $result = $this->db->query($query,array($IdUser));
+        return $result->result_array();
+    }
+    
+    public function sumAllFileSize($IdUser){
+        $query = "SELECT SUM(FileSize) AS diskused FROM file WHERE file.IdUser = ?";
+        $result = $this->db->query($query,array($IdUser));
+        return $result->row();
+    }
         
 	
 	

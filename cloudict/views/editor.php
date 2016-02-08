@@ -48,7 +48,7 @@
     }
     ?>
 </div>
-    <button id="btnSave" class="btn btn-primary">Save</button>    
+    <?php if(!isset($error)){?><button id="btnSave" class="btn btn-primary">Save</button><?php } ?> 
 <script src="<?php echo base_url();?>public/js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="<?php echo base_url();?>public/js/ace/ext-modelist.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">

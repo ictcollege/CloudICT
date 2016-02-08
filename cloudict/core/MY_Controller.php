@@ -11,6 +11,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  */
 class MY_Controller extends CI_Controller{
     public function __construct() {
+        date_default_timezone_set('Europe/Belgrade');
         parent::__construct();
     }
     
@@ -80,5 +81,29 @@ class MY_Controller extends CI_Controller{
         $this->load->view('menu',$data);
         $this->load->view($view, $data);
         $this->load->view('footer');
+    }
+    
+    protected function formatBytes($size, $precision = 2)
+    {
+// second algorytm
+//        $base = log($size, 1024);
+//        $suffixes = array('B', 'KB', 'MB', 'GB', 'TB');   
+//
+//        return round(pow(1024, $base - floor($base)), $precision) . $suffixes[floor($base)];
+        if ($size >= 1073741824) {
+            $size = number_format($size / 1073741824, 2) . ' GB';
+        } elseif ($size >= 1048576) {
+            $size = number_format($size / 1048576, 2) . ' MB';
+        } elseif ($size >= 1024) {
+            $size = number_format($size / 1024, 2) . ' KB';
+        } elseif ($size > 1) {
+            $size = $size . ' bytes';
+        } elseif ($size == 1) {
+            $size = $size . ' byte';
+        } else {
+            $size = '0 bytes';
+        }
+
+        return $size;
     }
 }

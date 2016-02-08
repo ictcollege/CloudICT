@@ -139,6 +139,7 @@ function timeConverter(UNIX_timestamp){
                             var error = data.files[index].error;
                             if (error) {
                                 $(this).find('.error').text(error);
+                                $("#errorMsg").text(error);
                             }
                         });
                     }
@@ -197,11 +198,13 @@ function timeConverter(UNIX_timestamp){
                                         that._trigger('completed', e, data);
                                         that._trigger('finished', e, data);
                                         deferred.resolve();
+                                        
                                     }
                                 );
                             }
                         );
                     });
+                    
                 } else {
                     template = that._renderDownload(files)[
                         that.options.prependFiles ? 'prependTo' : 'appendTo'
@@ -216,8 +219,8 @@ function timeConverter(UNIX_timestamp){
                             deferred.resolve();
                         }
                     );
+                    
                 }
-                myFunction();
             },
             // Callback for failed (abort or error) uploads:
             fail: function (e, data) {

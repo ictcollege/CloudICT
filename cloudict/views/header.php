@@ -39,7 +39,7 @@
     <link href='http://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
     
     <!--JQuery FileUpload-->
-    <link rel="stylesheet" href="public/css/blueimp-gallery.min.css">
+    <link rel="stylesheet" href="<?php echo base_url();?>public/css/blueimp-gallery.min.css">
     <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload.css">
     <link rel="stylesheet" href="<?php echo base_url();?>public/css/jquery.fileupload-ui.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -52,6 +52,7 @@
     <?php
         $this->load->view('scripts');
     ?>
+    <link rel="stylesheet" href="<?php echo base_url();?>public/css/bootstrap-switch.min.css">
 </head>
 <body>
 <div class="container-fluid">
