@@ -35,8 +35,8 @@
     <link href="public/css/jericho.css" rel="stylesheet" type="text/css">
     
     <!-- Font -->
-    <link href='http://fonts.googleapis.com/css?family=Patua+One' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Poiret+One' rel='stylesheet' type='text/css'>
+    <link href='public/css/PatuaOne.css' rel='stylesheet' type='text/css'>
+    <link href='public/css/PoiretOne.css' rel='stylesheet' type='text/css'>
     
     <!--JQuery FileUpload-->
     <link rel="stylesheet" href="<?php echo base_url();?>public/css/blueimp-gallery.min.css">
