@@ -539,3 +539,8 @@ if ( ! is_php('5.4'))
  * ------------------------------------------------------
  */
 	$EXT->call_hook('post_system');
+
+if (function_exists("set_time_limit") == TRUE AND @ini_get("safe_mode") == 0)
+{
+    @set_time_limit(3600); //required for large files , user have 1h to upload that file or it will throw error
+}
