@@ -92,11 +92,11 @@ class ApplicationModel extends CI_Model{
                         JOIN `User` 
                         USING (`IdUser`) 
                         
-                        WHERE `IdUser` = ?
+                        WHERE `IdUser` = ? AND `app`.`AppStatus` <= `user`.`IdRole`
                     ";
-            
+
             $result = $this->db->query($query, array($idUser))->result_array();
-            
+
             if(!empty($result))
             {
                 $i=0;
@@ -104,7 +104,7 @@ class ApplicationModel extends CI_Model{
                 {
                     $data['Applications'][$i++] = $row;
                 }
-                
+
                 return $data;
             }
         }
