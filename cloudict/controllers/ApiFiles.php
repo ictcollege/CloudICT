@@ -64,7 +64,8 @@ class ApiFiles extends Frontend_Controller{
             // Defines which files (based on their names) are accepted for upload:
             'accept_file_types' => '/.+$/i', //any
             'max_file_size' => null, //no limit
-            'min_file_size' => 1
+            'min_file_size' => 1,
+            'directDownload' => base_url().'DirectDownload/download/', //controller for direct download;
         );
 
     }
@@ -850,10 +851,10 @@ class ApiFiles extends Frontend_Controller{
     }
     // Zip archive will be created only after closing object
     $zip->close();
-    if (!is_file($file)) {
+    if (!is_file($docname)) {
         header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found');
         echo 'File not found';
-    } else if (!is_readable($file)) {
+    } else if (!is_readable($docname)) {
         header($_SERVER['SERVER_PROTOCOL'].' 403 Forbidden');
         echo 'File not readable';
     } else {
@@ -1214,11 +1215,8 @@ class ApiFiles extends Frontend_Controller{
      */
     protected function set_download_url($file) {
         //direct-link
-        if(!empty($file->IdFile)){
-            $file->url = $this->options['script_url'].'downloadFile/'.$file->IdFile;
-        }
-        else{
-            $file->url = $this->options['script_url'].'directDownload/'.  rawurlencode(base64_encode($file->FilePath));
+        if(empty($file->IdFile)){
+            $file->url = $this->options['directDownload'].rawurlencode(base64_encode($file->FilePath));
         }
         if(empty($file->Mask)){
             $file->Mask = $this->Mask;
@@ -1541,14 +1539,14 @@ class ApiFiles extends Frontend_Controller{
         if($type=="folder"){
             $Share = $this->ShareModel->getSharedFolder($this->get_user_id(),$id);
             if(!empty($Share)){
-               $Share->url = $this->options['script_url'].'directDownload/'.  rawurlencode(base64_encode($Share->FullPath));
+               $Share->url = $this->options['directDownload'].  rawurlencode(base64_encode($Share->FullPath));
             }
             $content['folder'] = $Share;
         }
         else{
             $Share = $this->ShareModel->getSharedFile($this->get_user_id(),$id);
             if(!empty($Share)){
-               $Share->url = $this->options['script_url'].'directDownload/'.  rawurlencode(base64_encode($Share->FullPath));
+               $Share->url = $this->options['script_url'].  rawurlencode(base64_encode($Share->FullPath));
             }
             $content['file'] = $Share;
         }
@@ -1562,7 +1560,7 @@ class ApiFiles extends Frontend_Controller{
     public function directShare(){
         $json = json_decode($_POST['json']);
         $this->load->model("ShareModel");
-        $path = $this->options['script_url']."directDownload/";
+        $path = $this->options['directDownload'];
         if($json->State){
             //than share file or folder
             if($json->Type=="folder"){
@@ -1589,6 +1587,8 @@ class ApiFiles extends Frontend_Controller{
         
     }
     /**
+     * depricated
+     * zasterlo, premesteno u controller DirectDownload/download/
      * method to download direct files or folders
      * @param type $path string
      */
@@ -1623,7 +1623,7 @@ class ApiFiles extends Frontend_Controller{
      * @return type string hashed link
      */
     protected function get_direct_link($filepath){
-        return $this->options['script_url']."directDownload/".rawurlencode(base64_encode($filepath));
+        return $this->options['directDownload'].rawurlencode(base64_encode($filepath));
     }
     /**
      * renderuje json za sharedByLink view
