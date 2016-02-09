@@ -186,7 +186,7 @@ class Files extends Frontend_Controller{
         }
         if(file_exists($file->FilePath)){
             $content = file_get_contents($file->FilePath);
-            $data['content'] = $content;
+            $data['content'] = htmlspecialchars($content);
             $data['filePath'] = $file->FilePath;
             $data['IdFile']=$IdFile;
         }
