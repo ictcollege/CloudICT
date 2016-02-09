@@ -1,11 +1,11 @@
 <div id="page-wrapper">
     <div class="row">
-        <div class="col-lg-12">
-            <div class="route pull-left">
+        <div class="col-lg-12 route">
+            <div class="pull-left">
                 <i class="fa fa-home fa-2x homeicon"></i>
-                <i class="fa fa-angle-right fa-2x separatoricon"></i>
-                <button type="button" class="btn btn-default routebutton"><i class="fa fa-upload  fa-1x"></i></button>
-                <button type="button" class="btn btn-default routebutton">New</button>
+            </div>
+            <div class="pull-right">
+<!--                <button type="button" class="btn btn-primary">New Task</button>-->
             </div>
         </div>
     </div>

@@ -1,10 +1,13 @@
-<?php if(!isset($tasks)) redirect("Tasks/"); ?>
+<?php //if(!isset($tasks)) redirect("Tasks/");
+        include("Create.php") ?>
 <div id="page-wrapper">
     <div class="row">
-        <div class="col-lg-12">
-            <div class="route pull-left">
+        <div class="col-lg-12 route">
+            <div class="pull-left">
                 <i class="fa fa-home fa-2x homeicon"></i>
-                <i class="fa fa-angle-right fa-2x separatoricon"></i>
+            </div>
+            <div class="pull-right">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mNewUser">New Task</button>
             </div>
         </div>
     </div>
