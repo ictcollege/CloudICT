@@ -428,7 +428,9 @@
             "fnInitComplete": function(oSettings){
                 attachListeners();
             },
-            "scrollX" : true, 
+            "responsive":true,
+            "scrollX":true,
+            "scroller":true,
             "deferRender" : true
         });
 //        $(".deleteLink").bind("click",function (e){

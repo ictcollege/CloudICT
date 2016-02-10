@@ -73,6 +73,8 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
             $groups = $this->UserModel->getAllUsersInGroups($user["User"]["Id"]);
             $userDiskQuota = $user["User"]["DiskQuota"];
             $userDiskUsed = $user["User"]["DiskUsed"];
+            $email = $user["User"]["Email"];
+            $name = $user["User"]["FullName"];
             if($userDiskUsed<0){
                 $userDiskUsed = 0;
                 //reset disk
@@ -84,7 +86,9 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
                 'role' => $idrole,
                 'group' => $groups,
                 'diskquota'=>$userDiskQuota,
-                'diskused'=>$userDiskUsed
+                'diskused'=>$userDiskUsed,
+                'email' => $email,
+                'name'=>$name
             );
             
             $this->session->set_userdata($session);
@@ -330,6 +334,12 @@ class User extends MY_Controller { //MY_Controller jer on nema zastitu za logova
         else 
         {
             $data["exists"] = false;
+        }
+        if($this->UserModel->checkIfKeyExpired($key)){
+            $data['exists'] = true;
+        }
+        else{
+            $data['exists'] = false;
         }
         
             $this->load->view("header");

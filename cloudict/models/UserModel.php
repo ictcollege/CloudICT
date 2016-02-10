@@ -252,7 +252,10 @@ class UserModel extends CI_Model {
 			WHERE IdUser = ?;
 		";
         $updateData = "user$IdUser";
-        $this->db->query($updateQuery, array($updateData,$updateData,$updateData,5,time(),$IdUser));
+        //dodato
+        // ne moze time(); mora jos minimum 7 dana
+        $nextWeek = time() + (7 * 24 * 60 * 60);
+        $this->db->query($updateQuery, array($updateData,$updateData,$updateData,5,$nextWeek,$IdUser));
         return $IdUser;
     }
 
@@ -331,26 +334,27 @@ class UserModel extends CI_Model {
 
         $result = $this->db->query($query);
     }
-
-    public function editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires)
+    //editovano, pogledati prethodne verzije
+    public function editUser($IdUser, $IdRole, $UserName, $UserPassword, $UserFullname, $UserEmail,$UserDiskQuota,$UserStatus,$UserKey, $UserKeyExpires )
     {
         $query = "
                     UPDATE      `User`      
                     
-                    SET         `UserName` = ?,
+                    SET         `IdRole` = ?,
+                                `UserName` = ?,
                                 `UserPassword` = ?,
                                 `UserFullname` = ?,
                                 `UserEmail` = ?,
                                 `UserDiskQuota` = ?,
-                                `UserDiskUsed` = ?,
                                 `UserStatus` = ?,
                                 `UserKey` = ?,
                                 `UserKeyExpires` = ?
                                 
+                                
                     WHERE `IdUser` = ?
                     ";
-
-        $result = $this->db->query($query, array($username, md5($password), $userfullname, $email, $diskquota, $diskused, $userstatus, $userkey, $keyexpires, $iduser));
+        $result = $this->db->query($query, array($IdRole, $UserName, $UserPassword, $UserFullname, $UserEmail,$UserDiskQuota, $UserStatus, $UserKey,$UserKeyExpires,$IdUser));
+        return !empty($result)?1:0;
     }
 
     public function deleteUser($iduser)
@@ -496,6 +500,12 @@ class UserModel extends CI_Model {
 			WHERE IdUser = ?;
 		";
         $result = $this->db->query($query, array($username, $fullname, $email, $iduser));
+    }
+    //ovaj metod sam napravio jer me smara da pravim objekat iz niza
+    public function getUserByIdObject($IdUser){
+        $query = "SELECT * FROM user WHERE user.IdUser=? LIMIT 1";
+        $result = $this->db->query($query,array($IdUser));
+        return $result->row();
     }
 }
 

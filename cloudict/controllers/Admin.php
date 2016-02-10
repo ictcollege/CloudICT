@@ -437,26 +437,26 @@ class Admin extends Backend_Controller {
         //model
         $this->load->model('MenuModel');
         $this->load->model("UserModel");
-//        $this->load->model("ApplicationModel");
-//        
-//        if(!$this->ApplicationModel->canUserUseApp($this->session->userdata('userid'), 3)) 
-//        {
-//            if($this->isAdmin())
-//            {
-//                header("location:".base_url()."admin/");
-//                exit;
-//            }
-//            else if($this->isUser())
-//            {
-//                 header("location:".base_url()."");
-//                exit;
-//            }
-//            else if($this->isLogged())
-//            {
-//                 header("location:".base_url());
-//                exit;
-//            }
-//        }
+        $this->load->model("ApplicationModel");
+        
+        if(!$this->ApplicationModel->canUserUseApp($this->session->userdata('userid'), 3)) 
+        {
+            if($this->isAdmin())
+            {
+                header("location:".base_url()."admin/");
+                exit;
+            }
+            else if($this->isUser())
+            {
+                 header("location:".base_url()."");
+                exit;
+            }
+            else if($this->isLogged())
+            {
+                 header("location:".base_url());
+                exit;
+            }
+        }
        
         $menu = $this->MenuModel->getMenuOfApplication(3);
         
@@ -473,110 +473,6 @@ class Admin extends Backend_Controller {
         
         $data['editmodal'] = ""; 
         $data['deltemodal'] = "";
-        
-        foreach($users as $u)
-        {
-                $data['editmodal'] .= '<div class="modal fade '.$u['IdUser'].'" id="mEditUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
-                $data['editmodal'] .= '<div class="modal-dialog" role="document">';
-                $data['editmodal'] .= '<div class="modal-content">';
-                $data['editmodal'] .= '<div class="modal-header">';
-                $data['editmodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-                $data['editmodal'] .= '<h4 class="modal-title" id="myModalLabel">Edit User</h4>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '<div class="modal-body">';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>#USER ID</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserId" placeholder="'.$u['IdUser'].'"  disabled/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>#ROLE ID</label>';
-                $data['editmodal'] .= '<input class="form-control tbRouleId" placeholder="'.$u['IdRole'].'" disabled/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>Username</label>';
-                $data['editmodal'] .= '<input class="form-control tbEditUsername" placeholder="'.$u['UserName'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>Password md5</label>';
-                $data['editmodal'] .= '<input class="form-control tbEditPassword" placeholder="'.$u['UserPassword'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>User Full Name</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserFullName" placeholder="'.$u['UserFullname'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>User Full Name</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserEmail" placeholder="'.$u['UserEmail'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>Disk Quota</label>';
-                $data['editmodal'] .= '<select class="form-control selUserDiskQuota">';
-                $data['editmodal'] .= '<option value="0">select</option>';
-                $data['editmodal'] .= '<option value="262144000"><256 MB</option>';
-                $data['editmodal'] .= '<option value="524288000"><512 MB</option>';
-                $data['editmodal'] .= '<option value="1000000000"><1 GB</option>';
-                $data['editmodal'] .= '<option value="5000000000"><5 GB</option>';
-                $data['editmodal'] .= '</select>';
-                $data['editmodal'] .= '<label>Custom size in bits</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserDiskQuota" value="'.$u['UserDiskQuota'].'" disabled/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>Disk Used %</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserDiskUsed" placeholder="'.$u['UserDiskUsed'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>User Status</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserStatus" placeholder="'.$u['UserStatus'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>User Key</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserKey" placeholder="'.$u['UserKey'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '<div class="form-group">';
-                $data['editmodal'] .= '<label>Key Expires</label>';
-                $data['editmodal'] .= '<input class="form-control tbUserKeyExpires" placeholder="'.$u['UserKeyExpires'].'"/>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '<div class="modal-footer">';
-                $data['editmodal'] .= '<button type="button" class="btn btn-primary pull-right btnSaveChanges" id="'.$u['IdUser'].'">Save Changes</button>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                $data['editmodal'] .= '</div>';
-                
-                $data['deltemodal'] .= '<div class="modal fade mDeleteUser" id="mDeleteUser'.$u['IdUser'].'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">';
-                $data['deltemodal'] .= '<div class="modal-dialog" role="document">';
-                $data['deltemodal'] .= '<div class="modal-content">';
-                $data['deltemodal'] .= '<div class="modal-header">';
-                $data['deltemodal'] .= '<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
-                $data['deltemodal'] .= '<h4 class="modal-title" id="myModalLabel">Delete Group</h4>';
-                $data['deltemodal'] .= '</div>';
-                $data['deltemodal'] .= '<div class="modal-body text-center">';
-                $data['deltemodal'] .= 'Delete user '.$u['UserName'].'?';
-                $data['deltemodal'] .= '</div>';
-                $data['deltemodal'] .= '<div class="modal-footer text-center">';
-                $data['deltemodal'] .= '<button type="button" id="'.$u['IdUser'].'" class="btn btn-primary btnDeleteUserYes">Yes</button>';
-                $data['deltemodal'] .= '<button type="button" class="btn btn-danger" data-dismiss="modal">No</button>';
-                $data['deltemodal'] .= '</div>';
-                $data['deltemodal'] .= '</div>';
-                $data['deltemodal'] .= '</div>';
-                $data['deltemodal'] .= '</div>';
-        }
          
         
         //data to view
@@ -611,8 +507,15 @@ class Admin extends Backend_Controller {
             $data['data'][$i][] = $percentage;
             $data['data'][$i][] = $user["UserStatus"];
             $data['data'][$i][] = $user["UserKey"];
-            $data['data'][$i][] = $user["UserKeyExpires"];
-            $data['data'][$i][] = '<div class="options"><button type="button" id="'.$user['IdUser'].'" class="btn btn-primary btnEditUser" data-toggle="modal" data-target="#mEditUser'.$user["IdUser"].'"><i class="fa fa-edit fa-fw"></i></button><button type="button" id="'.$user['IdUser'].'" class="btn btn-danger btnDeleteUser" data-toggle="modal" data-target="#mDeleteUser'.$user["IdUser"].'"><i class="fa fa-trash-o fa-fw"></i></button></div>';
+            $data['data'][$i][] = ($user["UserKeyExpires"]>time())?"Active" : "Expired";
+            $manage = '<div class="options">'
+                    . '<a href="javascript:void(0);" data-id="'.$user['IdUser'].'" class="btn btn-primary btnEditUser" data-toggle="modal" data-target="#editModal" onclick="editUser(this)"><i class="fa fa-edit fa-fw"></i></a>';
+            if($user['IdUser']!=$this->session->userdata('userid')){
+            $manage.='<a href="javascript:void(0);" data-id="'.$user['IdUser'].'" class="btn btn-danger btnDeleteUser" data-toggle="modal" data-target="#deleteModal" onclick="deleteUser(this)"><i class="fa fa-trash-o fa-fw"></i></a>';  
+            }
+            $manage .='</div>';
+            $data['data'][$i][] = $manage;
+                    
            
             $i++;
         }
@@ -761,8 +664,9 @@ class Admin extends Backend_Controller {
         
         $this->load->library('email');
         $this->load->helper('url');
-        
-        $this->email->from('filip.radojkovic.26.12@ict.edu.rs', 'Filip Radojkovic');
+        $from = $this->session->userdata('email');
+        $name = $this->session->userdata('name');
+        $this->email->from($email, $name);
         $this->email->to($email); 
 
         $this->email->subject('ICT Cloud Registration Key');
@@ -775,22 +679,35 @@ class Admin extends Backend_Controller {
     
     public function editUser()
     {
-        $iduser = $this->input->post('IdUser');
-        $username =  $this->input->post('Username');
-        $password = $this->input->post('Password');
-        $userfullname =  $this->input->post('Userfullname');
-        $email =  $this->input->post('Email');
-        $diskquota = $this->input->post('Diskquota');
-        $diskused = $this->input->post('Diskused');
-        $userstatus = $this->input->post('Userstatus');
-        $userkey = $this->input->post('Userkey');
-        $keyexpires = $this->input->post('KeyExpires');
-        
+        header("Content-Type:application/json");
+        //dohvati usera kako bi ga editovali
+        $IdUser = $this->input->post('IdUser');
         $this->load->model("UserModel");
+        if(!empty($IdUser)){
+            $User = $this->UserModel->getUserByIdObject($IdUser);
+            if(!empty($User)){
+                
+                echo json_encode($User);
+            }
+            else{
+                echo json_encode(false);
+            }
+        }
+        //editovan korisnik
+        $json = $this->input->post('json');
+        if(!empty($json)){
+            $User = json_decode($json);
+            if(!empty($User)){
+                if($User->UserOldPassword != $User->UserPassword){
+                    $User->UserPassword = md5($User->UserPassword);
+                }
+                $result = $this->UserModel->editUser($User->IdUser,$User->IdRole,$User->UserName,$User->UserPassword,$User->UserFullname,$User->UserEmail,$User->UserDiskQuota,$User->UserStatus,$User->UserKey,$User->UserKeyExpires);
+                $ERROR['error']='Something is wrong!';
+                echo ($result==0) ? json_encode($ERROR) : json_encode(true);
+            }
+        }
+
         
-        $this->UserModel->editUser($iduser, $username, $password, $userfullname, $email, $diskquota, $diskused, $diskused, $userstatus, $userstatus, $userkey, $keyexpires);
-        
-        echo json_encode(true);
     }
     
     public function deleteUser()

@@ -1225,7 +1225,7 @@ class ApiFiles extends Frontend_Controller{
             $file->url = base_url().'data/'.$this->get_user_id().'/'.$file->Mask.$file->name;
             $file->thumbnailUrl = base_url().'data/'.$this->get_user_id().'/'.$file->Mask.'thumb/'.$file->name;
             $dir = dirname($file->FilePath);
-            if(!file_exists($dir.'/thumb/'.$file->FileName)){
+            if(!file_exists($dir.'/thumb/'.$file->name)){
                 $file->thumbnailUrl = base_url().'public/img/no-image.png';
             }
 

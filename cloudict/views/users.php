@@ -1,5 +1,69 @@
 <script type="text/javascript">
+function editUser(control){
+    var id = $(control).data('id');
+    $.ajax({
+            url: 'admin/editUser',
+            type: 'post',
+            dataType: 'json',
+            data:{IdUser:id},
+            success: function(response) {
+                if(typeof response === 'object'){
+                    fillEditForm(response);
+                    
+                }
+                else{
+                    alert(response.toString());
+                }
+            }
+   });
+    
+}
+function makeRandomKey(size)
+{
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < size; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
+function sendKey(key,email){
+    $.ajax({
+                url: 'admin/sendKey',
+                type: 'post',
+                dataType: 'json',
+                data:{Key:key,Email:email},
+                success: function(response) {
+                }
+    });
+}
+function fillEditForm(User){
+    $("#tbEditIdUser").val(User.IdUser);
+    $("#selEditIdRole").val(User.IdRole);
+    $("#tbEditUserName").val(User.UserName);
+    $("#tbEditUserPassword").val(User.UserPassword);
+    $("#tbEditOldPassword").val(User.UserPassword);
+    $("#tbEditUserFullname").val(User.UserFullname);
+    $("#tbEditUserEmail").val(User.UserEmail);
+    $("#tbEditUserDiskQuota").val(User.UserDiskQuota);
+    $("#tbEditUserDiskUsed").val(User.UserDiskUsed);
+    $("#selEditUserStatus").val(User.UserStatus);
+    $("#tbEditUserKey").val(User.UserKey);
+    if(User.UserKeyExpires == "0"){
+       $("#chbEditUserKeyExpires").prop('checked','checked');
+    }
+    $("#fldEditUser").removeAttr('disabled');
+    $(".btnSaveChanges").removeAttr('disabled');
+}
+function deleteUser(control){
+    var id = $(control).data('id');
+    $("#hiddenIdUserDelete").val(id);
+}
 $(document).ready(function(){
+    $(".btnEditUser").click(function(){
+        alert($(this).data('id'));
+    });
      var datatable =$(".tableusers").DataTable( {
                         "ajax": 'admin/getAllUsers',
                         "scrollX" : true, 
@@ -8,7 +72,7 @@ $(document).ready(function(){
     
     //delete user         
     $(document).on("click", ".btnDeleteUserYes", function() {
-        var id = $(this).attr("id");
+        var id = $("#hiddenIdUserDelete").val();
 
         $.ajax({
             url: 'admin/deleteUser',
@@ -28,81 +92,47 @@ $(document).ready(function(){
      
      //save changes, edit modal
         $(document).on("click", ".btnSaveChanges", function() {
-            var id = $(this).attr("id"),
-                username = $(this).parent().parent().find(".tbEditUsername"),
-                password = $(this).parent().parent().find(".tbEditPassword"),
-                userfullname = $(this).parent().parent().find(".tbUserFullName"),
-                email = $(this).parent().parent().find(".tbUserEmail"),
-                diskquota = $(this).parent().parent().find(".selUserDiskQuota"),
-                diskquota2 = $(this).parent().parent().find(".tbUserDiskQuota"),
-                diskused = $(this).parent().parent().find(".tbUserDiskUsed"),
-                userstatus = $(this).parent().parent().find(".tbUserStatus"), 
-                userkey = $(this).parent().parent().find(".tbUserKey"),
-                keyexpires  = $(this).parent().parent().find(".tbUserKeyExpires");
-                
-            if(username.val() == "") {
-                username = username.attr("placeholder");
-            } else {
-                username = username.val();
+            var username = $("#tbEditUserName"),
+                password = $("#tbEditUserPassword"),
+                userfullname = $("#tbEditUserFullname"),
+                email = $("#tbEditUserEmail"),
+                diskquota = $("#tbEditUserDiskQuota"),
+                userstatus = $("#selEditUserStatus"), 
+                userkey = $("#tbEditUserKey"),
+                keyexpires  = $("#chbEditUserKeyExpires"),
+                idrole = $("#selEditIdRole"),
+                iduser = $("#tbEditIdUser");
+            
+            var User = new Object();
+            User.IdUser = iduser.val();
+            User.IdRole = idrole.val();
+            User.UserName = username.val();
+            User.UserPassword = password.val();
+            User.UserOldPassword = $("#tbEditOldPassword").val();
+            User.UserFullname = userfullname.val();
+            User.UserEmail = email.val();
+            User.UserDiskQuota = diskquota.val();
+            User.UserStatus = userstatus.val();
+            User.UserKey = userkey.val();
+            if($(keyexpires).is(':checked')){
+                User.UserKeyExpires = keyexpires.val();
+            }
+            else{
+                User.UserKeyExpires = <?php echo time() + (7 * 24 * 60 * 60);?>;
             }
             
-            if(password.val() == "") {
-                password = password.attr("placeholder");
-            } else {
-                password = password.val();
-            }
             
-            if(userfullname.val() == "") {
-                userfullname = userfullname.attr("placeholder");
-            } else {
-                userfullname = userfullname.val();
-            }
-            
-            if(email.val() == "") {
-                email = email.attr("placeholder");
-            } else {
-                email = email.val();
-            }
-            
-            if(diskquota.val() != "0") {
-                diskquota = diskquota.val();
-            } else {
-                diskquota = diskquota2.val();
-            }
-            
-            if(diskused.val() == "") {
-                diskused = diskused.attr("placeholder");
-            } else {
-                diskused = diskused.val();
-            }
-            
-            if(userstatus.val() == "") {
-                userstatus = userstatus.attr("placeholder");
-            } else {
-                userstatus = userstatus.val();
-            }
-            
-            if(userkey.val() == "") {
-                userkey = userkey.attr("placeholder");
-            } else {
-                userkey = userkey.val();
-            }
-            
-            if(keyexpires.val() == "") {
-                keyexpires = keyexpires.attr("placeholder");
-            } else {
-                keyexpires = keyexpires.val();
-            }
-            
+            var json = JSON.stringify(User);
             $.ajax({
                 url: 'admin/editUser',
                 type: 'post',
                 dataType: 'json',
-                data:{IdUser:id,Username:username,Password:password,Userfullname:userfullname,Email:email,Diskquota:diskquota,Diskused:diskused,Userstatus:userstatus,Userkey:userkey,KeyExpires:keyexpires},
-                success: function(resposne) {
-                    setTimeout(function() {
+                data:{json:json},
+                success: function(response) {
+                    if(response==true){
                         $(".modal").modal('hide');
-                    }, 200);
+                        $(".btnSaveChanges").attr('disabled','disabled');
+                    }
                 
                     datatable.ajax.reload();
                 }
@@ -166,25 +196,29 @@ $(document).ready(function(){
             var key = $(".tbKey").attr("placeholder"),
                 email = $(".tbEmail").val();
             
-            $.ajax({
-                url: 'admin/sendKey',
-                type: 'post',
-                dataType: 'json',
-                data:{Key:key,Email:email},
-                success: function(response) {
-                }
-            });
+            sendKey(key,email);
         });
         
         $(".selUserDiskQuota").change(function(){
             var size = $(this).val();
             if(size == "0"){
-                $(".tbUserDiskQuota").removeAttr('disabled');
+                $("#tbEditUserDiskQuota").removeAttr('disabled');
             }
             else{
-                $(".tbUserDiskQuota").attr('disabled','disabled');
-                $(".tbUserDiskQuota").val(size);
+                $("#tbEditUserDiskQuota").attr('disabled','disabled');
+                $("#tbEditUserDiskQuota").val(size);
             }
+        });
+        
+        $("#btnEditGenerate").click(function (){
+            var key = makeRandomKey(8);
+            $("#tbEditUserKey").val(key);
+        });
+        
+        $("#btnEditSendKey").click(function (){
+            var email = $("#tbEditUserEmail").val();
+            var key = $("#tbEditUserKey").val();
+            sendKey(key,email);
         });
 });
 
@@ -266,16 +300,106 @@ $(document).ready(function(){
     </div>
     <!-- /#modal -->
 
-    <!--modal-->
-    <div class="editmodals">
-        <?php
-            echo $editmodal;
-        ?>
-    </div>
-    <!-- /#modal -->
-    <div class="deletemodals">
-        <?php
-            echo $deltemodal;
-        ?>
-    </div>
+    <!--modal editModal-->
+        <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">';
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Edit User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <fieldset id="fldEditUser" disabled="">
+<div class="form-group">
+<label>#USER ID</label>
+<input class="form-control" disabled id="tbEditIdUser"/>
+</div>
+<div class="form-group">
+<label>#ROLE ID</label>
+<select id="selEditIdRole" class="form-control">
+    <option>Select..</option>
+    <option value="1">User</option>
+    <option value="2">Group Administrator</option>
+    <option value="3">Administrator</option>
+</select>
+</div>
+<div class="form-group">
+<label>Username</label>
+<input class="form-control" id="tbEditUserName"/>
+</div>
+<div class="form-group">
+<label>Password md5</label>
+<input class="form-control" id="tbEditUserPassword"/>
+<input type='hidden' id='tbEditOldPassword' value=""/>
+</div>
+<div class="form-group">
+<label>User Full Name</label>
+<input class="form-control" id="tbEditUserFullname"/>
+</div>
+<div class="form-group">
+<label>User Email</label>
+<input class="form-control" id="tbEditUserEmail"/>
+</div>
+<div class="form-group">
+<label>Disk Quota</label>
+<select class="form-control selUserDiskQuota">
+<option value="0">select</option>
+<option value="262144000"><256 MB</option>
+<option value="524288000"><512 MB</option>
+<option value="1000000000"><1 GB</option>
+<option value="5000000000"><5 GB</option>
+</select>
+<label>Custom size in byte's</label>
+<input class="form-control" disabled id="tbEditUserDiskQuota"/>
+</div>
+<div class="form-group">
+<label>Disk Used %</label>
+<input class="form-control" disabled="" id="tbEditUserDiskUsed"/>
+</div>
+<div class="form-group">
+<label>User Status</label>
+<select id="selEditUserStatus" class="form-control">
+    <option value="-1">Select..</option>
+    <option value="0">Banned</option>
+    <option value="1">Active</option>
+</select>
+</div>
+<div class="form-group">
+<label>User Key</label>
+<input class="form-control" disabled="" id="tbEditUserKey"/>
+<button class="btn btn-primary" id="btnEditGenerate">Generate</button>
+<button class="btn btn-link" id="btnEditSendKey">Send</button>
+</div>
+<div class="form-group">
+<label>Key Expires</label>
+<input type="checkbox" id="chbEditUserKeyExpires" value="0"/>
+</div>
+                        </fieldset>
+</div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary pull-right btnSaveChanges">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- modal deleteModal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+            <div class="modal-dialog" role="document">';
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">Delete User</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        Are you sure?
+                        <input type='hidden' id='hiddenIdUserDelete' value=""/>
+                    </div>
+                    <div class="modal-footer text-center">
+                        
+                        <button type="button" class="btn btn-primary btnDeleteUserYes">Yes</button>
+                        <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     <!-- /#modal -->
