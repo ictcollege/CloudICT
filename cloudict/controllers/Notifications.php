@@ -29,6 +29,7 @@ class Notifications extends MY_Controller{
 	
 	
 	
+<<<<<<< HEAD
 	public function allNotifications() {
         $data['base_url']=  base_url();
        
@@ -36,6 +37,15 @@ class Notifications extends MY_Controller{
 		
         $this->load->view('allnotifications',$data);
     }
+=======
+//	public function allNotifications() {
+//        $data['base_url']=  base_url();
+//       
+//		$data['allnotifications']=  $this->NotificationModel->getAllNotifications($this->session->userdata('userid'));
+//		
+//        $this->load->view('allnotifications',$data);
+//    }
+>>>>>>> master
 	
 	public function updateExpire(){
 		

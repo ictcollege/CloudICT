@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php defined('BASEPATH') OR exit('No direct script access allowed.');
 
 $config['useragent']        = 'PHPMailer';              // Mail engine switcher: 'CodeIgniter' or 'PHPMailer'
@@ -21,3 +22,17 @@ $config['newline']          = "\n";                     // "\r\n" or "\n" or "\r
 $config['bcc_batch_mode']   = false;
 $config['bcc_batch_size']   = 200;
 $config['encoding']         = '8bit';                   // The body encoding. For CodeIgniter: '8bit' or '7bit'. For PHPMailer: '8bit', '7bit', 'binary', 'base64', or 'quoted-printable'.
+=======
+<?php
+
+$config['protocol'] = 'smtp';
+$config['smtp_host'] = 'ssl://smtp.gmail.com';
+$config['smtp_port'] = '465';
+$config['smtp_user'] = 'cloud_project_auth@ict.edu.rs';
+$config['smtp_pass'] = 'Cl0ud.3322';
+$config['validate'] = TRUE;
+$config['mailtype'] = 'html';
+$config['charset'] = 'iso-8859-1';
+$config['wordwrap'] = TRUE;
+$config['newline'] = "\r\n";
+>>>>>>> master
