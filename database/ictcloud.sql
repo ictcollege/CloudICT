@@ -25,7 +25,6 @@ DELIMITER $$
 -- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `create_notification`(IN `iduser` INT(10), IN `idnotificationtype` INT(10), IN `idapp` INT(10), IN `idevent` INT(10), IN `userfullname` VARCHAR(100), IN `usernotificationdescription` VARCHAR(255))
-<<<<<<< HEAD
 BEGIN 
 DECLARE notification_created INT(10) UNSIGNED DEFAULT 0;
  SET notification_created = UNIX_TIMESTAMP();
@@ -91,73 +90,6 @@ BEGIN
 	 UPDATE `usernotification`
 	 SET `usernotification`.`UserNotificationStatus`=1
 	 WHERE `usernotification`.`IdUser`=IdUser;
-=======
-BEGIN 
-DECLARE notification_created INT(10) UNSIGNED DEFAULT 0;
- SET notification_created = UNIX_TIMESTAMP();
- INSERT INTO `usernotification` (
-     `IdUser`,
-     `IdNotificationType`,
-     `IdApp`,
-     `IdEvent`,
-     `UserFullname`,
-     `UserNotificationDescription`,
-     `UserNotificationCreated`,
-     `UserNotificationTimeExpires`,
-     `UserNotificationStatus`)
-     VALUES (
-         iduser,
-         idnotificationtype,
-         idapp,
-         idevent,
-         userfullname,
-         usernotificationdescription,
-         notification_created,
-         0,
-         0);
-end$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `scheduled_notification_deletion`()
-BEGIN 
-
-	DELETE FROM `usernotification`
-	WHERE `usernotification`.`UserNotificationTimeExpires` < UNIX_TIMESTAMP();
- 
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `update_conf_notification_time`(IN `new_expire_time` INT(10))
-BEGIN 
-							
-UPDATE `cloudconf`
-SET `cloudconf`.`CloudConfValue` = new_expire_time
-WHERE `cloudconf`.`CloudConfKey` = 'NotificationTimeExpires';
-
- 
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `update_notification_expire_time`(IN `IdUser` INT(10))
-BEGIN 
-DECLARE NtfNtfTimeExpire INT(10) UNSIGNED DEFAULT 0;
-	 SET NtfNtfTimeExpire = 	(	SELECT `CloudConfValue` 
-									FROM `cloudconf` 
-									WHERE `cloudconf`.`CloudConfKey` = 'NotificationTimeExpires'
-								);
-
-	 UPDATE `usernotification`
-	 SET `usernotification`.`UserNotificationTimeExpires`=NtfNtfTimeExpire +  `usernotification`.`UserNotificationCreated`
-	 WHERE `usernotification`.`IdUser`=IdUser;
-END$$
-
-CREATE DEFINER=`root`@`localhost` PROCEDURE `update_notification_status`(
-	IdUser int(10)
- )
-BEGIN 
-	 
-
-	 UPDATE `usernotification`
-	 SET `usernotification`.`UserNotificationStatus`=1
-	 WHERE `usernotification`.`IdUser`=IdUser;
->>>>>>> master
 END$$
 
 DELIMITER ;
