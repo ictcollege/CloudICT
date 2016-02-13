@@ -158,6 +158,11 @@ textarea {
 	padding-top: 50px !important;
 }
 
+#chat{
+    max-height: 400px;
+    overflow: scroll;
+}
+
 .chat li {
 	border-bottom: none;
     margin-bottom: 15px;
@@ -181,17 +186,22 @@ textarea {
 	}	
 }
 
-.min-chat {
-	position: absolute;
-
-	height: 450px;
-	width: 400px;
-	border:1px solid #000;
-    top: 152px;
-    z-index: 100;
-    left: -400px;
+#min-chat{
+    height: 400px;
 }
-
+#send_footer
+{
+    bottom: 0px;
+}
+.small_chat{
+    overflow: scroll;
+    height: 300px;
+}
+.chat_box
+{
+    bottom: 0px;
+    right: 0px;
+}
 .arrow {
 	position: absolute;
 

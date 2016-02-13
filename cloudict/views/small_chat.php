@@ -1,5 +1,5 @@
-<div class="col-md-2 pull-right" id="main_<?php echo $Reciever; ?>">
-	<div class="panel panel-primary main-panel">
+<div class="col-md-3 pull-right" id="main_<?php echo $Reciever; ?>">
+	<div class="panel panel-primary main-panel"  id="min-chat">
 		<div class="panel-heading">
 			<div class="pull-left">
 				<h4 ><i class="fa fa-user fa-fw"></i> <span class='small_chat_user'> <?php echo $Reciever; ?> </span> </h4>
@@ -149,6 +149,6 @@
 		}
 	}
 
-	setInterval(showSmallMesages<?php echo $Reciever; ?>,2000);
+	// setInterval(showSmallMesages<?php echo $Reciever; ?>,2000);
 	</script>
 </div>
