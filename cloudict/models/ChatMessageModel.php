@@ -37,7 +37,7 @@ class ChatMessageModel extends CI_Model {
 			OR   `IdSender` = ? AND `IdReceiver` = ?
 
         ";
-        $result = $this->db->query($query, [$MainId,$SecondId,$SecondId,$MainId])->result_array();
+        $result = $this->db->query($query, array($MainId,$SecondId,$SecondId,$MainId))->result_array();
         return $result;
 
     }
@@ -66,7 +66,7 @@ class ChatMessageModel extends CI_Model {
             WHERE   `IdGroup` = ? 
 
         ";
-        $result = $this->db->query($query, [$IdGroup])->result_array();
+        $result = $this->db->query($query, array($IdGroup))->result_array();
         return $result;
 
     }
@@ -89,7 +89,7 @@ class ChatMessageModel extends CI_Model {
 			VALUES (?,?,?,?,?,?,?);
 		";
 
-        $result = $this->db->query($query, [$IdGroup,$IdSender,$IdReceiver,$TextMessage,time(),$SenderName,$ReceiverName]);
+        $result = $this->db->query($query, array($IdGroup,$IdSender,$IdReceiver,$TextMessage,time(),$SenderName,$ReceiverName));
 
 
     }
