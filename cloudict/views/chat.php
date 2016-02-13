@@ -75,7 +75,7 @@
 		</div>
 
 
-		<div class="col-md-10" id="chat_box">
+		<div class="col-md-12" id="chat_box">
 			
 		</div>
 
@@ -289,7 +289,7 @@
 	});
 
 
-	setInterval(showMesages,2000);
+	// setInterval(showMesages,5000);
 
 
 </script>
