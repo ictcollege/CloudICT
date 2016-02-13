@@ -105,12 +105,12 @@ class Chat extends MY_Controller {
 	 */
 	public function getGroupMessages($IdGroup=null){
 		$this->load->model('chatmessagemodel');
-		 return  $this->chatmessagemodel->getGroupMessages(1);
+		 return  $this->chatmessagemodel->getGroupMessages(-1);
 	}
 
 
 	public function showGroupMessages($IdGroup=null){
-		$Messages 	=	$this->getGroupMessages(1);
+		$Messages 	=	$this->getGroupMessages(-1);
 		$data 		= array(
 			'Messages' 	=>	$Messages
 		);
@@ -119,7 +119,7 @@ class Chat extends MY_Controller {
 	}
 
 	public function showSmallGroupMessages($IdGroup=null){
-		$Messages 	=	$this->getGroupMessages(1);
+		$Messages 	=	$this->getGroupMessages(-1);
 		$data 		= array(
 			'Messages' 	=>	$Messages,
 			'Reciever'	=>	"All"
@@ -145,13 +145,15 @@ class Chat extends MY_Controller {
 		$Receiver   = $this->UserModel->getUserById($ReceiverId);
 
 		$this->load->model('chatmessagemodel');
-		$this->chatmessagemodel->insertMessage(NULL,$Sender['0']['IdUser'],$Receiver['0']['IdUser'],$TextMessage,$Sender['0']['UserName'],$Receiver['0']['UserName']);
+		$this->chatmessagemodel->insertMessage( NULL, $Sender['0']['IdUser'], $Receiver['0']['IdUser'], $TextMessage, $Sender['0']['UserName'], $Receiver['0']['UserName']); // NULL je parametar koji se upisuje u IdGroup 
 
 		$this->showMessage($Receiver['0']['IdUser']);
 
 	}
 	/**
-	 * insert new message
+	 * insert new group message
+	 *
+	 * ovu funkciju prepraviti da radi za sve grupe
 	 */
 	public function GroupMessage($IdGroup=null){
 
@@ -162,16 +164,16 @@ class Chat extends MY_Controller {
 		$Sender     = $this->UserModel->getUserById($this->session->userdata('userid'));
 
 		$this->load->model('chatmessagemodel');
-		$this->chatmessagemodel->insertMessage(1,$Sender['0']['IdUser'],$Sender['0']['IdUser'],$TextMessage,$Sender['0']['UserName'],$Sender['0']['UserName']);
+		$this->chatmessagemodel->insertMessage( -1,$Sender['0']['IdUser'], $Sender['0']['IdUser'], $TextMessage, $Sender['0']['UserName'], $Sender['0']['UserName'] ); // -1 je parametar koji ide u IdGroup hardkodovano je jer trenutno postoji samo All group.
 
-		$this->showGroupMessages(1);
+		$this->showGroupMessages(-1);
 
 	}
 
 
 	public function exportGroupChat($IdGroup=null)
 	{
-		$GroupMessages = $this->getGroupMessages(1);
+		$GroupMessages = $this->getGroupMessages(-1);
 
 		$path=$_SERVER['DOCUMENT_ROOT']."/All_users_chat.txt";
 		
