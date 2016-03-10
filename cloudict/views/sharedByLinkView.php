@@ -1,55 +1,6 @@
 <script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
-<script type="text/javascript">
-    var table;
-    function myFunction(){
-        table.ajax.reload( 
-                function (){
-                    attachListeners();
-                }
-                ); // user paging is not reset on reload
-    }
-    $(document).ready(function (){
-        table=$("#myTable").DataTable({
-            "ajax": {
-                "url":"<?php echo base_url();?>ApiFiles/sharedByLink/"
-              },
-            "fnInitComplete": function(oSettings){
-                attachListeners();
-            },
-            "scrollX" : true, 
-            "deferRender" : true
-        });
-        
-    });
-    function attachListeners(){
-        $('.unshare').bind('click',function (e){
-            e.preventDefault();
-            var Unshare=new Object();
-            Unshare.Id=$(this).data('id');
-            Unshare.Type=$(this).data('type');
-            Unshare.State=false;
-            var json = JSON.stringify(Unshare);
-            var control = $(this);
-            $.ajax({
-                    url: "<?php echo base_url();?>ApiFiles/directShare",
-                    type: "POST",
-                    dataType: "json",
-                    data:{json:json},
-                    beforeSend: function (xhr) {
-                        $(control).append('<i class="fa fa-spinner fa-spin"></i>');
-                    },
-                    success: function(data) {
-                       if($(".fa-spin").length>0){
-                           $(".fa-spin").remove();
-                       }
-                       myFunction();
 
-                    }
-                });
-        });
-    }
-</script>
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
@@ -87,8 +38,22 @@
        
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
-
+<script type="text/javascript" src="<?php echo base_url();?>public/js/filesScript.js"></script>
 <script type="text/javascript">
-    
+var options = {
+    apiurl:"<?php echo base_url();?>ApiFiles/",
+    scripturl:"<?php echo base_url();?>Files/",
+    apifunc:"sharedByLink/",
+    current_dir:$("#current_dir").val(),
+    current_path:"",
+    datatable:"#myTable",
+    datasrc:"files"
+            
+};
+var filesScript = $(document).filesScript(options);
+filesScript.base_url("<?php echo base_url();?>");
+$(document).ready(function (){
+    filesScript._initdatatables();
+});
 </script>
 

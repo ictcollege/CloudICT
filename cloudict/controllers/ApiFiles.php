@@ -79,6 +79,10 @@ class ApiFiles extends Frontend_Controller{
      */
     protected function initialize() {
         switch ($this->get_server_var('REQUEST_METHOD')) {
+            case 'HEAD':
+            case 'OPTIONS':
+                $this->head();
+                break;
             case 'GET':
                 $this->get();
                 break;
@@ -98,27 +102,17 @@ class ApiFiles extends Frontend_Controller{
     /**
      * delete method , decide what to delete
      * delete metod , odlucuje sta se i kako brise
-     * parametre slati putem GET
+     * parametre slati putem DELETE || GET
      */
     protected function delete(){
-        if(isset($_GET['Id'])){
-            $Id = intval($_GET['Id']);
-        }
-        else{
-            die(FALSE);
-        }
-        if(isset($_GET['Type'])){
-            $type = $_GET['Type'];
-        }
-        else{
-            die(FALSE);
-        }
+        $id = intval($this->inputGet('id'));
+        $type = $this->inputGet('type');
         switch ($type){
             case "File": case "file" :
-                $this->deleteFile($Id);
+                $this->deleteFile($id);
                 break;
             case "Folder": case "folder":
-                $this->deleteFolder($Id);
+                $this->deleteFolder($id);
                 break;
             default :
                 die(FALSE);
@@ -170,7 +164,8 @@ class ApiFiles extends Frontend_Controller{
             // param_name is an array identifier like "files[]",
             // $_FILES is a multi-dimensional array:
             foreach ($upload['tmp_name'] as $index => $value) {
-                if($upload['size'][$index]>$disk_space_remain){
+                $shared = isset($_REQUEST['Shared']) ? $_REQUEST['Shared'][$index] : false;
+                if($upload['size'][$index]>$disk_space_remain && !$shared){
                     $upload['error'][$index]='You have probably exceeded your disk quota!';
                 }
                 
@@ -188,7 +183,8 @@ class ApiFiles extends Frontend_Controller{
         } else {
             // param_name is a single object identifier like "file",
             // $_FILES is a one-dimensional array:
-            if($upload['size'][$index]>$disk_space_remain){
+            $shared = isset($_REQUEST['Shared']) ? $_REQUEST['Shared'][$index] : false;
+            if($upload['size'][$index]>$disk_space_remain&&!$shared){
                     $upload['error']='You have probably exceeded your disk quota!';
             }
             $files[] = $this->handle_file_upload(
@@ -339,8 +335,9 @@ class ApiFiles extends Frontend_Controller{
             $mime = $this->get_mime($filename);
             $this->load->model("FileModel");
             $this->FileModel->insertUserFile($this->get_user_id(),$mime,$file->IdFolder,$ext,$filename,$path,$size);
-            die(TRUE);
+            $this->generate_response(TRUE);
         }
+        else {$this->generateError('File not created!',  self::WARNING,FALSE);}
        }
     /**
      * public function to rename file
@@ -358,9 +355,15 @@ class ApiFiles extends Frontend_Controller{
                 $newFilePath = dirname($result->FilePath)."/".$newName;
                 if(rename($result->FilePath, $newFilePath)){
                     $this->FileModel->changeFileName($file->IdFile,$newName,$newFilePath);
-                    die(TRUE);
+                    $this->generate_response(TRUE);
                 }
-                die(FALSE);
+                else{
+                    $this->generateError("File not renamed!", self::ERROR, false);
+                }
+                
+            }
+            else{
+                $this->generateError("File not exists!", self::ERROR, false);
             }
         }
     }
@@ -405,16 +408,16 @@ class ApiFiles extends Frontend_Controller{
             endif;
             $this->FileModel->deleteFile($IdFile);
             $this->updateUserQuota($file->FileSize,false);
-            die(TRUE);
+            return $this->generate_response(TRUE);
         }
         $this->load->model("ShareModel");
         if($this->ShareModel->canExecute($this->get_user_id(),$file->IdFile)){
-            if(unlink($file->FilePath)){
-                $this->FileModel->deleteFile($IdFile);
-                $this->updateUserQuota($file->FileSize, false, true,$file->IdUser);
-                die(TRUE);
-            }
-            die(FALSE);
+            if(file_exists($file->FilePath)):
+                unlink($file->FilePath);
+            endif;
+            $this->FileModel->deleteFile($IdFile);
+            $this->updateUserQuota($file->FileSize, false, true,$file->IdUser);
+            return $this->generate_response(TRUE);
         }
         else{
             $this->generateError("You don't have permision to download this file!");
@@ -447,16 +450,16 @@ class ApiFiles extends Frontend_Controller{
             $this->load->model("FolderModel");
             //insertUserFolder($IdUser,$FolderName,$FolderMask,$FolderPath)
             $this->FolderModel->insertUserFolder($this->get_user_id(), $folder->FolderName, $folder->Mask,$path,($folder->IdFolder==0)? NULL : $folder->IdFolder);
-            die(TRUE);
+            return $this->generate_response(TRUE);
         }
-        die(FALSE);
+        return $this->generateError('Folder not created!',  self::WARNING,FALSE);
     }
     /**
      * rename folders
      * pass json
      */
     public function renameFolder() {
-        $folder = json_decode($_POST['json']);
+        $folder = json_decode($this->inputPost('json'));
         $newName = $this->prepareName($folder->Name);
         $this->load->model("FolderModel");
         $result = $this->FolderModel->getFolderById($folder->IdFolder);
@@ -465,12 +468,16 @@ class ApiFiles extends Frontend_Controller{
                 $newFolderPath = dirname($result->FolderPath)."/".$newName;
                 rename($result->FolderPath, $newFolderPath);
                 $this->FolderModel->changeFolderName($folder->IdFolder,$newName,$newFolderPath);
-                die(TRUE);
-                exit;
+                return $this->generate_response(TRUE);
+            }
+            else{
+                return $this->generateError('Folder not exists!',  self::ERROR,false);
             }
             
         }
-        die(FALSE);
+        else{
+            return $this->generateError("Folder not found!",self::ERROR,false);
+        }
     }
     /**
      * downlaod folder (force_download)
@@ -512,7 +519,7 @@ class ApiFiles extends Frontend_Controller{
             }
             //delete from db where constraint do all recursive stuff
             $this->FolderModel->deleteFolder($IdFolder);
-            die(TRUE);
+            return $this->generate_response(TRUE);
         }
         else{
             $this->load->model("ShareModel");
@@ -522,13 +529,12 @@ class ApiFiles extends Frontend_Controller{
                 }
                 //delete from db where constraint do all recursive stuff
                 $this->FolderModel->deleteFolder($IdFolder);
-                die(TRUE);
+                return $this->generate_response(TRUE);
             }
             else{
                 $this->generateError("You don't have permision to delete this folder!");
             }
         }
-        die(FALSE);
     }
     /**
      * if someone want to put that file or folder in favourites so he can find him later easy
@@ -537,15 +543,17 @@ class ApiFiles extends Frontend_Controller{
      * @param type $Type - type (folder/file)
      * @param type $Unset bool (set, unset)
      */
-    public function setFavourites($IdFile,$Type,$Unset=FALSE){
-        if($Type=="folder"){
+    public function setFavourites(){
+        $json = json_decode($this->inputPost('json'));
+        if($json->type=="folder"){
             $this->load->model("FolderModel","TModel");
         }
         else{
             $this->load->model("FileModel","TModel");
         }
         $UserId = $this->get_user_id();
-        $this->TModel->setFavourites($UserId,intval($IdFile),$Unset);
+        $this->TModel->setFavourites($UserId,intval($json->id),$json->set);
+        $this->generate_response(TRUE);
     }
     
     /**
@@ -561,12 +569,12 @@ class ApiFiles extends Frontend_Controller{
         $i = 0;
         
         foreach($folders as $folder){
-            $preview = '<span class="size"><i class="fa fa-folder-open fa-fw"></i></span>';
+            $preview = '<span class="preview"><i class="fa fa-folder-open fa-fw"></i></span>';
             if($folder["Favourites"]){
-                $preview.= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" data-set="0" class="unsetfav" onclick="setFavourites(this);"><i class="fa fa-star fa-fw"></i></a>';
+                $preview.= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" data-set="0" class="favourites" onclick="setFavourites(this);"><i class="fa fa-star fa-fw"></i></a>';
             }
             else{
-                $preview.= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" data-set="1" class="setfav" onclick="setFavourites(this);"><i class="fa fa-star-o fa-fw"></i></a>';
+                $preview.= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" data-set="1" class="favourites" onclick="setFavourites(this);"><i class="fa fa-star-o fa-fw"></i></a>';
             }
             $checkbox = '<input type="checkbox" name="chbDelete" data-type="folder" data-id="'.$folder["IdFolder"].'" value="'.$folder['IdFolder'].'" class="toggle chbDelete">';
             $name = '<a href="Files/index/'.$folder["FolderMask"].$folder["FolderName"].'">'.$folder['FolderName'].'</a>';
@@ -591,7 +599,7 @@ class ApiFiles extends Frontend_Controller{
         }
         
         foreach($files as $file){
-            $preview = '<span class="size"><i class="fa fa-file-text-o fa-fw"></i></span>';
+            $preview = '<span class="preview"><i class="fa fa-file-text-o fa-fw"></i></span>';
             if($file->Favourites){
                 $preview.= '<a href="javascript:void(0);" data-id="'.$file->IdFile.'" data-type="file" class="unsetfav" data-set="0" onclick="setFavourites(this);"><i class="fa fa-star fa-fw"></i></a>';
             }
@@ -602,7 +610,7 @@ class ApiFiles extends Frontend_Controller{
                 $file->image = true;
                 $file->name = $file->FileName;
                 $this->set_download_url($file);
-                $preview = '<a href="'.$file->url.'" title="'.$file->FileName.'" download="'.$file->FileName.'" data-gallery=""><img src="'.$file->thumbnailUrl.'"></a>';
+                $preview = '<span class="preview"><a href="'.$file->url.'" title="'.$file->FileName.'" download="'.$file->FileName.'" data-gallery=""><img src="'.$file->thumbnailUrl.'"></a></span>';
             }
             
             $checkbox = '<input type="checkbox" name="chbDelete" data-id="'.$file->IdFile.'" data-type="file" value="'.$file->IdFile.'" class="toggle chbDelete">';
@@ -619,7 +627,7 @@ class ApiFiles extends Frontend_Controller{
           </ul>
           <a href="javascript:void(0);" data-id="'.$file->IdFile.'" data-type="file" class="deleteLink" onclick="deleteFileFolder(this);"><i class="glyphicon glyphicon-trash"></i></a>
           <a href="'.$this->options['script_url'].'downloadFile/'.$file->IdFile.'" data-type="File" data-id="'.$file->IdFile.'" class="download"  title="Download '.$file->FileName.'"><i class="fa  fa-cloud-download fa-fw"></i></a>
-          <a href="javascript:void(0);" class="share" data-toggle="modal" data-target="#ShareModal" data-id="'.$file->IdFile.'" data-type="file" title="Share file" onclick="shareFileFolder(this)"><i class="fa  fa-share-alt fa-fw" onclick="shareFileFolder(this);"></i></a>
+          <a href="javascript:void(0);" class="share" data-toggle="modal" data-target="#ShareModal" data-id="'.$file->IdFile.'" data-type="file" title="Share file" onclick="shareFileFolder(this)"><i class="fa  fa-share-alt fa-fw"></i></a>
           </div>';
             $size = $this->formatBytes($file->FileSize);
             $modified = date("d.m.Y h:i",$file->FileLastModified);
@@ -756,7 +764,7 @@ class ApiFiles extends Frontend_Controller{
         header('X-Content-Type-Options: nosniff');
         if (!preg_match('/\.(gif|jpe?g|png)$/i', $result->FileName)) {
            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="'.$result->FileName.'"');
+           header('Content-Disposition: attachment; filename="'.$result->FileName.'"');
         } else {
             header('Content-Type: '.$result->FileType);
             header('Content-Disposition: inline; filename="'.$result->FileName.'"');
@@ -911,7 +919,13 @@ class ApiFiles extends Frontend_Controller{
             if (!is_dir($upload_dir)) {
                 mkdir($upload_dir, $this->options['mkdir_mode'], true);
             }
-            $file_path = $this->get_upload_path($file->name,$file->Mask);
+            if(!$file->Shared){
+                $file_path = $this->get_upload_path($file->name,$file->Mask);
+            }
+            else{
+                $file_path = $this->get_shared_path($file);
+            }
+            
             $append_file = $content_range && is_file($file_path) &&
                 $file->size > $this->get_file_size($file_path);
             if ($uploaded_file && is_uploaded_file($uploaded_file)) {
@@ -948,7 +962,8 @@ class ApiFiles extends Frontend_Controller{
                     $file->error = "File upload aborted...";
                 }
             }
-            $file->FilePath = $this->get_upload_path($file->name, $file->Mask);
+            //$file->FilePath = $this->get_upload_path($file->name, $file->Mask);
+            $file->FilePath = $file_path;
             $this->set_additional_file_properties($file,$insert);
             //$file->url = $this->get_download_url($file->name);
         }
@@ -1180,8 +1195,13 @@ class ApiFiles extends Frontend_Controller{
         $this->load->model("FileModel");
         $file->IdFile = null;
         if($content_range){
-            $file->IdFile=$this->FileModel->insertUserFile($this->get_user_id(),$mime,$file->IdFolder,$ext,$file->name,$file->FilePath,$file->size);
-            $this->updateUserQuota($file->size);
+            $file->IdFile=$this->FileModel->insertUserFile($file->IdUser,$mime,$file->IdFolder,$ext,$file->name,$file->FilePath,$file->size);
+            $this->updateUserQuota($file->size,true,$file->IdUser);
+            if($file->Shared){
+                //share file
+                $this->load->model("ShareModel");
+                $this->ShareModel->shareFile($file->IdUser,$this->get_user_id(),$file->IdFile,3); 
+            }
         }
         $file->FileLastModified = date("d.m.Y h:i",time());
         if($file->IdFile){
@@ -1198,6 +1218,7 @@ class ApiFiles extends Frontend_Controller{
      * @param type $index
      */
     protected function handle_form_data($file, $index) {
+        $file->IdUser = $this->get_user_id();
         if(isset($_REQUEST['IdFolder'])){
             $file->IdFolder = intval($_REQUEST['IdFolder'][$index]);
         }
@@ -1205,7 +1226,15 @@ class ApiFiles extends Frontend_Controller{
             //root file
             $file->IdFolder = null;
         }
-        $file->Mask = @$_REQUEST['Mask'][$index];
+        $file->Mask="";
+        if(isset($_REQUEST['Mask'])){
+            $file->Mask = $_REQUEST['Mask'][$index];
+        }
+        //check if user upload in shared folder
+        $file->Shared = false;
+        if(isset($_REQUEST['Shared'])&&$_REQUEST['Shared'][$index]){
+            $file->Shared = true;
+        }
     }
 
     /**
@@ -1227,15 +1256,11 @@ class ApiFiles extends Frontend_Controller{
             $dir = dirname($file->FilePath);
             if(!file_exists($dir.'/thumb/'.$file->name)){
                 $file->thumbnailUrl = base_url().'public/img/no-image.png';
-            }
-
-            
+            }       
             
         }
     }
-    
-
-    
+       
     /**
      * how to save edited file
      * metod za cuvanje editovanog fajla
@@ -1294,13 +1319,10 @@ class ApiFiles extends Frontend_Controller{
      * render json for datatables used in view Shared With you
      */
     public function sharedWithYou(){
-        if(isset($_GET['id_folder'])){
+        if(isset($_GET['id_folder'])&&!empty($_GET['id_folder'])){
             $id_folder=intval($_GET['id_folder']);
         }
         else{
-            $id_folder = null;
-        }
-        if(empty($id_folder)){
             $id_folder = null;
         }
         //folders
@@ -1311,10 +1333,16 @@ class ApiFiles extends Frontend_Controller{
         foreach($folders as $folder){
             $owner = $folder['UserName'];
             $shared_on = $shared_on = date("d-m-Y h:i:s",$folder["ShareCreated"]);
-            $name = "<a href='".  base_url()."Files/shared_with_you/".$folder['IdFolder']."'>".$folder["Name"]."</a>";
+            if($folder['IdParent']){
+                $name = "<a href='".base_url()."Files/shared_with_you/".$folder['IdParent']."'>~../&nbsp;</a><a href='".  base_url()."Files/shared_with_you/".$folder['IdFolder']."'>".$folder["Name"]."</a>";
+            }
+            else{
+              $name = "<a href='".  base_url()."Files/shared_with_you/".$folder['IdFolder']."'>".$folder['Name']."</a>";  
+            }
+            
             $privilege = $this->switchPrivilege($folder["SharePrivilege"]);
             $modified = '';
-            $modify="<a href='#' class='unshare' data-idshare='".$folder["IdShare"]."' data-idshared='".$folder["IdShared"]."' data-id='".$folder["IdFolder"]."' data-type='folder' title='Remove from share'><i class='fa fa-minus-circle'></i></a>";
+            $modify="<a href='javascript:void(0);' class='unshare' data-idshare='".$folder["IdShare"]."' data-idshared='".$folder["IdShared"]."' data-id='".$folder["IdFolder"]."' data-type='folder' title='Remove from share' onclick='ushareFileFolder(this);'><i class='fa fa-minus-circle'></i></a>";
             $modify.="<a href='".base_url()."ApiFiles/downloadFolder/".$folder["IdFolder"]."' title='Download entire folder'><i class='fa  fa-cloud-download fa-fw'></i></a>";
             if($folder["SharePrivilege"]==3){
                 $modify.="<a href='javascript:void(0);' title='delete folder' data-id='".$folder["IdFolder"]."' data-type='folder' onclick='deleteFileFolder(this);'><i class='glyphicon glyphicon-trash' title='delete folder'></i></a>";
@@ -1335,10 +1363,11 @@ class ApiFiles extends Frontend_Controller{
         foreach($files as $file){
             $owner = $file['UserName'];
             $shared_on = $shared_on = date("d-m-Y h:i:s",$file["ShareCreated"]);
-            $name = "<a href='".  base_url()."ApiFiles/downloadFile/".$file["IdFile"]."'>".$file["Name"]."</a>";
+            $name = "<a href='".  base_url()."Files/shared_with_you/".$file['IdFolder']."'>&nbsp;../&nbsp;</a>";
+            $name .= "<a href='".  base_url()."ApiFiles/downloadFile/".$file["IdFile"]."'>".$file["Name"]."</a>";
             $privilege = $this->switchPrivilege($file["SharePrivilege"]);
             $modified = date("d.m.Y h:i",$file["FileLastModified"]);
-            $modify="<a href='#' class='unshare' data-idshare='".$file["IdShare"]."' data-type='file' data-id='".$file["IdFile"]."' data-idshared='".$file["IdShared"]."' title='Remove from share'><i class='fa fa-minus-circle'></i></a>";
+            $modify="<a href='javascript:void(0);' class='unshare' data-idshare='".$file["IdShare"]."' data-type='file' data-id='".$file["IdFile"]."' data-idshared='".$file["IdShared"]."' title='Remove from share' onclick='ushareFileFolder(this);'><i class='fa fa-minus-circle'></i></a>";
             $modify.="<a href='".base_url()."ApiFiles/downloadFile/".$file["IdFile"]."' title='Download file'><i class='fa  fa-cloud-download fa-fw'></i></a>";
             if($file["SharePrivilege"]==3){
                 $modify.="<a href='javascript:void(0);' title='delete file' data-id='".$file["IdFile"]."' data-type='file' onclick='deleteFileFolder(this);'><i class='glyphicon glyphicon-trash'></i></a>";
@@ -1356,7 +1385,7 @@ class ApiFiles extends Frontend_Controller{
             $data[$i][]=$modify;
             $i++;
         }
-        $content['data'] = $data;
+        $content['files'] = $data;
         $this->generate_response($content,TRUE);
     }
     /**
@@ -1389,7 +1418,7 @@ class ApiFiles extends Frontend_Controller{
             $name = "<a href='".  base_url()."Files/shared_with_others/".$folder['IdFolder']."/".$folder["IdShared"]."'>".$folder["Name"]."</a>";
             $privilege = $this->switchPrivilege($folder["SharePrivilege"]);
             $modified = '';
-            $modify="<a href='#' class='unshare' data-idshared='".$folder["IdShared"]."' data-id='".$folder["IdFolder"]."' data-type='folder' data-idshare='".$folder["IdShare"]."' title='Unshare this folder'><i class='fa fa-minus-circle'></i></a>";
+            $modify="<a href='javascript:void(0);' class='unshare' data-idshared='".$folder["IdShared"]."' data-id='".$folder["IdFolder"]."' data-type='folder' data-idshare='".$folder["IdShare"]."' title='Unshare this folder' onclick='ushareFileFolder(this)'><i class='fa fa-minus-circle'></i></a>";
             
             $size = "<i class='fa fa-folder-open' title='folder'></i>";
             $data[$i][]=$shareduser;
@@ -1411,7 +1440,7 @@ class ApiFiles extends Frontend_Controller{
             
             $privilege = $this->switchPrivilege($file["SharePrivilege"]);
             $modified = date("d.m.Y h:i",$file["FileLastModified"]);
-            $modify="<a href='#' class='unshare' data-idshared='".$file["IdShared"]."' data-id='".$file["IdFile"]."' data-type='file' data-idshare='".$file["IdShare"]."' title='Unshare this file'><i class='fa fa-minus-circle'></i></a>";
+            $modify="<a href='javascript:void(0);' class='unshare' data-idshared='".$file["IdShared"]."' data-id='".$file["IdFile"]."' data-type='file' data-idshare='".$file["IdShare"]."' title='Unshare this file' onclick='ushareFileFolder(this);'><i class='fa fa-minus-circle'></i></a>";
             
             $size = $this->formatBytes($file['FileSize']);
             $data[$i][]=$shareduser;
@@ -1440,7 +1469,8 @@ class ApiFiles extends Frontend_Controller{
         else{
            $this->ShareModel->deleteShareById($json->IdShare);     
         }
-        die(TRUE);
+        
+        $this->generate_response(TRUE);
     }
     
     protected function switchPrivilege($param){
@@ -1464,12 +1494,7 @@ class ApiFiles extends Frontend_Controller{
         $i = 0;
         $data = array();
         foreach($folders as $folder){
-            if($folder["Favourites"]){
-                $fav= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" class="unsetfav"><i class="fa fa-star fa-fw"></i></a>';
-            }
-            else{
-                $fav= '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" class="setfav"><i class="fa fa-star-o fa-fw"></i></a>';
-            }
+            $fav = '<a href="javascript:void(0);" data-id="'.$folder["IdFolder"].'" data-type="folder" data-set="0" class="favourites" onclick="setFavourites(this);"><i class="fa fa-star fa-fw"></i></a>';
             $name = "<a href='".  base_url()."Files/index/".$folder['FolderMask'].$folder["FolderName"]."'>".$folder["FolderName"]."</a>";
             $modified = '';
             
@@ -1487,12 +1512,7 @@ class ApiFiles extends Frontend_Controller{
         //files
         $files = $this->FileModel->getAllFavFiles($this->get_user_id());
         foreach($files as $file){
-            if($file["Favourites"]){
-                $fav= '<a href="javascript:void(0);" data-id="'.$file["IdFile"].'" data-type="file" class="unsetfav"><i class="fa fa-star fa-fw"></i></a>';
-            }
-            else{
-                $fav= '<a href="javascript:void(0);" data-id="'.$fav["IdFile"].'" data-type="folder" class="setfav"><i class="fa fa-star-o fa-fw"></i></a>';
-            }
+            $fav = '<a href="javascript:void(0);" data-id="'.$file["IdFile"].'" data-type="file" data-set="0" class="favourites" onclick="setFavourites(this);"><i class="fa fa-star fa-fw"></i></a>';
             $name = "<a href='".  base_url()."ApiFiles/downloadFile/".$file['IdFile']."'>".$file["FileName"]."</a>";
             $modified = date("m.d.Y h:i",$file['FileLastModified']);
             
@@ -1505,7 +1525,7 @@ class ApiFiles extends Frontend_Controller{
             $data[$i][]=$modify;
             $i++;
         }
-        $content['data'] = $data;
+        $content['files'] = $data;
         $this->generate_response($content,TRUE);
     }
     
@@ -1525,26 +1545,26 @@ class ApiFiles extends Frontend_Controller{
             header("location:".$this->options['redirect_url']);
             die();exit();
         }
+        header("HTTP/1.0 500 Internal server error!");
         echo $alert;
 
     }
     /**
-     * zastarela funkcija, nije u koriscenju.
-     * depricated function
+     * funkcija za proveru dal je taj fajl vec share-ovan diretno
+     * function to check if file is already shared directly
      */
     public function getSharedItem(){
-        $id=intval($_POST['id']);
-        $type = $_POST['type'];
+        $json = json_decode($this->inputPost('json'));
         $this->load->model("ShareModel");
-        if($type=="folder"){
-            $Share = $this->ShareModel->getSharedFolder($this->get_user_id(),$id);
+        if($json->type=="folder"){
+            $Share = $this->ShareModel->getSharedFolder($this->get_user_id(),$json->id);
             if(!empty($Share)){
                $Share->url = $this->options['directDownload'].  rawurlencode(base64_encode($Share->FullPath));
             }
             $content['folder'] = $Share;
         }
         else{
-            $Share = $this->ShareModel->getSharedFile($this->get_user_id(),$id);
+            $Share = $this->ShareModel->getSharedFile($this->get_user_id(),$json->id);
             if(!empty($Share)){
                $Share->url = $this->options['script_url'].  rawurlencode(base64_encode($Share->FullPath));
             }
@@ -1558,16 +1578,16 @@ class ApiFiles extends Frontend_Controller{
      * put file or folder in direct share mode (shared by link)
      */
     public function directShare(){
-        $json = json_decode($_POST['json']);
+        $json = json_decode($this->inputPost('json'));
         $this->load->model("ShareModel");
         $path = $this->options['directDownload'];
-        if($json->State){
+        if($json->state){
             //than share file or folder
-            if($json->Type=="folder"){
-                $result=$this->ShareModel->shareDirectFolder($json->Id,  $this->get_user_id());
+            if($json->type=="folder"){
+                $result=$this->ShareModel->shareDirectFolder($json->id,  $this->get_user_id());
             }
             else{
-                $result=$this->ShareModel->shareDirectFile($json->Id, $this->get_user_id());
+                $result=$this->ShareModel->shareDirectFile($json->id, $this->get_user_id());
             }
             if(!empty($result)){
                $content['directLink'] =  $path.  rawurlencode(base64_encode($result));
@@ -1576,13 +1596,13 @@ class ApiFiles extends Frontend_Controller{
         }
         else{
             //than unshare file or folder
-            if($json->Type=="folder"){
-                $this->ShareModel->unshareDirectFolder($json->Id,  $this->get_user_id());
+            if($json->type=="folder"){
+                $this->ShareModel->unshareDirectFolder($json->id,  $this->get_user_id());
             }
             else{
-                $this->ShareModel->unshareDirectFile($json->Id, $this->get_user_id());
+                $this->ShareModel->unshareDirectFile($json->id, $this->get_user_id());
             }
-            die(TRUE);
+            return $this->generate_response(TRUE);
         }
         
     }
@@ -1652,11 +1672,11 @@ class ApiFiles extends Frontend_Controller{
             $data[$i][]="<a href='".$url."'>".$url."</a>";
             $id = ($type=="file")? $row['IdFile'] : $row['IdFolder'];
             //manage
-            $manage = "<a href='#' class='unshare' data-id='".$id."' data-type='".$type."' title='Unshare this ".$type."'><i class='fa fa-minus-circle'></i></a>";
+            $manage = "<a href='javascript:void(0);' class='unshare' data-id='".$id."' data-type='".$type."' title='Unshare this ".$type."' onclick='unshareDirectShare(this);'><i class='fa fa-minus-circle'></i></a>";
             $data[$i][]=$manage;
             $i++;
         }
-        $content['data']=$data;
+        $content['files']=$data;
         $this->generate_response($content);
     }
     
@@ -1796,10 +1816,44 @@ class ApiFiles extends Frontend_Controller{
         
         
     }
-    
-    
-    
-    
-    
+    /**
+     * zamena za $this->input post
+     * @param type $id
+     * @return type
+     */
+    protected function inputPost($id){
+        if(isset($_POST[$id])){
+            return $_POST[$id];
+        }
+        else{
+            $this->generateError('POST INPUT FAIL check your post params',  self::ERROR,FALSE);
+        }
+    }
+    /**
+     * zamena za $this->input->get();
+     * @param type $id
+     * @return type
+     */
+    protected function inputGet($id){
+        if(isset($_GET[$id])){
+            return $_GET[$id];
+        }
+        else{
+            $this->generateError('GET INPUT FAIL check your post params',  self::ERROR,FALSE);
+        }
+    }
+    /**
+     * redefinise $file ako se uploaduje u share-ovan folder
+     * refine $file if uploading in shared folder and return filepath
+     * @param type $file
+     * @return type string
+     */
+    protected function get_shared_path($file){
+        $this->load->model("FolderModel");
+        $folder = $this->FolderModel->getFolderById($file->IdFolder);
+        //redefine owner of file
+        $file->IdUser = $folder->IdUser;
+        return $folder->FolderPath."/".$file->name;
+    }
     
 }

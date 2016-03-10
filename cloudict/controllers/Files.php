@@ -66,6 +66,25 @@ class Files extends Frontend_Controller{
     public function shared_with_you($IdFolder=0){
         $data = array();
         $data['current_dir']=$IdFolder;
+        $data['can_upload'] = false;
+        if($IdFolder!=0){
+            $this->load->model("ShareModel");
+            //if user can upload ?
+            if($this->ShareModel->canEdit($this->get_user_id(),NULL,$IdFolder)){
+                $data['can_upload']=true;
+                $this->load->model("FolderModel");
+                $folder=$this->FolderModel->getFolderById($IdFolder);
+                $this->load->model("UserModel");
+                $user = $this->UserModel->getUserByIdObject($folder->IdUser);
+                $diskRemain = $user->UserDiskQuota - $user->UserDiskUsed;
+                if($diskRemain<0){
+                    $diskRemain = 1;
+                }
+                $data['maxFileSize'] = $diskRemain;
+                $data['max_upload_size'] = $this->formatBytes($diskRemain);
+            }
+        }
+        $data['shared_dir'] = ($IdFolder>0) ? 1 : 0;
         $data['menu'] = $this->getMenu();
         $user_group = $this->session->userdata('group');
         $data['user_groups'] = $user_group;

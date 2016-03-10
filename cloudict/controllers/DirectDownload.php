@@ -7,14 +7,14 @@
 /**
  * Description of DirectDownload
  * Koristi se za direktno downloadovanje fajlova kad je fajl ili folder share-ovan
- * 
+ * This controllers we use for direct download files or folders if it is shared
  * @author Darko
  */
 class DirectDownload extends MY_Controller{
     public function __construct() {
         parent::__construct();
     }
-    
+    //main download method
     public function download($path){
         $filepath=base64_decode(rawurldecode($path));
         $this->load->model("ShareModel");
@@ -27,8 +27,7 @@ class DirectDownload extends MY_Controller{
             }
             if(is_file($filepath)){
                 //codeigniter helper 
-                //ovo treba izmeniti kasnije u nas foce_download ili posto ovo ide u zaseban kontroler
-                //najverovatnije se nece ni menjati
+                //ovo treba izmeniti kasnije u nas foce_download ako se ne koristi CI
                 $this->load->helper('download');
                 force_download($filepath, NULL);
             }

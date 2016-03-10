@@ -76,7 +76,7 @@ class ShareModel extends CI_Model{
            $result = $this->db->query($query,array($IdShared,$IdFile))->result_array();
        }
        else{
-           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdUser = ? AND IdFolder = ? AND SharePrivilege <> 1 AND IdFile=0 LIMIT 1";
+           $query = "SELECT IdShared,IdFolder FROM shares WHERE IdShared = ? AND IdFolder = ? AND SharePrivilege <> 1 AND IdFile IS NULL LIMIT 1";
            $result = $this->db->query($query,array($IdShared,$IdFolder))->result_array();
        }
        if(!empty($result)){
@@ -154,9 +154,9 @@ class ShareModel extends CI_Model{
         if(!is_null($IdFolder)){
             $query.=" AND shares.IdFolder=".$IdFolder;
         }
-        else{
-            $query.=" AND shares.IdFolder IS NULL";
-        }
+//        else{
+//            $query.=" AND shares.IdFolder IS NULL";
+//        }
         $result = $this->db->query($query,array($IdShared));
         return $result->result_array();
     }
@@ -186,11 +186,11 @@ JOIN user ON shares.IdOwner = user.IdUser
 JOIN folders ON shares.IdFolder = folders.IdFolder
 ";
         if(is_null($IdFolder)){
-            $query.=" WHERE shares.IdFile IS NULL AND shares.IdShared=?";
+            $query.=" WHERE shares.IdFile IS NULL  AND shares.IdShared=?";
             $result = $this->db->query($query,array($IdShared));
         }
         else{
-            $query.= " WHERE folders.IdParent = ? AND shares.IdShared = ?";
+            $query.= " WHERE shares.IdFile IS NULL AND folders.IdParent = ? AND shares.IdShared = ?";
             $result = $this->db->query($query,array($IdFolder,$IdShared));
         }
         return $result->result_array();
@@ -479,12 +479,13 @@ SELECT DISTINCT ?,?,file.IdFile,file.IdFolder,UNIX_TIMESTAMP(),file.FileName,fil
             shares.IdOwner,
             shares.IdShared,
             shares.IdFile,
+            shares.IdFolder,
             shares.ShareCreated,
             shares.Name,
             shares.FullPath,
             shares.SharePrivilege
             )
-            SELECT DISTINCT ?,?,file.IdFile,UNIX_TIMESTAMP(),file.FileName,file.FilePath,? FROM file WHERE file.IdFile = ?';
+            SELECT DISTINCT ?,?,file.IdFile,file.IdFolder,UNIX_TIMESTAMP(),file.FileName,file.FilePath,? FROM file WHERE file.IdFile = ?';
         $this->db->trans_start();
         $this->db->query($query,array($IdOwner,$IdShared,$SharePrivilege,$IdFile));
         $id = $this->db->insert_id();
@@ -510,5 +511,5 @@ SELECT DISTINCT ?,?,file.IdFile,file.IdFolder,UNIX_TIMESTAMP(),file.FileName,fil
         return $result;
     }
     
-    
+        
 }

@@ -26,7 +26,10 @@ class Frontend_Controller extends MY_Controller{
         }
         $this->get_upload_dir();
     }
-    
+    /**
+     * Returns user upload dir exp
+     * @return string 
+     */
     protected function get_upload_dir() {
         $userpath = self::USERS_UPLOAD_DIR.$this->get_user_id().'/';
         if(!file_exists($userpath)){
@@ -42,10 +45,13 @@ class Frontend_Controller extends MY_Controller{
     protected function get_user_id(){
         return $this->session->userdata('userid');
     }
-    
-
-
-    
+    /**
+     * Ovaj metod je potreban za dobijanje maske korisnickog dir
+     * This method is for geting mask of user current dir
+     * @param type $class_name
+     * @param type $uri_string
+     * @return string
+     */   
     protected function get_mask($class_name='',$uri_string=''){
         $class_name = strtolower($class_name);
         $uri_string = strtolower($uri_string);
@@ -64,9 +70,4 @@ class Frontend_Controller extends MY_Controller{
         }
         return $upload_path;
     }
-    
-    
-    
-
-    
 }

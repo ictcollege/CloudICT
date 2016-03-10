@@ -1,50 +1,4 @@
-<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
-<script type="text/javascript">
-    var table;
-    function myFunction(){
-        table.ajax.reload( 
-                function (){
-                    attachListeners();
-                }
-                ); 
-    }
-    $(document).ready(function (){
-        table=$("#myTable").DataTable({
-            "ajax": {
-                "url":"<?php echo base_url();?>ApiFiles/favourites/"
-              },
-            "fnInitComplete": function(oSettings){
-                attachListeners();
-            }
-        });
-    });
-    function attachListeners(){
-        $(".setfav").bind("click",function (e){
-            e.preventDefault();
-            var id = $(this).data("id");
-            var type = $(this).data("type");
-            $.ajax({
-                url: "<?php echo base_url();?>ApiFiles/setFavourites/"+id+"/"+type+"/"+1,
-                success:function(data){
-                    myFunction();
-                }
-            });
-        
-        });
-        $(".unsetfav").bind("click",function (e){
-            e.preventDefault();
-            var id = $(this).data("id");
-            var type = $(this).data("type");
-            $.ajax({
-                url: "<?php echo base_url();?>ApiFiles/setFavourites/"+id+"/"+type+"/"+0,
-                success:function(data){
-                    myFunction();
-                }
-            });
-        });
-    }
-</script>
+
 <div id="page-wrapper">
     
     <div class="row">
@@ -83,7 +37,23 @@
        
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
-
+<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/filesScript.js"></script>
 <script type="text/javascript">
-    
+    var options = {
+            apiurl:"<?php echo base_url();?>ApiFiles/",
+            scripturl:"<?php echo base_url();?>Files/",
+            apifunc:"favourites/",
+            current_dir:$("#current_dir").val(),
+            current_path:"",
+            datatable:"#myTable",
+            datasrc:"files"
+            
+};
+var filesScript = $(document).filesScript(options);
+filesScript.base_url("<?php echo base_url();?>");
+$(document).ready(function (){
+    filesScript._initdatatables();
+});
 </script>

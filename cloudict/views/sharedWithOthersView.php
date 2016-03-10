@@ -1,63 +1,4 @@
-<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
-<script type="text/javascript">
-    var table;
-    var IdFolder = $("#current_dir").val();
-    function myFunction(){
-        IdFolder = $("#current_dir").val();
-        table.ajax.reload( 
-                function (){
-                    attachListeners();
-                }
-                ); // user paging is not reset on reload
-    }
-    $(document).ready(function (){
-        table=$("#myTable").DataTable({
-            "ajax": {
-                "url":"<?php echo base_url();?>ApiFiles/sharedWithOthers/",
-                "data": {
-                    "id_folder": $("#current_dir").val(),
-                    "id_shared": $("#id_shared").val()
-                }
-              },
-            "fnInitComplete": function(oSettings){
-                attachListeners();
-            },
-            "scrollX" : true, 
-            "deferRender" : true
-        });
-        
 
-    });
-    function attachListeners(){
-        $('.unshare').bind('click',function (e){
-            e.preventDefault();
-            var Unshare=new Object();
-            Unshare.Id=$(this).data('id'); //id file folder
-            Unshare.Type=$(this).data('type'); //type folder or file
-            Unshare.IdShared = $(this).data('idshared'); //shareduser
-            Unshare.IdShare = $(this).data('idshare'); // id share
-            var json = JSON.stringify(Unshare);
-            var control = $(this);
-            $.ajax({
-                    url: "<?php echo base_url();?>ApiFiles/unshareFilesFolders",
-                    type: "POST",
-                    dataType: "json",
-                    data:{json:json},
-                    beforeSend: function (xhr) {
-                        $(control).append('<i class="fa fa-spinner fa-spin"></i>');
-                    },
-                    success: function(data) {
-                       if($(".fa-spin").length>0){
-                           $(".fa-spin").remove();
-                       }
-                       myFunction();
-
-                    }
-                });
-        });
-    }
-</script>
 <div id="page-wrapper">
     <div class="row">
         <div class="col-lg-12">
@@ -98,8 +39,39 @@
        
 </div><!-- /#page-wrapper -->
 <div class="clearfix"></div>
-
+<script type="text/javascript" src="<?php echo base_url();?>public/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/dataTables.bootstrap.js"></script>
+<script type="text/javascript" src="<?php echo base_url();?>public/js/filesScript.js"></script>
 <script type="text/javascript">
-    
+var options = {
+            apiurl:"<?php echo base_url();?>ApiFiles/",
+            scripturl:"<?php echo base_url();?>Files/",
+            apifunc:"sharedWithOthers/",
+            current_dir:$("#current_dir").val(),
+            current_path:"",
+            datatable:"#myTable",
+            datasrc:"files"
+            
+};
+var filesScript = $(document).filesScript(options);
+filesScript.base_url("<?php echo base_url();?>");
+function reload(){
+    filesScript._reload();
+}
+$(document).ready(function (){
+    filesScript._initdatatables({
+        "ajax": {
+        "url":"<?php echo base_url();?>ApiFiles/sharedWithOthers/",
+        "datasrc":"files",
+        "data": {
+            "id_folder": $("#current_dir").val(),
+            "id_shared": $("#id_shared").val()
+            }
+        },
+        
+        
+    });
+});
 </script>
+
 
