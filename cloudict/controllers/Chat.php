@@ -35,7 +35,7 @@ class Chat extends MY_Controller {
 		$this->load->model('MenuModel');
 		$this->load->model("UserModel");
 
-		 $menu = $this->MenuModel->getMenuOfApplication(5);
+		 $menu = $this->MenuModel->getMenuOfApplication(6);
 		if($menu!=null){
 			$data['menu'] = "";
 

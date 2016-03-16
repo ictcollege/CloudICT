@@ -22,8 +22,15 @@
                     
                     <div class="panel-body application-panel">
                        <div class="jumbotron">
-                           <img src="" class="img-circle img-responsive pull-right"/>
+                           <img src="<?php echo base_url();?>public/img/darkol.jpg" class="img-circle img-responsive pull-right"/>
                         <h3>Darko Lesendric</h3>
+                        <div class="more pull-right">
+                                <p>Back End Developer na ovom projektu. Radio na izradi Fajlova i deljenju fajlova u Cloud sistemu, celokupni sistem.</p>
+                            </div>
+                            
+                            <div class="more2">
+                                <p>Back End Developer na ovom projektu. Radio na izradi Fajlova i deljenju fajlova u Cloud sistemu, celokupni sistem.</p>
+                            </div>
                     </div> 
                    </div>
                     
