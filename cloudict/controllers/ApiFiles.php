@@ -882,14 +882,37 @@ class ApiFiles extends Frontend_Controller{
      * @return type bool
      */
     protected function forceDeleteDir($file_path){
-        $it = new RecursiveDirectoryIterator($file_path);
-        $it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
-        foreach($it as $file) {
-            if ('.' === $file->getBasename() || '..' ===  $file->getBasename()) continue;
-            if ($file->isDir()) rmdir($file->getPathname());
-            else unlink($file->getPathname());
+        $mode = 0777;
+        if (is_dir($file_path)) {
+            $objects = scandir($file_path);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($file_path."/".$object) == "dir"){
+                        chmod($file_path.'/'.$object, $mode);
+                        $this->forceDeleteDir($file_path."/".$object); 
+                    }
+                    else unlink($file_path."/".$object);
+                }
+            }
+            reset($objects);
+            chmod($file_path, $mode);
+            return rmdir($file_path);
         }
-        return rmdir($file_path);
+        //this works on php 5.4+
+//        $it = new RecursiveDirectoryIterator($file_path);
+//        $it = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+//        foreach($it as $file) {
+//            if ('.' === $file->getBasename() || '..' ===  $file->getBasename()) continue;
+//            if ($file->isDir()){
+//                chmod($file->getPathname(), $mode);
+//                rmdir($file->getPathname());
+//            }
+//            else {
+//                unlink($file->getPathname());
+//            }
+//        }
+//        chmod($file_path,$mode);
+//        return rmdir($file_path);
     }
     
     /**
@@ -1191,7 +1214,7 @@ class ApiFiles extends Frontend_Controller{
     protected function set_additional_file_properties($file,$content_range=false){
         $this->load->model("FileModel");
         $ext = pathinfo($file->FilePath,PATHINFO_EXTENSION);
-        $mime = $this->get_mime($file->name);
+        $mime = ($file->type)? $file->type : $this->get_mime($file->name);
         $this->load->model("FileModel");
         $file->IdFile = null;
         if($content_range){

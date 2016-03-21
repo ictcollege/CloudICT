@@ -1,5 +1,9 @@
+@font-face {
+    font-family: PatuaOne;
+    src: url('../fonts/PatuaOne-Regular.ttf');
+}
 body{
-	font-family: 'Patua One', cursive;
+	font-family: PatuaOne;
 	font-weight: 100;
 }
 .route{
@@ -39,7 +43,7 @@ body{
 }
 
 .application-panel {
-    font-family: 'Patua One', cursive;
+    font-family: PatuaOne;
 }
 
 .user-panel {

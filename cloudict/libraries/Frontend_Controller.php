@@ -22,7 +22,7 @@ class Frontend_Controller extends MY_Controller{
            //redirect('Users'); //CI_version
         }
         if(!file_exists(self::USERS_UPLOAD_DIR)){
-            mkdir(self::USERS_UPLOAD_DIR);
+            mkdir(self::USERS_UPLOAD_DIR,0777);
         }
         $this->get_upload_dir();
     }
